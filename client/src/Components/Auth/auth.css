@@ -1,0 +1,8 @@
+/* Only keep non-invasive rules (no global body/* selectors) */
+
+/* Remove number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
