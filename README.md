@@ -1,145 +1,234 @@
-# FinLearn Academy: Financial Literacy Hub
+<div align="center">
+
+<img src="/client/src/asset/apple-touch-icon.png" alt="FinLearn Logo" width="120" height="120" style="border-radius: 50%;"/>
+
+# 🎓 FinLearn Academy
+### Financial Literacy Hub
+
 **A Gamified, Full-Stack Educational Ecosystem for Modern Finance**
 
----
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb)](https://mongodb.com/)
+[![MUI](https://img.shields.io/badge/MUI-v6-007FFF?style=for-the-badge&logo=mui)](https://mui.com/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 
-## 🚀 Project Vision
-**FinLearn** is a comprehensive educational platform designed to bridge the financial literacy gap. Unlike traditional learning management systems, FinLearn focuses on **bite-sized, high-retention modules** combined with a robust **gamification engine** that rewards consistent progress with XP, streaks, and verified certificates.
-
-### Core Pillars
-- **Personalized Onboarding:** A cinematic, multi-step flow that tailors the curriculum to user experience levels (Beginner to Expert) and specific goals (Wealth Building, Debt Freedom, etc.).
-- **Gamified Learning:** Real-time XP tracking, leaderboard rankings, and learning streaks to drive daily engagement.
-- **Verified Achievements:** A public certificate verification system allowing users to showcase their credentials securely.
-- **Advanced Account Control:** A centralized settings hub for managing security (2FA), regional preferences, and notification granularities.
+[🚀 Live Demo](#) · [📖 Documentation](#) · [🐛 Report Bug](#) · [✨ Request Feature](#)
 
 ---
 
-## ✨ Key Technical Features
+</div>
+
+## 📌 Table of Contents
+
+- [Project Overview](#-project-overview)
+- [Core Features](#-core-features)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
+- [Database Schema](#-database-schema)
+- [Security](#-security)
+- [Screenshots](#-screenshots)
+- [Future Roadmap](#-future-roadmap)
+- [Troubleshooting](#-troubleshooting)
+- [Team & Academic Info](#-team--academic-info)
+
+---
+
+## 🚀 Project Overview
+
+**FinLearn** bridges the financial literacy gap through an engaging, bite-sized learning experience. Unlike traditional LMS platforms, FinLearn combines a **gamification engine** with personalized curriculum delivery — rewarding learners with XP, streaks, and verifiable certificates.
+
+### 🎯 Core Pillars
+
+| Pillar | Description |
+|--------|-------------|
+| 🧭 **Personalized Onboarding** | Cinematic 7-step flow tailors curriculum to your experience level and goals |
+| 🏆 **Gamified Learning** | Real-time XP, leaderboards, and daily streaks drive engagement |
+| 🔒 **Verified Certificates** | Public verification system with SEO-optimized LinkedIn sharing |
+| ⚙️ **Account Control Hub** | Centralized settings for security, regional preferences, and notifications |
+
+---
+
+## ✨ Core Features
 
 ### 🛠️ Advanced Profile & Settings Hub
-A unified management console built with a tabbed interface and Framer Motion for fluid transitions:
-- **Live Profile Updates:** Real-time avatar preview and base64 image uploading.
-- **Security Center:** Comprehensive password management with field-level visibility toggles and placeholders for 2FA integration.
-- **Notification Granularity:** Categorized toggles (Learning Activity, Financial Insights, Marketing) with persistent local state.
-- **Regional Customization:** Support for multi-currency (INR, USD, etc.) and localized timezones.
+A unified management console with Framer Motion–powered tabbed transitions:
+- **Live Profile Updates** — Real-time avatar preview with base64 image uploading
+- **Security Center** — Password management with field-level visibility toggles; 2FA placeholder
+- **Notification Granularity** — Categorized toggles (Learning Activity, Financial Insights, Marketing)
+- **Regional Customization** — Multi-currency (INR, USD, etc.) and localized timezones
 
-### 🧭 Intelligent Onboarding Flow
-A 7-step guided journey that captures user data to personalize the learning path:
-- **Experience Leveling:** 🌱 Beginner to 🧠 Advanced selection with tailored card UI.
-- **Goal Mapping:** Multi-select functionality to prioritize specific financial interests.
-- **Path Preview:** Instant preview of the first 3 modules curated based on onboarding input.
+### 🧭 Intelligent Onboarding (7 Steps)
+
+```
+Experience Level → Goal Mapping → Time Commitment → Learning Style
+→ Current Situation → Priority → Path Preview
+```
+
+- 🌱 Beginner to 🧠 Advanced experience selection
+- Multi-select goal mapping (Wealth Building, Debt Freedom, etc.)
+- Instant preview of your first 3 curated modules
 
 ### 🏆 Gamification Infrastructure
-- **Real-time Polling:** The `useRealtimeXP` hook implements a safe polling mechanism with memory leak prevention to keep user stats (XP, levels) synchronized with the server.
-- **Dynamic Leaderboard:** Automated fetching of global rankings and current user position.
-- **Modular Progress:** `courses.js` logic manages per-lesson completion, module unlocking, and automated XP rewards.
+- **`useRealtimeXP` Hook** — Memory-leak-safe polling keeps XP/levels in sync with the server
+- **Dynamic Leaderboard** — Global rankings + current user position, auto-fetched
+- **Modular Progress** — `courses.js` handles per-lesson completion, module unlocking, and XP rewards
 
 ### 🔒 Enterprise-Grade Backend
-- **Resilient Connections:** MongoDB integration featuring graceful shutdown handling (`SIGINT`) and automated connection state monitoring.
-- **Certificate Verification:** A public route (`/verify/:id`) leveraging `react-helmet-async` for SEO and OpenGraph optimization, ensuring certificates shared on LinkedIn show rich previews.
-- **Seedable Demo Environment:** Dedicated scripts to populate the database with comprehensive course data for development and QA.
+- **Resilient MongoDB** — Graceful `SIGINT` shutdown + automated connection monitoring
+- **Certificate Verification** — `/verify/:id` route with `react-helmet-async` for OpenGraph previews on LinkedIn
+- **Seedable Demo Data** — One command populates the DB with full course data for dev/QA
 
 ---
 
-## 💻 Tech Stack Highlights
+## 💻 Tech Stack
 
 ### Frontend
-- **UI Core:** React 19 + Material UI (MUI) 6
-- **Styling:** Tailwind CSS 4 + Bootstrap 5 (Grid)
-- **Animations:** Framer Motion 12
-- **State & Logic:** Custom Hooks + React Context
-- **Data Fetching:** Abstraction over Fetch API with robust error handling
+
+| Technology | Purpose |
+|-----------|---------|
+| React 19 | UI Framework |
+| Material UI v6 | Component Library |
+| Tailwind CSS v4 | Utility Styling |
+| Bootstrap 5 | Grid System |
+| Framer Motion 12 | Animations & Transitions |
+| Custom Hooks + Context | State Management |
+| Fetch API Abstraction | Data Fetching |
 
 ### Backend
-- **Runtime:** Node.js + Express
-- **Persistence:** MongoDB + Mongoose
-- **Auth:** Passport.js (Google OAuth 2.0) + JWT (HttpOnly Cookies)
-- **Security:** Bcrypt, Rate Limiting, and CORS protection
+
+| Technology | Purpose |
+|-----------|---------|
+| Node.js + Express | Server Runtime |
+| MongoDB + Mongoose | Database & ODM |
+| Passport.js (Google OAuth 2.0) | Authentication |
+| JWT (HttpOnly Cookies) | Session Management |
+| Bcrypt | Password Hashing |
+| Nodemailer | Email Service |
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Environment Configuration
-Create a `.env` file in the `server/` directory:
-```env
-MONGO_URL=your_mongodb_connection_string
-ACCESS_TOKEN_KEY=your_jwt_secret
-GOOGLE_CLIENT_ID=your_google_id
-GOOGLE_CLIENT_SECRET=your_google_secret
-MAIL_USER=your_gmail
-MAIL_PASSWORD=your_app_password
+### Prerequisites
+
+- Node.js v18+
+- MongoDB (local or Atlas)
+- Google Cloud Console project (for OAuth)
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/finlearn-academy.git
+cd finlearn-academy
 ```
 
-### 2. Installation
+### 2. Environment Configuration
+
+Create a `.env` file inside the `server/` directory:
+
+```env
+# Database
+MONGO_URL=your_mongodb_connection_string
+
+# Auth
+ACCESS_TOKEN_KEY=your_jwt_secret_key
+REFRESH_TOKEN_KEY=your_refresh_secret_key
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Email
+MAIL_USER=your_gmail_address
+MAIL_PASSWORD=your_gmail_app_password
+
+# Server
+PORT=5050
+NODE_ENV=development
+```
+
+### 3. Install Dependencies
+
 ```bash
-# Install Backend Dependencies
+# Backend
 cd server && npm install
 
-# Install Frontend Dependencies
+# Frontend
 cd ../client && npm install
 ```
 
-### 3. Database Seeding
-Populate your local database with demo courses to get started immediately:
+### 4. Seed the Database
+
 ```bash
 cd server
 npm run seed
 ```
 
+### 5. Run the Application
+
+```bash
+# Terminal 1 — Backend
+cd server && npm run dev
+
+# Terminal 2 — Frontend
+cd client && npm run dev
+```
+
+The app will be available at `http://localhost:5173` (frontend) and `http://localhost:5050` (API).
+
 ---
 
 ## 📂 Project Structure
 
-```bash
-FullProject/
-├── client/
-│   ├── src/
-│   │   ├── Components/
-│   │   │   ├── Auth/           # Onboarding & Auth UI
-│   │   │   └── Dashboard/      # Navigation & SideBar
-│   │   ├── hooks/              # Real-time XP & General Hooks
-│   │   ├── pages/              # Profile, Verify, Dashboard Pages
-│   │   └── utils/              # API wrappers & HTTP utilities
-└── server/
-    ├── models/                 # Course & User Schema
-    ├── routes/                 # Courses & Auth API
-    ├── scripts/                # Seeding & Migration Tools
-    └── utils/                  # DB Connection & Passport Logic
 ```
-
----
-
-## 👨‍💻 Development Team
-- **Ravi Kumar** - Lead Developer (BCA 2025-2026)
-- **College:** Rama Institute Of Higher Education
-
-*This project is submitted in partial fulfillment of the requirements for the degree of Bachelor of Computer Application.*
+FinLearnAcademy/
+│
+├── client/                          # React Frontend
+│   ├── public/                      # Static assets & screenshots
+│   └── src/
+│       ├── Components/
+│       │   ├── Auth/                # Login, Register, Onboarding, OTP flows
+│       │   ├── Dashboard/           # Navbar, Sidebar, Calculators, Course Cards
+│       │   └── Home/                # Hero, About, Pricing, Footer
+│       ├── pages/                   # Dashboard, Profile, Courses, Tools, Progress
+│       ├── layouts/                 # AuthLayout, MainLayout wrappers
+│       ├── hooks/                   # useGeneral, useRealtimeXP
+│       └── utils/                   # API endpoints, HTTP utilities, Google auth
+│
+└── server/                          # Express Backend
+    ├── controllers/                 # Business logic (auth, profile, OTP, leaderboard)
+    ├── middlewares/                 # JWT auth, error handler, Google OAuth
+    ├── models/                      # Mongoose schemas (User)
+    ├── routes/                      # API routes (auth, courses)
+    ├── scripts/                     # DB seeding & migration
+    └── utils/                       # DB connection, Passport strategy, email, JWT
+```
 
 ---
 
 ## 🗄️ Database Schema
 
-### User Collection
+<details>
+<summary><b>👤 User Collection (click to expand)</b></summary>
 
 ```javascript
 {
   _id: ObjectId,
-  name: String (required, trim),
-  email: String (required, unique, lowercase),
-  password: String (hashed, optional for OAuth users),
-  profileImage: String (base64 or URL),
-  
-  // Password Reset OTP
+  name: String,              // required, trimmed
+  email: String,             // required, unique, lowercase
+  password: String,          // bcrypt hashed; optional for OAuth users
+  profileImage: String,      // base64 or URL
+
   password_otp: {
     otp: Number,
-    time: Number (expiry timestamp),
-    attempts: Number (max 5),
+    time: Number,            // expiry timestamp
+    attempts: Number,        // max 5
     last_attempt_time: Date,
     status: Boolean
   },
-  
-  // Email Change OTP
+
   email_otp: {
     otp: Number,
     time: Number,
@@ -148,28 +237,25 @@ FullProject/
     last_attempt_time: Date,
     status: Boolean
   },
-  
-  // Gamification
+
   xp: {
-    totalXP: Number (default: 0),
-    currentXP: Number (default: 0),
-    level: Number (default: 1),
-    maxXPForLevel: Number (default: 7500)
+    totalXP: Number,         // default: 0
+    currentXP: Number,       // default: 0
+    level: Number,           // default: 1
+    maxXPForLevel: Number    // default: 7500
   },
-  
-  // Leaderboard Stats
+
   leaderboardStats: {
     completedCourses: Number,
-    completionRate: Number (0-100),
+    completionRate: Number,  // 0–100
     achievementCount: Number,
     streak: Number,
     rank: Number
   },
-  
-  // Onboarding
+
   onboarding: {
     completed: Boolean,
-    experience: String (beginner/intermediate/advanced),
+    experience: String,      // beginner | intermediate | advanced
     goals: [String],
     timeCommitment: String,
     learningStyle: String,
@@ -177,348 +263,128 @@ FullProject/
     priority: String,
     completedAt: Date
   },
-  
+
   createdAt: Date,
   updatedAt: Date
 }
 ```
 
+</details>
+
 ---
 
-## 🔒 Security Features
+## 🔒 Security
 
-### Implemented Security Measures
-
-1. **Password Security**
-   - Bcrypt hashing with 10 salt rounds
-   - Minimum 6 characters requirement
-   - Never stored or transmitted in plain text
-
-2. **Token-Based Authentication**
-   - JWT tokens with expiration (7 days access, 30 days refresh)
-   - HTTP-only cookies (prevents XSS attacks)
-   - SameSite cookie attribute (prevents CSRF)
-   - Secure flag in production (HTTPS only)
-
-3. **Rate Limiting**
-   - 5 OTP attempts per 24 hours
-   - Automatic reset after time window
-   - Prevents brute force attacks
-
-4. **Input Validation**
-   - Email format validation
-   - Required field checks
-   - String trimming and sanitization
-   - MongoDB injection prevention (via Mongoose)
-
-5. **CORS Protection**
-   - Configured allowed origins
-   - Credentials flag for cross-origin requests
-   - Environment-based configuration
-
-6. **Session Security**
-   - Express session for OAuth
-   - 24-hour session expiry
-   - Secure session secrets
+| Measure | Implementation |
+|---------|---------------|
+| Password Hashing | Bcrypt with 10 salt rounds |
+| Token Auth | JWT (7-day access / 30-day refresh) in HttpOnly cookies |
+| XSS Prevention | HttpOnly + SameSite cookie attributes |
+| CSRF Prevention | SameSite cookie attribute |
+| Brute Force Protection | 5 OTP attempts per 24 hours with auto-reset |
+| Input Validation | Mongoose schema enforcement + string sanitization |
+| CORS | Configured allowed origins with credentials flag |
+| OAuth Sessions | 24-hour expiry with secure session secrets |
 
 ---
 
 ## 📸 Screenshots
 
-### Landing Page
-![Landing Page](./client/public/1.png)
-*Modern, responsive homepage with hero section and course previews*
-
-### Dashboard
-![Dashboard](./client/public/2.png)
-*User dashboard showing XP progress, statistics, and course suggestions*
-
-### Authentication
-![Login](./client/public/3.png)
-*Clean login interface with Google OAuth option*
-
-### Financial Literacy Module
-![Course Content](./client/public/FinancialLiteracy.png)
-*Interactive course content with progress tracking*
+| Page | Preview |
+|------|---------|
+| 🏠 Landing Page | ![Landing](./client/public/1.png) |
+| 📊 Dashboard | ![Dashboard](./client/public/2.png) |
+| 🔑 Authentication | ![Login](./client/public/3.png) |
+| 📚 Course Module | ![Course](./client/public/FinancialLiteracy.png) |
 
 ---
 
-## 📂 Project Structure
+## 🗺️ Future Roadmap
 
-```
-FullProject/
-│
-├── client/                          # Frontend React Application
-│   ├── public/                      # Static assets
-│   │   ├── favicon.ico
-│   │   └── images...
-│   │
-│   ├── src/                         # Source files
-│   │   ├── Components/              # Reusable components
-│   │   │   ├── Auth/                # Authentication components
-│   │   │   │   ├── Login.jsx
-│   │   │   │   ├── Register.jsx
-│   │   │   │   ├── ForgetPassword.jsx
-│   │   │   │   ├── Verification.jsx
-│   │   │   │   ├── NewPassword.jsx
-│   │   │   │   ├── Onboarding.jsx
-│   │   │   │   └── auth.css
-│   │   │   │
-│   │   │   ├── Dashboard/           # Dashboard widgets
-│   │   │   │   ├── Navbar.jsx
-│   │   │   │   ├── SideBar.jsx
-│   │   │   │   ├── CourseCard.jsx
-│   │   │   │   ├── CourseSuggestions.jsx
-│   │   │   │   ├── DailyStreak.jsx
-│   │   │   │   ├── CompletedCourses.jsx
-│   │   │   │   ├── BudgetCalculator.jsx
-│   │   │   │   ├── InvestmentCalculator.jsx
-│   │   │   │   ├── LoanCalculator.jsx
-│   │   │   │   └── SavingsCalculator.jsx
-│   │   │   │
-│   │   │   └── Home/                # Landing page sections
-│   │   │       ├── HeroSection.jsx
-│   │   │       ├── AboutSection.jsx
-│   │   │       ├── PricingSection.jsx
-│   │   │       └── Footer.jsx
-│   │   │
-│   │   ├── pages/                   # Full page components
-│   │   │   ├── Home.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── Profile.jsx
-│   │   │   ├── Courses.jsx
-│   │   │   ├── AllCourses.jsx
-│   │   │   ├── Tools.jsx
-│   │   │   └── Progress.jsx
-│   │   │
-│   │   ├── layouts/                 # Layout wrappers
-│   │   │   ├── AuthLayout.jsx
-│   │   │   └── MainLayout.jsx
-│   │   │
-│   │   ├── hooks/                   # Custom React hooks
-│   │   │   └── useGeneral.js
-│   │   │
-│   │   ├── utils/                   # Helper functions
-│   │   │   ├── apis.js              # API endpoints
-│   │   │   ├── httpAction.js        # HTTP utilities
-│   │   │   └── loginWithGoogle.js   # Google login helper
-│   │   │
-│   │   ├── App.jsx                  # Main app component
-│   │   ├── main.jsx                 # Entry point
-│   │   └── index.css                # Global styles
-│   │
-│   ├── package.json                 # Frontend dependencies
-│   ├── vite.config.js               # Vite configuration
-│   └── README.md
-│
-└── server/                          # Backend Express Application
-    ├── controllers/                 # Business logic
-    │   ├── login.js
-    │   ├── register.js
-    │   ├── getUserProfile.js
-    │   ├── updateProfile.js
-    │   ├── forgotPassword.js
-    │   ├── verifyOtp.js
-    │   ├── updatePassword.js
-    │   ├── sendEmailOtp.js
-    │   ├── verifyEmailOtp.js
-    │   ├── saveOnboarding.js
-    │   ├── skipOnboarding.js
-    │   ├── getLeaderboard.js
-    │   ├── uploadProfileImage.js
-    │   └── logout.js
-    │
-    ├── middlewares/                 # Express middleware
-    │   ├── auth.js                  # JWT verification
-    │   ├── errorHandler.js          # Global error handling
-    │   └── googleAuth.js            # Google OAuth handler
-    │
-    ├── models/                      # Mongoose schemas
-    │   └── User.js                  # User model
-    │
-    ├── routes/                      # API routes
-    │   └── auth.js                  # Authentication routes
-    │
-    ├── utils/                       # Utility functions
-    │   ├── generateToken.js         # JWT token generation
-    │   ├── getConnection.js         # MongoDB connection
-    │   ├── googleStrategy.js        # Passport Google OAuth
-    │   └── sendMail.js              # Email service
-    │
-    ├── server.js                    # Main server file
-    ├── package.json                 # Backend dependencies
-    └── .env                         # Environment variables (not in repo)
-```
-
----
-
-## 👨‍💻 Development Team
-
-### Project Information
-- **Course:** BCA
-- **College:** Rama Institute Of Higher Education , Kiratpur
-- **Academic Year:** 2025-2026
-- **Project Type:** Full Stack Web Development
-
-### Team Members
-- **Ravi Kumar** - Lead Developer (Frontend & Backend)
-<!-- - **[Team Member 2]** - Backend Developer (if applicable)
-- **[Team Member 3]** - Frontend Developer (if applicable) -->
-
-### Project Supervisor
-- **[Supervisor Name]** - [Title]
-
----
-
-## 🎓 Academic Declaration
-
-This project is submitted in partial fulfillment of the requirements for the degree of **Bachelor of Computer Application** at **Rama Institute Of Higher Education**.
-
-### Originality Statement
-This is an original work developed by the undersigned student(s). All external sources, libraries, and code snippets used in this project have been properly acknowledged and cited.
-
-### Acknowledgments
-We would like to express our gratitude to:
-- Our project supervisor for valuable guidance
-- The department faculty for their support
-- Online resources and documentation (React, Express, MongoDB)
-- Open-source contributors whose libraries made this project possible
-
----
-
-## 📚 References & Resources
-
-### Documentation
-- [React Documentation](https://react.dev/)
-- [Express.js Guide](https://expressjs.com/)
-- [MongoDB Manual](https://docs.mongodb.com/manual/)
-- [Material-UI Components](https://mui.com/material-ui/)
-- [TailwindCSS Documentation](https://tailwindcss.com/docs)
-
-### Tutorials & Guides
-- JWT Authentication Best Practices
-- OAuth 2.0 Implementation Guide
-- MongoDB Schema Design Patterns
-- React Hooks Documentation
+- [ ] **Video Lessons** — Embedded video content per module
+- [ ] **Quizzes & Assessments** — Auto-graded module tests
+- [ ] **Certificate Generation** — PDF certificates with QR verification
+- [ ] **Social Features** — Friends, discussion forums, study groups
+- [ ] **React Native App** — Mobile app with push notifications + offline mode
+- [ ] **Payment Gateway** — Razorpay/Stripe integration for premium courses
+- [ ] **AI Recommendations** — Adaptive learning paths and chatbot support
+- [ ] **Learning Analytics** — Personalized performance insights dashboard
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Common Issues
+<details>
+<summary><b>MongoDB Connection Refused</b></summary>
 
-#### 1. MongoDB Connection Error
-```
-Error: connect ECONNREFUSED 127.0.0.1:27017
-```
-**Solution:** Ensure MongoDB is running
 ```bash
-# Windows
-net start MongoDB
-
 # macOS/Linux
 sudo systemctl start mongod
-# or
-mongod
-```
 
-#### 2. Port Already in Use
+# Windows
+net start MongoDB
 ```
-Error: listen EADDRINUSE: address already in use :::5050
-```
-**Solution:** Change port in `.env` file or kill the process
+</details>
+
+<details>
+<summary><b>Port Already in Use (5050)</b></summary>
+
 ```bash
-# Find process using port 5050
+# Find and kill the process
 netstat -ano | findstr :5050
-
-# Kill process
 taskkill /PID <PID> /F
 ```
+</details>
 
-#### 3. Google OAuth Not Working
-**Solution:** Verify callback URL in Google Cloud Console matches exactly:
-`http://localhost:5050/auth/google/callback`
+<details>
+<summary><b>Google OAuth Not Working</b></summary>
 
-#### 4. Email Not Sending
-**Solution:** 
-- Enable "Less secure app access" in Gmail settings (for development)
-- Or use App-Specific Password
-- Check MAIL_USER and MAIL_PASSWORD in `.env`
+Ensure the callback URL in your Google Cloud Console matches exactly:
+```
+http://localhost:5050/auth/google/callback
+```
+</details>
 
----
+<details>
+<summary><b>Email Not Sending</b></summary>
 
-## 🚀 Future Enhancements
-
-### Planned Features
-1. **Advanced Course Management**
-   - Video lessons integration
-   - Quizzes and assessments
-   - Certificate generation
-
-2. **Social Features**
-   - Friend system
-   - Discussion forums
-   - Study groups
-
-3. **Mobile Application**
-   - React Native mobile app
-   - Push notifications
-   - Offline mode
-
-4. **Premium Features**
-   - Payment gateway integration
-   - Subscription plans
-   - Premium courses
-
-5. **Analytics Dashboard**
-   - Learning analytics
-   - Performance insights
-   - Personalized recommendations
-
-6. **AI-Powered Features**
-   - Chatbot for queries
-   - Smart course recommendations
-   - Adaptive learning paths
+- Use a Gmail **App Password** (not your account password)
+- Enable 2FA on your Google account first, then generate an App Password
+- Set `MAIL_USER` and `MAIL_PASSWORD` correctly in `.env`
+</details>
 
 ---
 
-## 📄 License
+## 👨‍💻 Team & Academic Info
 
-This project is created for academic purposes. All rights reserved.
+| Field | Details |
+|-------|---------|
+| **Developer** | Ravi Kumar |
+| **Role** | Lead Developer (Frontend & Backend) |
+| **Degree** | Bachelor of Computer Application (BCA) |
+| **Institution** | Rama Institute Of Higher Education, Kiratpur |
+| **Academic Year** | 2025–2026 |
 
-**Note:** This project is for educational purposes only. Commercial use requires proper licensing and permissions.
+### 🎓 Academic Declaration
 
----
+This project is submitted in partial fulfillment of the requirements for the **Bachelor of Computer Application** degree. It is an original work; all external libraries and resources have been properly acknowledged.
 
-## 📞 Contact Information
+### 🙏 Acknowledgments
 
-For questions or support regarding this project:
-- **Email:** [your.email@college.edu]
-- **GitHub:** [your-github-profile]
-- **LinkedIn:** [your-linkedin-profile]
-
----
-
-## 🙏 Conclusion
-
-The Financial Literacy Hub demonstrates proficiency in:
-- Full-stack web development
-- RESTful API design
-- Database management
-- Authentication and security
-- Modern frontend frameworks
-- Responsive design principles
-- Software engineering best practices
-
-This project showcases the ability to build a complete, production-ready web application that solves real-world problems.
+Special thanks to our project supervisor, department faculty, and the open-source communities behind React, Express, MongoDB, and Material UI.
 
 ---
 
-**Last Updated:** March 2026  
-**Version:** 1.0.0
+## 📚 References
+
+- [React Docs](https://react.dev/) · [Express Guide](https://expressjs.com/) · [MongoDB Manual](https://docs.mongodb.com/manual/) · [MUI Components](https://mui.com/) · [Tailwind Docs](https://tailwindcss.com/docs)
 
 ---
 
-*Thank you for reviewing our project!* 🎉
-#   F i n L e a r n  
- 
+<div align="center">
+
+**Last Updated:** May 2026 &nbsp;|&nbsp; **Version:** 1.0.0
+
+*Built with ❤️ for financial literacy education*
+
+</div>
