@@ -55,6 +55,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "tailwindcss": "^4.1.17",
+    "@rollup/rollup-linux-x64-gnu": "^4.40.0",
     "vite": "^7.1.9"
   }
 }
