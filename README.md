@@ -77,7 +77,7 @@ Experience Level → Goal Mapping → Time Commitment → Learning Style
 
 ### 🔒 Enterprise-Grade Backend
 - **Resilient MongoDB** — Graceful `SIGINT` shutdown + automated connection monitoring
-- **Certificate Verification** — `/verify/:id` route with `react-helmet-async` for OpenGraph previews on LinkedIn
+previews on LinkedIn
 - **Seedable Demo Data** — One command populates the DB with full course data for dev/QA
 
 ---

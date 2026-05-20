@@ -5,17 +5,15 @@
  *
  * This page does two things:
  *  1. Shows the certificate publicly so anyone with the link can view it.
- *  2. Injects OG meta tags via react-helmet so social platforms
+
  *     (LinkedIn, Facebook, WhatsApp, Twitter) show a rich preview
  *     with the certificate image when the link is shared.
  *
- * Install:  npm install react-helmet-async
- * Wrap your app root with <HelmetProvider> from react-helmet-async.
+
  */
 
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-// import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, ExternalLink, AlertTriangle } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050';
@@ -75,7 +73,6 @@ const VerifyPage = () => {
     return (
         <>
             {/*
-                OG meta tags — injected into <head> by react-helmet-async.
                 Social crawlers read these when someone shares the link.
                 NOTE: For LinkedIn and Facebook crawlers (which don't run JS),
                 you also need the SSR Express route from certificateRoutes.js
