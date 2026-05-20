@@ -110,7 +110,8 @@ const userProgressSchema = new mongoose.Schema(
             default: null,
             trim: true,
             uppercase: true,
-            sparse: true,
+            unique: true, // Moved index declaration here explicitly
+            sparse: true, // Kept sparse here
         },
         modules: [moduleProgressSchema],
     },
@@ -119,8 +120,10 @@ const userProgressSchema = new mongoose.Schema(
     }
 );
 
-// Compound index for unique enrollment per user per course
+// Compound index stays here since it involves multiple fields
 userProgressSchema.index({ userId: 1, courseId: 1 }, { unique: true });
-userProgressSchema.index({ verificationId: 1 }, { unique: true, sparse: true });
+
+// 🛠️ REMOVED THE DUPLICATE LINE FROM HERE:
+// userProgressSchema.index({ verificationId: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("UserProgress", userProgressSchema);
