@@ -146,15 +146,7 @@ const CourseCard = ({ course, onNavigate }) => {
   const isActive = course.status === 'active';
   const isAvailable = course.status === 'available';
 
-  const btnLabel = isDone
-    ? 'Review Course'
-    : isActive
-      ? 'Continue Learning'
-      : isAvailable
-        ? 'Start Learning'
-        : 'Preview';
-  const btnBg = isDone ? '#d1fae5' : isActive || isAvailable ? course.color : '#f3f4f6';
-  const btnColor = isDone ? '#065f46' : isActive || isAvailable ? '#fff' : '#374151';
+  const btnLabel = isDone ? 'Review Course' : isActive ? 'Continue Learning' : isAvailable ? 'Start Learning' : 'Preview';
 
   return (
     <motion.div
@@ -163,135 +155,153 @@ const CourseCard = ({ course, onNavigate }) => {
       transition={{ duration: 0.26 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`bg-white rounded-xl overflow-hidden flex flex-col relative ${isLocked ? 'opacity-80' : 'opacity-100'}`}
-      style={{
-        border: isActive || isAvailable ? `2px solid ${course.color}` : '1px solid #e5e7eb',
-        transform: hovered && !isLocked ? 'translateY(-4px)' : 'none',
-        boxShadow: hovered && !isLocked ? '0 12px 32px rgba(0,0,0,0.10)' : '0 1px 4px rgba(0,0,0,0.05)',
-        cursor: isLocked ? 'default' : 'pointer',
-      }}
+      className={`
+        relative flex flex-col h-full bg-white rounded-xl overflow-hidden
+        transition-all duration-200
+        ${isLocked ? 'opacity-80 cursor-default' : 'cursor-pointer'}
+        ${hovered && !isLocked ? '-translate-y-1 shadow-xl' : 'shadow-sm'}
+        ${isActive || isAvailable ? 'border-2' : 'border border-gray-200'}
+      `}
+      style={isActive || isAvailable ? { borderColor: course.color } : {}}
     >
-      {/* Top accent stripe */}
-      <div className="h-1" style={{ background: isLocked ? '#e5e7eb' : course.color }} />
+      {/* ── Top accent stripe ── */}
+      <div
+        className="h-1 shrink-0"
+        style={{ background: isLocked ? '#e5e7eb' : course.color }}
+      />
 
-      {/* Boss badge */}
+      {/* ── Status badge ── */}
       {course.isBoss && (
-        <div style={{
-          position: 'absolute', top: 16, right: 14,
-          background: '#fef3c7', color: '#92400e',
-          fontSize: 10, fontWeight: 700, padding: '3px 9px',
-          borderRadius: 99, border: '1px solid #fde68a',
-          display: 'flex', alignItems: 'center', gap: 4,
-        }}>
+        <div className="absolute top-4 right-3 flex items-center gap-1 bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">
           <Trophy size={10} /> BOSS LEVEL
         </div>
       )}
-
-      {/* Active badge */}
       {isActive && !course.isBoss && (
-        <div style={{
-          position: 'absolute', top: 16, right: 14,
-          background: '#ede9fe', color: '#4338ca',
-          fontSize: 10, fontWeight: 700, padding: '3px 9px',
-          borderRadius: 99, border: '1px solid #c4b5fd',
-        }}>IN PROGRESS</div>
+        <div className="absolute top-4 right-3 bg-violet-100 text-violet-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-violet-200">
+          IN PROGRESS
+        </div>
       )}
-
       {isAvailable && !course.isBoss && (
-        <div style={{
-          position: 'absolute', top: 16, right: 14,
-          background: '#f1f5f9', color: '#475569',
-          fontSize: 10, fontWeight: 700, padding: '3px 9px',
-          borderRadius: 99, border: '1px solid #e2e8f0',
-        }}>NOT STARTED</div>
+        <div className="absolute top-4 right-3 bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-200">
+          NOT STARTED
+        </div>
       )}
-
-      {/* Completed badge */}
       {isDone && (
-        <div style={{
-          position: 'absolute', top: 16, right: 14,
-          background: '#d1fae5', color: '#065f46',
-          fontSize: 10, fontWeight: 700, padding: '3px 9px',
-          borderRadius: 99, border: '1px solid #a7f3d0',
-          display: 'flex', alignItems: 'center', gap: 4,
-        }}>
+        <div className="absolute top-4 right-3 flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">
           <CheckCircle2 size={10} /> DONE
         </div>
       )}
 
-      <div className="p-4 pb-3 flex-1 flex flex-col">
+      {/* ── Card body ── */}
+      <div className="flex flex-col flex-1 p-4">
 
         {/* Icon + Title */}
         <div className="flex gap-3 items-start mb-3">
-          <div className={`w-11 h-11 rounded-lg flex-shrink-0 flex items-center justify-center`} style={{ background: isLocked ? '#f3f4f6' : course.colorLight }}>
-            {isLocked ? <Lock size={18} color="#9ca3af" /> : <Icon size={20} color={course.color} />}
+          <div
+            className="w-11 h-11 rounded-lg shrink-0 flex items-center justify-center"
+            style={{ background: isLocked ? '#f3f4f6' : course.colorLight }}
+          >
+            {isLocked
+              ? <Lock size={18} className="text-gray-400" />
+              : <Icon size={20} style={{ color: course.color }} />
+            }
           </div>
-          <div className="flex-1" style={{ paddingRight: course.isBoss || isActive || isAvailable || isDone ? 72 : 0 }}>
-            <div className={`text-base font-bold ${isLocked ? 'text-gray-400' : 'text-gray-900'} leading-tight mb-1`}>{course.title}</div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span className="text-xs font-semibold px-2 rounded-full" style={{ background: lvl.bg, color: lvl.color }}>{course.level}</span>
-              <span className="text-xs text-gray-400">·</span>
-              <span className="text-xs text-gray-500">{course.category}</span>
+
+          <div className={`flex-1 ${course.isBoss || isActive || isAvailable || isDone ? 'pr-16' : ''}`}>
+            {/* ✅ Fix 3: title clamped to 2 lines */}
+            <p className="text-sm font-bold text-gray-900 leading-snug mb-1 line-clamp-2">
+              {course.title}
+            </p>
+            <div className="flex items-center gap-1.5 text-xs">
+              <span
+                className="font-semibold px-2 py-0.5 rounded-full"
+                style={{ background: lvl?.bg, color: lvl?.color }}
+              >
+                {course.level}
+              </span>
+              <span className="text-gray-300">·</span>
+              <span className="text-gray-400">{course.category}</span>
             </div>
           </div>
         </div>
 
-        {/* Description */}
-        <p className={`text-sm ${isLocked ? 'text-gray-400' : 'text-gray-600'} leading-relaxed mb-3 flex-1`}>{course.description}</p>
+        {/* ✅ Fix 1: Description clamped to 3 lines */}
+        <p className={`text-xs leading-relaxed mb-3 line-clamp-3 ${isLocked ? 'text-gray-400' : 'text-gray-500'}`}>
+          {course.description}
+        </p>
 
-        {/* Unlock hint for locked */}
+        {/* Unlock hint */}
         {isLocked && course.unlockHint && (
-          <div style={{
-            fontSize: 12, color: '#92400e',
-            background: '#fef9c3', borderRadius: 8, padding: '8px 12px',
-            marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6,
-          }}>
-            <Lock size={11} color="#92400e" />
+          <div className="flex items-center gap-1.5 text-xs text-amber-800 bg-yellow-50 rounded-lg px-3 py-2 mb-3">
+            <Lock size={11} className="text-amber-800 shrink-0" />
             {course.unlockHint}
           </div>
         )}
 
-        {/* Stats row */}
-        <div className="flex flex-wrap gap-3 mb-3 text-sm text-gray-500">
-          <span className="flex items-center gap-2"><Star size={12} color="#fbbf24" fill="#fbbf24" />{course.rating}</span>
-          <span className="flex items-center gap-2"><Clock size={12} color="#9ca3af" />{course.duration}</span>
-          <span className="flex items-center gap-2"><BookOpen size={12} color="#9ca3af" />{course.lessonsTotal} lessons</span>
-          <span className="flex items-center gap-2"><Zap size={12} color="#f59e0b" fill="#f59e0b" />+{course.xp} XP</span>
+        {/* ✅ Fix 5: Stats row — no wrap */}
+        <div className="flex items-center gap-2 mb-3 flex-nowrap overflow-hidden">
+          <span className="flex items-center gap-1 text-xs text-gray-500 shrink-0">
+            <Star size={11} className="text-yellow-400 fill-yellow-400" />{course.rating}
+          </span>
+          <span className="flex items-center gap-1 text-xs text-gray-400 shrink-0">
+            <Clock size={11} />{course.duration}
+          </span>
+          <span className="flex items-center gap-1 text-xs text-gray-400 shrink-0">
+            <BookOpen size={11} />{course.lessonsTotal} lessons
+          </span>
+          <span className="flex items-center gap-1 text-xs text-gray-400 shrink-0 ml-auto">
+            <Zap size={11} className="text-amber-400 fill-amber-400" />+{course.xp} XP
+          </span>
         </div>
 
-        {/* Progress bar for active */}
+        {/* Progress bar (active only) */}
         {isActive && (
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontSize: 12, color: '#6b7280' }}>{course.lessonsDone} of {course.lessonsTotal} lessons done</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: course.color }}>{course.progress}%</span>
+          <div className="mb-3">
+            <div className="flex justify-between mb-1">
+              <span className="text-xs text-gray-400">{course.lessonsDone} of {course.lessonsTotal} done</span>
+              <span className="text-xs font-bold" style={{ color: course.color }}>{course.progress}%</span>
             </div>
-            <div style={{ height: 6, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden' }}>
-              <div style={{
-                height: '100%', width: `${course.progress}%`,
-                background: course.color, borderRadius: 99,
-                transition: 'width 0.6s ease',
-              }} />
+            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${course.progress}%`, background: course.color }}
+              />
             </div>
           </div>
         )}
 
-        {/* Footer: price + CTA */}
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <span className={`text-lg font-extrabold ${course.price === 'Free' ? 'text-emerald-600' : 'text-gray-900'}`}>{course.price}</span>
-            {course.price !== 'Free' && (<span className="text-xs text-gray-500 ml-1">one-time</span>)}
-          </div>
+        {/* ✅ Fix 2: Footer pinned to bottom */}
+        <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-gray-100">
+          <span className={`text-base font-extrabold ${course.price === 'Free' ? 'text-emerald-600' : 'text-gray-900'}`}>
+            {course.price}
+            {course.price !== 'Free' && (
+              <span className="text-xs text-gray-400 font-normal ml-1">one-time</span>
+            )}
+          </span>
+
           <button
             onClick={() => !isLocked && onNavigate(`/dashboard/course/${course.id}`)}
             disabled={isLocked && !course.unlockHint}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg font-bold flex-shrink-0 transition duration-150 ${isLocked ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''}`}
-            style={{ background: !isLocked ? btnBg : undefined, color: !isLocked ? btnColor : undefined }}
+            className={`
+              flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold
+              shrink-0 transition-opacity duration-150
+              ${isLocked ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'cursor-pointer'}
+            `}
+            style={!isLocked ? {
+              background: isDone ? '#d1fae5' : course.color,
+              color: isDone ? '#065f46' : '#fff',
+            } : {}}
           >
-            {isLocked ? <Lock size={13} /> : isDone ? <CheckCircle2 size={13} /> : <PlayCircle size={13} />}
-            <span>{isLocked ? 'Locked' : btnLabel}</span>
+            {isLocked
+              ? <Lock size={12} />
+              : isDone
+                ? <CheckCircle2 size={12} />
+                : <PlayCircle size={12} />
+            }
+            {isLocked ? 'Locked' : btnLabel}
           </button>
         </div>
+
       </div>
     </motion.div>
   );
