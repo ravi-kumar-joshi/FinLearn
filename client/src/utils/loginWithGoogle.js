@@ -1,3 +1,3 @@
 export const loginWithGoogle = () => {
-  window.location.href = "http://localhost:5050/auth/google";
+  window.location.href = "https://finlearn-1.onrender.com/auth/google";
 };

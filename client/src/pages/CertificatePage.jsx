@@ -23,7 +23,7 @@ import {
     nativeShareCertificate,
 } from '../utils/certificateShare';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
 
 /* ─────────────────────────────────────────────
    CERTIFICATE CARD

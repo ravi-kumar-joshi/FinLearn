@@ -17,7 +17,7 @@ import { useSidebarOpen } from "../hooks/useSidebarOpen";
 import LeaderboardClient from "../Components/Home/LeaderboardClient";
 import { TrendingUp, BookOpen, Target, Award, Rocket, Shield } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5050";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://finlearn-1.onrender.com";
 const PALETTE_COLORS = ["#6366f1", "#10b981", "#8b5cf6", "#0ea5e9", "#f59e0b"];
 
 function formatDurationMinutes(mins) {

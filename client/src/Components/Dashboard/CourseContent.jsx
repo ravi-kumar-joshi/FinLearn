@@ -13,7 +13,7 @@ import httpAction from '../../utils/httpAction';
 import { notifyCourseProgressUpdated } from '../../utils/courseProgressEvents';
 import { useSidebarOpen } from '../../hooks/useSidebarOpen';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
 
 // ── Sidebar Module Item ────────────────────────────────────────────────────
 const ModuleItem = ({ module, modProgress, isActive, onClick }) => {

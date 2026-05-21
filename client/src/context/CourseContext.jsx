@@ -22,7 +22,7 @@ import apis from '../utils/apis';
 import { notifyCourseProgressUpdated } from '../utils/courseProgressEvents';
 
 // Optional environment override for API base URL (rarely used here).
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
 
 const CourseContext = createContext(null);
 

@@ -14,7 +14,7 @@ import httpAction from '../utils/httpAction';
 import { useSidebarOpen } from '../hooks/useSidebarOpen';
 import { notifyCourseProgressUpdated } from '../utils/courseProgressEvents';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 function formatMins(mins) {

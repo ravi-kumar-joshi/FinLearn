@@ -11,7 +11,7 @@ import { collectModuleQuizQuestions } from '../utils/moduleQuizQuestions';
 import { ArrowLeft, Trophy, Zap, CheckCircle2, Target, BookOpen, ChevronRight } from 'lucide-react';
 import { useSidebarOpen } from '../hooks/useSidebarOpen';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5050';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
 const PASS_SCORE = 70;
 
 /* ── shared page shell ── */

@@ -8,7 +8,7 @@ const apis = () => {
   // requests point to the express server at port 5050. Change the
   // production URL to your deployed backend when ready.
   const base = isDevelopment
-    ? 'http://localhost:5050/' // Local backend for development
+    ? 'https://finlearn-1.onrender.com' // Local backend for development
     : 'https://your-production-api.com/'; // TODO: replace with production URL
 
   // Each key represents a logical API endpoint. Keep paths relative to `base`.

@@ -341,7 +341,7 @@ taskkill /PID <PID> /F
 
 Ensure the callback URL in your Google Cloud Console matches exactly:
 ```
-http://localhost:5050/auth/google/callback
+https://finlearn-1.onrender.com/auth/google/callback
 ```
 </details>
 

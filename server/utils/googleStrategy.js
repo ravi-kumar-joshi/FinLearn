@@ -8,7 +8,7 @@ const strategy = (app) => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_CALLBACK || "http://localhost:5050/auth/google/callback",
+        callbackURL: process.env.GOOGLE_CALLBACK || "https://finlearn-1.onrender.com/auth/google/callback",
       },
       (accessToken, refreshToken, profile, done) => {
         return done(null, profile);
