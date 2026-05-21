@@ -9,7 +9,7 @@ const apis = () => {
   // production URL to your deployed backend when ready.
   const base = isDevelopment
     ? 'https://finlearn-1.onrender.com' // Local backend for development
-    : 'https://your-production-api.com/'; // TODO: replace with production URL
+    : 'https://finlearn-1.onrender.com/'; // TODO: replace with production URL
 
   // Each key represents a logical API endpoint. Keep paths relative to `base`.
   const list = {
