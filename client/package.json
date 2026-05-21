@@ -12,7 +12,6 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@imagekit/react": "^5.0.2",
     "@mui/core-downloads-tracker": "^6.5.0",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.5.0",
@@ -27,7 +26,6 @@
     "formik": "^2.4.9",
     "framer-motion": "^12.38.0",
     "html-to-image": "^1.11.13",
-    "imagekitio-react": "^4.3.0",
     "katex": "^0.16.45",
     "lucide-react": "^0.556.0",
     "react": "^19.2.6",
