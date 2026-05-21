@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { MdAdd, MdCheckCircle, MdErrorOutline, MdRefresh, MdLock } from 'react-icons/md'
 import AdminLayout from '../AdminLayout'
-import CourseTable from '../components/CourseTable'
-import CourseModal from '../components/CourseModal'
+import CourseTable from '../Components/CourseTable'
+import CourseModal from '../Components/CourseModal'
 import api from '../services/api'
 
 export default function Courses() {

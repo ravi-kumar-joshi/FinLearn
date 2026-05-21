@@ -14,7 +14,7 @@ import apis from "../utils/apis";
 import { COURSE_PROGRESS_UPDATED } from "../utils/courseProgressEvents";
 import { useRealtimeLeaderboard, useRealtimeXP } from "../hooks/useRealtimeXP";
 import { useSidebarOpen } from "../hooks/useSidebarOpen";
-import LeaderboardClient from "../components/Home/LeaderboardClient";
+import LeaderboardClient from "../Components/Home/LeaderboardClient";
 import { TrendingUp, BookOpen, Target, Award, Rocket, Shield } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5050";

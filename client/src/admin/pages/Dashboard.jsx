@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import AdminLayout from '../AdminLayout'
-import StatsCard from '../components/StatsCard'
-import Leaderboard from '../components/Leaderboard'
-import SimpleChart from '../components/SimpleChart'
+import StatsCard from '../Components/StatsCard'
+import Leaderboard from '../Components/Leaderboard'
+import SimpleChart from '../Components/SimpleChart'
 import api from '../services/api'
 
 export default function Dashboard() {
