@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
-import Sidebar from './Components/Sidebar'
-import Topbar from './Components/Topbar'
+import Sidebar from './components/Sidebar'
+import Topbar from './components/Topbar'
 
 export default function AdminLayout({ children }) {
 

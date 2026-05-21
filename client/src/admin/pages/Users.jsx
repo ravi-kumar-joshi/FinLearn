@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import AdminLayout from '../AdminLayout'
-import UserTable from '../Components/UserTable'
+import UserTable from '../components/UserTable'
 import api from '../services/api'
 
 export default function Users() {
