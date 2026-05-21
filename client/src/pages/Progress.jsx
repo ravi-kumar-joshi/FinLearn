@@ -4,7 +4,7 @@ import SideBar from "../Components/Dashboard/SideBar"
 import Navbar from "../Components/Dashboard/Navbar"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
 import { useSidebarOpen } from "../hooks/useSidebarOpen"
-import { useRealtimeXP } from "../hooks/useRealtimeXP"
+import { useRealtimeXP } from "../hooks/useRealTimeXP"
 import toast from "react-hot-toast"
 
 // ─── Static fallback chart data ───────────────────────────────────────────────
