@@ -1,6 +1,6 @@
 import React from 'react'
 import Leaderboard from '../../admin/components/Leaderboard'
-import { useRealtimeLeaderboard } from '../../hooks/useRealtimeXP'
+import { useRealtimeLeaderboard } from '../../hooks/temp'
 
 export default function LeaderboardClient() {
     const { topUsers, currentUserRank, loading } = useRealtimeLeaderboard(5, 7000)
