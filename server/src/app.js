@@ -14,18 +14,18 @@
 
 require('dotenv').config();
 
-import express, { json, urlencoded } from 'express';
-import { initialize, session as _session } from 'passport';
-import cors from 'cors';
-import session from 'express-session';
-import cookieParser from 'cookie-parser';
+const express = require('express');
+const passport = require('passport');
+const cors = require('cors');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
 
-import strategy from '../utils/googleStrategy';
-import errorHandler from '../middlewares/errorHandler';
-import authRoutes from '../routes/auth';
-import courseRoutes from '../routes/courses';
-import adminRoutes from '../routes/admin';
-import certificateRoutes from '../routes/certificateRoutes';
+const strategy = require('../utils/googleStrategy.js');
+const errorHandler = require('../middlewares/errorHandler.js');
+const authRoutes = require('../routes/auth.js');
+const courseRoutes = require('../routes/courses.js');
+const adminRoutes = require('../routes/admin.js');
+const certificateRoutes = require('../routes/certificateRoutes.js');
 
 // SESSION_SECRET is required to sign session cookies. The app will refuse
 // to start if it's missing to prevent insecure default behavior.
@@ -60,9 +60,9 @@ app.use(
 );
 
 // Body parsers and cookie parser for handling request payloads.
-app.use(json({ limit: '10mb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
-app.use(urlencoded({ extended: false, limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
 // Health-check endpoint for basic monitoring/heartbeat.
 app.get('/', (req, res) => {
@@ -75,8 +75,8 @@ app.get('/', (req, res) => {
 });
 
 // Passport (authentication) initialization and wiring of the Google strategy.
-app.use(initialize());
-app.use(_session());
+app.use(passport.initialize());
+app.use(passport.session());
 strategy(app);
 
 // Mount feature-specific route modules. Each module handles its own
@@ -98,4 +98,4 @@ app.get('/user/info', (req, res) => {
 // Centralized error handler middleware - last middleware in the chain.
 app.use(errorHandler);
 
-export default app;
+module.exports = app;
