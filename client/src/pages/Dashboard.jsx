@@ -12,7 +12,7 @@ import { AnimatedXPBar, LevelCard } from "../Components/Dashboard/AnimatedXPBar"
 import httpAction from "../utils/httpAction";
 import apis from "../utils/apis";
 import { COURSE_PROGRESS_UPDATED } from "../utils/courseProgressEvents";
-import { useRealtimeLeaderboard, useRealtimeXP } from "../hooks/useRealtimeXP";
+import { useRealtimeLeaderboard, useRealtimeXP } from "../hooks/useRealtimeXP.js";
 import { useSidebarOpen } from "../hooks/useSidebarOpen";
 import LeaderboardClient from "../Components/Home/LeaderboardClient";
 import { TrendingUp, BookOpen, Target, Award, Rocket, Shield } from "lucide-react";
