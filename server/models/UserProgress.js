@@ -107,7 +107,6 @@ const userProgressSchema = new mongoose.Schema(
         },
         verificationId: {
             type: String,
-            default: null,
             trim: true,
             uppercase: true,
             unique: true, // Moved index declaration here explicitly
