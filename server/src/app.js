@@ -51,9 +51,8 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      // Only set secure & sameSite none when in production behind TLS.
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   })
