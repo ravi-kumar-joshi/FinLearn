@@ -35,6 +35,8 @@ if (!process.env.SESSION_SECRET) {
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 // CORS configuration: allow requests from configured origin and send
 // credentials (cookies) so authentication works across origins during dev.
 app.use(
