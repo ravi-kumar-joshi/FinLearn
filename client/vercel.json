@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://finlearn-1.onrender.com/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
