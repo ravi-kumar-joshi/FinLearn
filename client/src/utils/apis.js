@@ -7,9 +7,8 @@ const apis = () => {
   // Base URL used to build the API endpoints. When developing locally,
   // requests point to the express server at port 5050. Change the
   // production URL to your deployed backend when ready.
-  const base = isDevelopment
-    ? 'https://finlearn-1.onrender.com' // Local backend for development
-    : 'https://finlearn-1.onrender.com/'; // TODO: replace with production URL
+
+  const base = 'https://finlearn-1.onrender.com/';
 
   // Each key represents a logical API endpoint. Keep paths relative to `base`.
   const list = {
