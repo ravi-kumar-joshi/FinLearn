@@ -8,7 +8,7 @@ const apis = () => {
   // requests point to the express server at port 5050. Change the
   // production URL to your deployed backend when ready.
 
-  const base = 'https://finlearn-1.onrender.com/';
+  const base = '/api/';
 
   // Each key represents a logical API endpoint. Keep paths relative to `base`.
   const list = {
