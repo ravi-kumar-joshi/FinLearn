@@ -25,6 +25,7 @@ const getSessionId = () => {
 };
 
 const formatMessage = (text) => {
+  if (!text || typeof text !== "string") return "...";
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return parts.map((part, i) =>
     part.startsWith("**") && part.endsWith("**") ? (
@@ -82,7 +83,8 @@ export default function FinBot() {
         body: JSON.stringify({ message: userMsg, sessionId }),
       });
       const data = await res.json();
-      setMessages((prev) => [...prev, { role: "bot", text: data.reply }]);
+      const reply = data.reply || "Koi jawab nahi mila. Dobara try karo!";
+      setMessages((prev) => [...prev, { role: "bot", text: reply }]);
     } catch {
       setMessages((prev) => [
         ...prev,
