@@ -42,7 +42,7 @@ app.set('trust proxy', 1);
 // credentials (cookies) so authentication works across origins during dev.
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.ORIGIN || 'http://localhost:5173',
     credentials: true,
   })
 );
@@ -87,7 +87,7 @@ app.use('/user', authRoutes);
 app.use('/courses', courseRoutes);
 app.use('/admin', adminRoutes);
 app.use('/certificates', certificateRoutes);
-app.use('/api', chatRoutes); 
+app.use('/api', chatRoutes);
 
 // Simple route to expose current `req.user` info when authenticated.
 app.get('/user/info', (req, res) => {
