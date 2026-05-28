@@ -28,6 +28,7 @@ import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import CourseDetailsPage from './pages/CourseDetailsPage';
 import VerifyPage from './pages/VerifyPage';
 import FinBot from './Components/Chatbot/FinBot';
+import FinBotPage from './Components/Chatbot/Finbotpage';
 
 // ==================== Layouts ====================
 // AuthLayout: Provides consistent styling for all auth pages
@@ -86,6 +87,7 @@ function App() {
           <Route path="/dashboard/achievements" element={<Dashboard />} />
           <Route path="/dashboard/goals" element={<Dashboard />} />
           <Route path="/dashboard/help" element={<Dashboard />} />
+          <Route path="/dashboard/finbot" element={<FinBotPage />} />
         </Route>
 
       </Routes>
