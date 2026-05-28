@@ -27,6 +27,7 @@ import CertificatePage from './pages/CertificatePage';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import CourseDetailsPage from './pages/CourseDetailsPage';
 import VerifyPage from './pages/VerifyPage';
+import FinBot from './Components/Chatbot/FinBot';
 
 // ==================== Layouts ====================
 // AuthLayout: Provides consistent styling for all auth pages
@@ -88,6 +89,7 @@ function App() {
         </Route>
 
       </Routes>
+      <FinBot />
     </>
   );
 }
