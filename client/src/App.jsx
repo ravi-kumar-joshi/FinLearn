@@ -27,7 +27,6 @@ import CertificatePage from './pages/CertificatePage';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import CourseDetailsPage from './pages/CourseDetailsPage';
 import VerifyPage from './pages/VerifyPage';
-import FinBot from './Components/Chatbot/FinBot';
 import FinBotPage from './Components/Chatbot/Finbotpage';
 
 // ==================== Layouts ====================
@@ -91,7 +90,6 @@ function App() {
         </Route>
 
       </Routes>
-      <FinBot />
     </>
   );
 }
