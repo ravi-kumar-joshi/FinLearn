@@ -1,20 +1,16 @@
-
-
 const mongoose = require("mongoose");
 
 const getConnection = () => {
   try {
-    // Validate MongoDB URL exists
     if (!process.env.MONGO_URL) {
       throw new Error("MONGO_URL not configured in environment variables");
     }
 
-    // Mongoose connection options for better reliability
     const options = {
-      // useNewUrlParser: true, // Deprecated in Mongoose 6+
-      // useUnifiedTopology: true, // Deprecated in Mongoose 6+
-      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
-      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 60000,
+      maxPoolSize: 10,
+      family: 4,
     };
 
     mongoose
@@ -26,11 +22,8 @@ const getConnection = () => {
       })
       .catch((error) => {
         console.error("❌ Failed to connect to database:", error.message);
-        // In production, you might want to exit the process
-        // process.exit(1);
       });
 
-    // Handle connection events
     mongoose.connection.on('connected', () => {
       console.log('🔗 Mongoose connected to MongoDB');
     });
@@ -40,13 +33,12 @@ const getConnection = () => {
     });
 
     mongoose.connection.on('disconnected', () => {
-      console.log('⚠️ Mongoose disconnected from MongoDB');
+      console.log('⚠️ Mongoose disconnected'); // loop nahi hoga ab
     });
 
-    // Graceful shutdown
     process.on('SIGINT', async () => {
       await mongoose.connection.close();
-      console.log('🛑 Mongoose connection closed due to app termination');
+      console.log('🛑 Connection closed');
       process.exit(0);
     });
 
@@ -56,5 +48,4 @@ const getConnection = () => {
   }
 };
 
-module.exports = getConnection
-
+module.exports = getConnection;

@@ -26,6 +26,7 @@ const authRoutes = require('../routes/auth.js');
 const courseRoutes = require('../routes/courses.js');
 const adminRoutes = require('../routes/admin.js');
 const certificateRoutes = require('../routes/certificateRoutes.js');
+const chatRoutes = require('../routes/chat.js');
 
 // SESSION_SECRET is required to sign session cookies. The app will refuse
 // to start if it's missing to prevent insecure default behavior.
@@ -41,7 +42,7 @@ app.set('trust proxy', 1);
 // credentials (cookies) so authentication works across origins during dev.
 app.use(
   cors({
-    origin: process.env.ORIGIN,
+    origin: 'http://localhost:5173',
     credentials: true,
   })
 );
@@ -86,6 +87,7 @@ app.use('/user', authRoutes);
 app.use('/courses', courseRoutes);
 app.use('/admin', adminRoutes);
 app.use('/certificates', certificateRoutes);
+app.use('/api', chatRoutes); 
 
 // Simple route to expose current `req.user` info when authenticated.
 app.get('/user/info', (req, res) => {
