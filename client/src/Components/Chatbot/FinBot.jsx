@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/Components/ui/avatar";
+import { Badge } from "@/Components/ui/badge";
 import { MessageCircle, X, Send } from "lucide-react";
 import apis from "../../utils/apis";
 import httpAction from "../../utils/httpAction";
@@ -99,7 +99,7 @@ export default function FinBot() {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {open && (
-        <div className="w-[360px] max-sm:w-screen max-sm:h-screen max-sm:fixed max-sm:inset-0 max-sm:rounded-none flex flex-col rounded-2xl shadow-2xl border border-border bg-background overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+        <div className="w-90 max-sm:w-screen max-sm:h-screen max-sm:fixed max-sm:inset-0 max-sm:rounded-none flex flex-col rounded-2xl shadow-2xl border border-border bg-background overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
           
           {/* Header */}
           <div className="bg-slate-900 px-4 py-3 flex items-center justify-between shrink-0">
