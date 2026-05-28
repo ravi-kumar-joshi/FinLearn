@@ -99,8 +99,7 @@ export default function FinBot() {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {open && (
-        <div className="w-90 max-sm:w-screen max-sm:h-screen max-sm:fixed max-sm:inset-0 max-sm:rounded-none flex flex-col rounded-2xl shadow-2xl border border-border bg-background overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-          
+        <div className="w-[360px] h-[520px] max-sm:w-screen max-sm:h-screen max-sm:fixed max-sm:inset-0 max-sm:rounded-none flex flex-col rounded-2xl shadow-2xl border border-border bg-background overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
           {/* Header */}
           <div className="bg-slate-900 px-4 py-3 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
@@ -130,14 +129,13 @@ export default function FinBot() {
           </div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 bg-slate-50 dark:bg-slate-950">
+         <ScrollArea className="flex-1 min-h-0 bg-slate-50 dark:bg-slate-950">
             <div className="flex flex-col gap-3 p-4">
               {messages.map((msg, i) => (
                 <div
                   key={i}
-                  className={`flex items-end gap-2 ${
-                    msg.role === "user" ? "flex-row-reverse" : "flex-row"
-                  }`}
+                  className={`flex items-end gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"
+                    }`}
                 >
                   {msg.role === "bot" && (
                     <Avatar className="h-7 w-7 shrink-0">
@@ -147,11 +145,10 @@ export default function FinBot() {
                     </Avatar>
                   )}
                   <div
-                    className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                      msg.role === "user"
+                    className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user"
                         ? "bg-green-500 text-white rounded-br-sm"
                         : "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 rounded-bl-sm shadow-sm"
-                    }`}
+                      }`}
                   >
                     {formatMessage(msg.text)}
                   </div>
