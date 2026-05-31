@@ -14,7 +14,7 @@ import {
   Info,
 } from "lucide-react";
 import { clamp, fmtINR, makeSliderStyle } from "../../utils/financialUtils";
-import InputRow from "./InputRow";
+import InputRow from "../Dashboard/InputRow";
 
 Chart.register(...registerables);
 
