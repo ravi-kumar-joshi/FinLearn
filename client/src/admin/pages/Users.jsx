@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import AdminLayout from '../AdminLayout'
+import AdminLayout from '../../layouts/AdminLayout'
 import UserTable from '../components/UserTable'
 import api from '../services/api'
 

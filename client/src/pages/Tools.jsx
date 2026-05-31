@@ -3,13 +3,13 @@ import Navbar from '../Components/Dashboard/Navbar';
 import SideBar from '../Components/Dashboard/SideBar';
 
 // Lazy load calculators for better performance
-const BudgetCalculator = lazy(() => import('../Components/Dashboard/BudgetCalculator'));
-const InvestmentCalculator = lazy(() => import('../Components/Dashboard/InvestmentCalculator'));
-const LoanCalculator = lazy(() => import('../Components/Dashboard/LoanCalculator'));
-const SavingsCalculator = lazy(() => import('../Components/Dashboard/SavingsCalculator'));
-const SIPCalculator = lazy(() => import('../Components/Dashboard/SIPCalculator'));
-const InflationCalculator = lazy(() => import('../Components/Dashboard/InflationCalculator'));
-const EmergencyFundCalculator = lazy(() => import('../Components/Dashboard/EmergencyFundCalculator'));
+const BudgetCalculator = lazy(() => import('../Components/FinTools/BudgetCalculator'));
+const InvestmentCalculator = lazy(() => import('../Components/FinTools/InvestmentCalculator'));
+const LoanCalculator = lazy(() => import('../Components/FinTools/LoanCalculator'));
+const SavingsCalculator = lazy(() => import('../Components/FinTools/SavingsCalculator'));
+const SIPCalculator = lazy(() => import('../Components/FinTools/SIPCalculator'));
+const InflationCalculator = lazy(() => import('../Components/FinTools/InflationCalculator'));
+const EmergencyFundCalculator = lazy(() => import('../Components/FinTools/EmergencyFundCalculator'));
 
 import {
     Wallet, TrendingUp, Landmark, PiggyBank,

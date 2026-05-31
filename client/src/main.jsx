@@ -1,11 +1,3 @@
-/*
-  client/src/main.jsx
-
-  Purpose:
-  - Application entry for the React client. Mounts the React tree onto the DOM.
-  - Wraps the app with `BrowserRouter` for routing, an `ErrorBoundary` to
-    catch rendering errors, and `Toaster` for global toast notifications.
-*/
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

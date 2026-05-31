@@ -25,13 +25,6 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
 
-/* ─────────────────────────────────────────────
-   CERTIFICATE CARD
-   Inline styles only — required for html-to-image
-   Wrapped in a fluid scaler so it stays legible
-   on every screen width without changing the
-   actual rendered dimensions (important for PNG export).
-───────────────────────────────────────────── */
 const CertificateCard = React.forwardRef(
     ({ studentName, courseName, completionDate, totalXP, verifyId, instructor }, ref) => {
         const dateStr = completionDate
@@ -129,16 +122,7 @@ const CertificateCard = React.forwardRef(
 );
 CertificateCard.displayName = 'CertificateCard';
 
-/* ─────────────────────────────────────────────
-   CERTIFICATE SCALER
-   Keeps the card's full fidelity (needed for PNG
-   export) while scaling it visually to fit the
-   viewport. The inner div is rendered at a fixed
-   reference width; CSS transform scales it down
-   on narrow screens without affecting toPng output
-   because toPng captures the real DOM node, not
-   the scaled visual.
-───────────────────────────────────────────── */
+
 const CertificateScaler = React.forwardRef(({ children }, ref) => {
     const wrapperRef = useRef(null);
     const [scale, setScale] = useState(1);

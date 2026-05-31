@@ -1,16 +1,3 @@
-/**
- * Inflation Calculator Component
- *
- * Optimized to match SIPCalculator / BudgetCalculator quality.
- * - Manual number inputs + visible filled range sliders (orange theme)
- * - Indian Rupee formatting (Cr / L / K)
- * - Purchasing power breakdown bar
- * - Year-wise inflation timeline table (toggle)
- * - Conditional tip banners
- * - Reset button, onClose prop support
- *
- * @component
- */
 
 import React, { useState, useMemo } from "react";
 import {
@@ -382,7 +369,6 @@ const InflationCalculator = ({ onClose }) => {
           </div>
         </div>
 
-        {/* conditional tip banners — mirrors BudgetCalculator pattern */}
         {inflation >= 10 && (
           <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-sm text-red-800">

@@ -1,14 +1,4 @@
-/**
- * EmergencyFundCalculator.jsx
- * ─────────────────────────────────────────────────────────────
- * Optimized to match InflationCalculator quality:
- *  - Shared InputRow + filled sliders (teal accent)
- *  - All derived values in useMemo with clamp guards
- *  - Chart.js projection (unchanged logic, cleaner setup)
- *  - Conditional tip banners consistent with suite pattern
- *  - Fixed bg-gradient-to-r (was bg-linear-to-r)
- *  - Reset button
- */
+
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Chart, registerables } from "chart.js";

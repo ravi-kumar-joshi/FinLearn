@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import AdminLayout from '../AdminLayout'
+import AdminLayout from '../../layouts/AdminLayout'
 import StatsCard from '../components/StatsCard'
 import Leaderboard from '../components/Leaderboard'
 import SimpleChart from '../components/SimpleChart'

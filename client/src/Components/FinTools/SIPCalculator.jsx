@@ -1,15 +1,3 @@
-/**
- * SIP Calculator Component
- *
- * Optimized & redesigned to match BudgetCalculator quality.
- * - Manual number inputs (not just sliders) with validation
- * - Indian Rupee formatting (Cr / L / K)
- * - Breakdown bar + yearly growth table
- * - Savings-rate style tips & warnings
- * - Reset button, onClose prop support
- *
- * @component
- */
 
 import React, { useState, useMemo } from "react";
 import {
@@ -378,7 +366,6 @@ const SIPCalculator = ({ onClose }) => {
           </div>
         </div>
 
-        {/* conditional tips – mirroring BudgetCalculator pattern */}
         {rate < 8 && (
           <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-sm text-yellow-800">

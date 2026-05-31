@@ -1,16 +1,3 @@
-/**
- * VerifyPage.jsx
- *
- * Route: /verify/:verifyId
- *
- * This page does two things:
- *  1. Shows the certificate publicly so anyone with the link can view it.
-
- *     (LinkedIn, Facebook, WhatsApp, Twitter) show a rich preview
- *     with the certificate image when the link is shared.
- *
-
- */
 
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
