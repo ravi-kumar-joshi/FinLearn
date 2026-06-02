@@ -18,28 +18,28 @@ const fmtFull = (v) =>
 
 const JOB_REC = { salaried: 6, freelance: 9, business: 12 };
 const JOB_HINTS = {
-  salaried:  "Stable income — 6 months recommended",
+  salaried: "Stable income — 6 months recommended",
   freelance: "Variable income — 9 months recommended",
-  business:  "Business risk — 12 months recommended",
+  business: "Business risk — 12 months recommended",
 };
 
 const DEFAULT_EXPENSES = [
-  { id: 1, cat: "Rent / EMI",       amt: 15000 },
-  { id: 2, cat: "Food & Groceries", amt: 8000  },
-  { id: 3, cat: "Transport",        amt: 4000  },
-  { id: 4, cat: "Utilities",        amt: 3000  },
+  { id: 1, cat: "Rent / EMI", amt: 15000 },
+  { id: 2, cat: "Food & Groceries", amt: 8000 },
+  { id: 3, cat: "Transport", amt: 4000 },
+  { id: 4, cat: "Utilities", amt: 3000 },
 ];
 
 export default function EmergencyFundCalculator({ onClose }) {
-  const [jobType,        setJobType]        = useState("salaried");
-  const [months,         setMonths]         = useState(6);
+  const [jobType, setJobType] = useState("salaried");
+  const [months, setMonths] = useState(6);
   const [currentSavings, setCurrentSavings] = useState(50000);
-  const [monthlySaving,  setMonthlySaving]  = useState(10000);
-  const [expenses,       setExpenses]       = useState(DEFAULT_EXPENSES);
-  const [nextId,         setNextId]         = useState(5);
+  const [monthlySaving, setMonthlySaving] = useState(10000);
+  const [expenses, setExpenses] = useState(DEFAULT_EXPENSES);
+  const [nextId, setNextId] = useState(5);
 
-  const canvasRef     = useRef(null);
-  const chartInstance = useRef(null);
+  const canvasRef = useRef(null);
+  const _chartInstanceRef = useRef(null);
 
   /* ── derived ── */
   const totalExp = useMemo(
@@ -49,12 +49,12 @@ export default function EmergencyFundCalculator({ onClose }) {
 
   const { target, gap, covered, monthsToGoal, goalDateStr } = useMemo(() => {
     const saSavings = clamp(currentSavings, 0, 1e8);
-    const saMthly   = clamp(monthlySaving,  0, 1e7);
-    const saMonths  = clamp(months, 3, 24);
+    const saMthly = clamp(monthlySaving, 0, 1e7);
+    const saMonths = clamp(months, 3, 24);
 
-    const target       = totalExp * saMonths;
-    const gap          = Math.max(0, target - saSavings);
-    const covered      = target > 0 ? Math.min(100, (saSavings / target) * 100) : 100;
+    const target = totalExp * saMonths;
+    const gap = Math.max(0, target - saSavings);
+    const covered = target > 0 ? Math.min(100, (saSavings / target) * 100) : 100;
     const monthsToGoal = gap > 0 && saMthly > 0 ? Math.ceil(gap / saMthly) : gap > 0 ? Infinity : 0;
 
     const goalDate = new Date();
@@ -76,8 +76,8 @@ export default function EmergencyFundCalculator({ onClose }) {
     const ctx = canvas.getContext("2d");
 
     const saSavings = clamp(currentSavings, 0, 1e8);
-    const saMthly   = clamp(monthlySaving,  0, 1e7);
-    const limit     = Math.min(isFinite(monthsToGoal) ? monthsToGoal + 3 : 24, 36);
+    const saMthly = clamp(monthlySaving, 0, 1e7);
+    const limit = Math.min(isFinite(monthsToGoal) ? monthsToGoal + 3 : 24, 36);
 
     const points = Array.from({ length: limit + 1 }, (_, i) => ({
       x: i,
@@ -86,13 +86,13 @@ export default function EmergencyFundCalculator({ onClose }) {
 
     const W = canvas.offsetWidth;
     const H = canvas.offsetHeight;
-    canvas.width  = W * window.devicePixelRatio;
+    canvas.width = W * window.devicePixelRatio;
     canvas.height = H * window.devicePixelRatio;
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
     const PAD = { top: 12, right: 16, bottom: 32, left: 52 };
     const cw = W - PAD.left - PAD.right;
-    const ch = H - PAD.top  - PAD.bottom;
+    const ch = H - PAD.top - PAD.bottom;
 
     const maxY = Math.max(target * 1.05, saSavings * 1.1, 1000);
     const toX = (i) => PAD.left + (i / limit) * cw;
@@ -145,7 +145,7 @@ export default function EmergencyFundCalculator({ onClose }) {
   }, [currentSavings, monthlySaving, target, monthsToGoal]);
 
   /* ── expense helpers ── */
-  const addExpense    = () => { setExpenses(p => [...p, { id: nextId, cat: "", amt: 0 }]); setNextId(n => n + 1); };
+  const addExpense = () => { setExpenses(p => [...p, { id: nextId, cat: "", amt: 0 }]); setNextId(n => n + 1); };
   const removeExpense = (id) => { if (expenses.length > 1) setExpenses(p => p.filter(e => e.id !== id)); };
   const updateExpense = (id, field, value) =>
     setExpenses(p => p.map(e => e.id === id ? { ...e, [field]: field === "amt" ? Number(value) || 0 : value } : e));
@@ -174,9 +174,9 @@ export default function EmergencyFundCalculator({ onClose }) {
 
   const tipColors = {
     success: { bg: "#f0fdf9", border: "#0d9488", text: "#064e3b" },
-    warn:    { bg: "#fffbeb", border: "#d97706", text: "#78350f" },
-    danger:  { bg: "#fff1f2", border: "#dc2626", text: "#7f1d1d" },
-    info:    { bg: "#f0fdfa", border: "#0d9488", text: "#134e4a" },
+    warn: { bg: "#fffbeb", border: "#d97706", text: "#78350f" },
+    danger: { bg: "#fff1f2", border: "#dc2626", text: "#7f1d1d" },
+    info: { bg: "#f0fdfa", border: "#0d9488", text: "#134e4a" },
   }[tip.type];
 
   return (
@@ -276,13 +276,12 @@ export default function EmergencyFundCalculator({ onClose }) {
         <div className="ef-card p-5 mb-5">
           <p className="text-xs font-semibold text-[#0f766e] uppercase tracking-wider mb-3">Employment Type</p>
           <div className="flex gap-2 job-btns">
-            {[["salaried","💼 Salaried"],["freelance","🧑‍💻 Freelancer"],["business","🏢 Business Owner"]].map(([v,l]) => (
+            {[["salaried", "💼 Salaried"], ["freelance", "🧑‍💻 Freelancer"], ["business", "🏢 Business Owner"]].map(([v, l]) => (
               <button key={v} onClick={() => { setJobType(v); setMonths(JOB_REC[v]); }}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-medium border-2 transition-all ${
-                  jobType === v
-                    ? "bg-[#0d9488] text-white border-[#0d9488] shadow-sm"
-                    : "bg-[#f0fdfb] text-[#134e4a] border-[#99f6e4] hover:border-[#0d9488]"
-                }`}>
+                className={`flex-1 py-2.5 px-3 rounded-xl text-sm font-medium border-2 transition-all ${jobType === v
+                  ? "bg-[#0d9488] text-white border-[#0d9488] shadow-sm"
+                  : "bg-[#f0fdfb] text-[#134e4a] border-[#99f6e4] hover:border-[#0d9488]"
+                  }`}>
                 {l}
               </button>
             ))}
@@ -401,7 +400,7 @@ export default function EmergencyFundCalculator({ onClose }) {
                 style={{ fontFamily: "'Playfair Display', serif" }}>
                 {Math.round(covered)}%
               </p>
-              <p className="text-sm opacity-70 mt-1">{statusLabel} · {clamp(months, 3, 24)}-month goal</p>
+              <p className="text-sm opacity-70 mt-1"><span style={{ color: statusColor }}>{statusLabel}</span> · {clamp(months, 3, 24)}-month goal</p>
               <div className="mt-4 pt-4 border-t border-white/20 grid grid-cols-2 gap-3 text-center">
                 <div>
                   <p className="text-xs opacity-70">Fund Target</p>
@@ -429,10 +428,10 @@ export default function EmergencyFundCalculator({ onClose }) {
               {/* 4 metric boxes */}
               <div className="grid grid-cols-2 gap-3 mt-4">
                 {[
-                  { label: "Fund Target",    value: fmtINR(target),       sub: `${clamp(months,3,24)} × ${fmtINR(totalExp)}` },
-                  { label: "Shortfall",      value: gap > 0 ? fmtINR(gap) : "None!", sub: gap > 0 ? "still needed" : "fully covered" },
+                  { label: "Fund Target", value: fmtINR(target), sub: `${clamp(months, 3, 24)} × ${fmtINR(totalExp)}` },
+                  { label: "Shortfall", value: gap > 0 ? fmtINR(gap) : "None!", sub: gap > 0 ? "still needed" : "fully covered" },
                   { label: "Months to Goal", value: gap > 0 ? (isFinite(monthsToGoal) ? `${monthsToGoal} mo` : "Set saving") : "Done!", sub: gap > 0 && isFinite(monthsToGoal) ? `by ${goalDateStr}` : "" },
-                  { label: "Monthly Expense",value: fmtINR(totalExp),      sub: `${expenses.length} categories` },
+                  { label: "Monthly Expense", value: fmtINR(totalExp), sub: `${expenses.length} categories` },
                 ].map(({ label, value, sub }) => (
                   <div key={label} className="bg-[#f0fdfb] rounded-xl p-3 border border-[#99f6e4]">
                     <p className="text-xs text-[#0f766e] mb-0.5">{label}</p>

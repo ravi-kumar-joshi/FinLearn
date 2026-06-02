@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { IndianRupee, PlusCircle, MinusCircle } from 'lucide-react';
 
 const InputRow = ({
@@ -19,7 +19,8 @@ const InputRow = ({
     labelClassName = '',
     currency = false,
 }) => {
-    const inputId = `input-row-${id || label?.toLowerCase().replace(/\s/g, '-') || Math.random().toString(36).substring(7)}`;
+    const autoId = useId();
+    const inputId = `input-row-${id || label?.toLowerCase().replace(/\s/g, '-') || autoId}`;
 
     const focusRingColor = {
         blue: 'focus:ring-blue-500',

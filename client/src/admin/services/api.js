@@ -3,11 +3,11 @@ const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'https:/
 async function request(path, opts = {}) {
   const token = localStorage.getItem('adminToken')
   const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+  const { headers: optHeaders, ...restOpts } = opts
   const res = await fetch(`${API_BASE.replace(/\/$/, '')}${path}`, {
     credentials: 'include',
-    headers,
-    ...opts,
-    headers: { ...headers, ...(opts.headers || {}) },
+    ...restOpts,
+    headers: { ...headers, ...(optHeaders || {}) },
   })
   const data = await res.json().catch(() => null)
   if (!res.ok) {
@@ -20,17 +20,17 @@ async function request(path, opts = {}) {
 }
 
 // Courses
-export async function getCourses()               { return request('/admin/courses') }
-export async function createCourse(payload)      { return request('/admin/courses',      { method: 'POST',   body: JSON.stringify(payload) }) }
-export async function updateCourse(id, payload)  { return request(`/admin/courses/${id}`, { method: 'PUT',    body: JSON.stringify(payload) }) }
-export async function deleteCourse(id)           { return request(`/admin/courses/${id}`, { method: 'DELETE' }) }
+export async function getCourses() { return request('/admin/courses') }
+export async function createCourse(payload) { return request('/admin/courses', { method: 'POST', body: JSON.stringify(payload) }) }
+export async function updateCourse(id, payload) { return request(`/admin/courses/${id}`, { method: 'PUT', body: JSON.stringify(payload) }) }
+export async function deleteCourse(id) { return request(`/admin/courses/${id}`, { method: 'DELETE' }) }
 
 // Users
-export async function getUsers()                           { return request('/admin/users') }
-export async function adjustUserXP(id, op, amount)         { return request(`/admin/users/${id}/xp`,    { method: 'PUT', body: JSON.stringify({ op, amount }) }) }
-export async function toggleBanUser(id)                    { return request(`/admin/users/${id}/ban`,   { method: 'PUT' }) }
-export async function resetUser(id)                        { return request(`/admin/users/${id}/reset`, { method: 'PUT' }) }
-export async function getLeaderboard(limit = 10)           { return request(`/user/leaderboard?limit=${limit}`) }
+export async function getUsers() { return request('/admin/users') }
+export async function adjustUserXP(id, op, amount) { return request(`/admin/users/${id}/xp`, { method: 'PUT', body: JSON.stringify({ op, amount }) }) }
+export async function toggleBanUser(id) { return request(`/admin/users/${id}/ban`, { method: 'PUT' }) }
+export async function resetUser(id) { return request(`/admin/users/${id}/reset`, { method: 'PUT' }) }
+export async function getLeaderboard(limit = 10) { return request(`/user/leaderboard?limit=${limit}`) }
 
 // Auth
 export async function login(email, password) {
@@ -39,7 +39,7 @@ export async function login(email, password) {
   return data
 }
 export async function logout() {
-  try { await request('/user/logout') } catch (_) { /* best-effort */ }
+  try { await request('/user/logout') } catch { /* best-effort */ }
   finally { localStorage.removeItem('adminToken') }
 }
 

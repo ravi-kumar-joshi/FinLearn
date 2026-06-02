@@ -6,16 +6,14 @@ import CourseModal from '../components/CourseModal'
 import api from '../services/api'
 
 export default function Courses() {
-  const [courses, setCourses]         = useState([])
-  const [editing, setEditing]         = useState(null)
-  const [open, setOpen]               = useState(false)
-  const [unauth, setUnauth]           = useState(false)
-  const [loading, setLoading]         = useState({})
+  const [courses, setCourses] = useState([])
+  const [editing, setEditing] = useState(null)
+  const [open, setOpen] = useState(false)
+  const [unauth, setUnauth] = useState(false)
+  const [loading, setLoading] = useState({})
   const [mainLoading, setMainLoading] = useState(false)
-  const [error, setError]             = useState(null)
-  const [success, setSuccess]         = useState(null)
-
-  useEffect(() => { load() }, [])
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
 
   async function load() {
     try {
@@ -32,8 +30,10 @@ export default function Courses() {
     }
   }
 
-  function handleAdd()  { setEditing(null); setOpen(true); setError(null) }
-  function handleEdit(c) { setEditing(c);   setOpen(true); setError(null) }
+  useEffect(() => { load() }, []) // eslint-disable-line react-hooks/set-state-in-effect
+
+  function handleAdd() { setEditing(null); setOpen(true); setError(null) }
+  function handleEdit(c) { setEditing(c); setOpen(true); setError(null) }
 
   async function handleSave(payload) {
     try {

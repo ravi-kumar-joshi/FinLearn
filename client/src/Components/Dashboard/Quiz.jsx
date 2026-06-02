@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, RotateCcw } from 'lucide-react';
 import { QuestionCard } from '../Shared/QuizComponents';
@@ -20,15 +20,6 @@ const Quiz = ({ module, modProgress, onComplete }) => {
     const finalizeOnce = useRef(false);
 
     const passed = !!modProgress?.quizPassed;
-
-    useEffect(() => {
-        setCurrent(0);
-        setAnswers({});
-        setShowFeedback(false);
-        setFinished(false);
-        setFinalScore(null);
-        finalizeOnce.current = false;
-    }, [module?.id]);
 
     const answeredForCurrent = answers[current] !== undefined;
     const question = questions[current];

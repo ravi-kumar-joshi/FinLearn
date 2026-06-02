@@ -55,8 +55,6 @@ const VerifyPage = () => {
         </div>
     );
 
-    const pageUrl = `${SITE_URL}/verify/${verifyId}`;
-
     return (
         <>
             {/*
@@ -65,7 +63,7 @@ const VerifyPage = () => {
                 you also need the SSR Express route from certificateRoutes.js
                 to serve these tags in the raw HTML response.
             */}
-           
+
             <div className="min-h-screen bg-stone-50">
                 {/* Minimal header */}
                 <header className="border-b border-gray-100 bg-white px-6 py-4 flex items-center justify-between">

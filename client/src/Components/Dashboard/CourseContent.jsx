@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -131,7 +131,7 @@ const CourseContent = () => {
     const lessonProgress = modProgress?.lessons?.find(l => l.lessonId === activeLesson?.id);
 
     // Complete a lesson
-    const handleLessonComplete = useCallback(async () => {
+    const handleLessonComplete = async () => {
         if (!activeLesson || lessonProgress?.completed) return;
         if (lessonCompleteInFlight.current) return;
         lessonCompleteInFlight.current = true;
@@ -154,10 +154,10 @@ const CourseContent = () => {
         } finally {
             lessonCompleteInFlight.current = false;
         }
-    }, [courseId, activeLesson, lessonProgress]);
+    };
 
     // Complete a module (after quiz pass)
-    const handleModuleComplete = useCallback(async (quizScore) => {
+    const handleModuleComplete = async (quizScore) => {
         if (!activeModule?.id || moduleCompleteInFlight.current) return;
         moduleCompleteInFlight.current = true;
         try {
@@ -177,7 +177,7 @@ const CourseContent = () => {
         } finally {
             moduleCompleteInFlight.current = false;
         }
-    }, [courseId, activeModule]);
+    };
 
     const goNextLesson = () => {
         if (activeLessonIdx < (activeModule?.lessons?.length || 0) - 1) {
@@ -404,6 +404,7 @@ const CourseContent = () => {
                         ) : showQuiz ? (
                             <motion.div key="quiz" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                                 <Quiz
+                                    key={activeModule?.id}
                                     module={activeModule}
                                     modProgress={modProgress}
                                     onComplete={handleModuleComplete}

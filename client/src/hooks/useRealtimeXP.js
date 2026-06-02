@@ -92,7 +92,7 @@ export const useRealtimeLeaderboard = (limit = 10, pollInterval = 8000) => {
 
     useEffect(() => {
         isMountedRef.current = true;
-        fetchLeaderboard();
+        fetchLeaderboard(); // eslint-disable-line react-hooks/set-state-in-effect
         pollTimerRef.current = setInterval(fetchLeaderboard, pollInterval);
 
         return () => {

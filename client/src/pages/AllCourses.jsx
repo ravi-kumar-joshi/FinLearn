@@ -859,7 +859,7 @@ const AllCourses = () => {
 
                 {/* Journey list */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {journeyCourses.map((c, i) => (
+                  {journeyCourses.map((c) => (
                     <JourneyCard
                       key={c.id}
                       course={c}

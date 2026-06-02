@@ -17,7 +17,6 @@ import { useSidebarOpen } from '../hooks/useSidebarOpen';
 import {
     CERTIFICATE_PLATFORMS,
     getSiteUrl,
-    buildVerifyUrl,
     openCertificateShare,
     copyCertificateCaption,
     nativeShareCertificate,
@@ -239,29 +238,29 @@ const ShareModal = ({ open, onClose, onSharePlatform, sharingPlatform, onCopyCap
                             const Icon = PLATFORM_ICONS[key];
                             const busy = sharingPlatform === key;
                             return (
-                            <motion.button
-                                key={key}
-                                type="button"
-                                whileTap={{ scale: 0.98 }}
-                                disabled={!!sharingPlatform}
-                                onClick={() => onSharePlatform(key)}
-                                /* Increased min-height for comfortable touch targets */
-                                className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border border-gray-100 hover:border-gray-200 bg-gray-50 hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed group min-h-14"
-                            >
-                                <div
-                                    className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                                    style={{ background: color }}
+                                <motion.button
+                                    key={key}
+                                    type="button"
+                                    whileTap={{ scale: 0.98 }}
+                                    disabled={!!sharingPlatform}
+                                    onClick={() => onSharePlatform(key)}
+                                    /* Increased min-height for comfortable touch targets */
+                                    className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border border-gray-100 hover:border-gray-200 bg-gray-50 hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed group min-h-14"
                                 >
-                                    {busy ? <Loader2 size={16} className="text-white animate-spin" /> : <Icon size={16} className="text-white" />}
-                                </div>
-                                <div className="text-left flex-1 min-w-0">
-                                    <p className="font-semibold text-sm text-gray-900 leading-none">{label}</p>
-                                    <p className="text-xs text-gray-400 mt-0.5 truncate">{PLATFORM_HINTS[key]}</p>
-                                </div>
-                                <svg className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </motion.button>
+                                    <div
+                                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                                        style={{ background: color }}
+                                    >
+                                        {busy ? <Loader2 size={16} className="text-white animate-spin" /> : <Icon size={16} className="text-white" />}
+                                    </div>
+                                    <div className="text-left flex-1 min-w-0">
+                                        <p className="font-semibold text-sm text-gray-900 leading-none">{label}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5 truncate">{PLATFORM_HINTS[key]}</p>
+                                    </div>
+                                    <svg className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </motion.button>
                             );
                         })}
                     </motion.div>
@@ -350,7 +349,7 @@ const CertificatePage = () => {
     const [copiedId, setCopiedId] = useState(false);
 
     const [sharingPlatform, setSharingPlatform] = useState(null);
-    const [copiedCaption, setCopiedCaption] = useState(false);
+    const [_copiedCaption, setCopiedCaption] = useState(false);
     const [canNativeShare, setCanNativeShare] = useState(false);
 
     const certificateRef = useRef(null);
@@ -522,7 +521,7 @@ const CertificatePage = () => {
             ].join(' ')}>
                 {/* Safe-area padding on sides for notched/punch-hole phones */}
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10"
-                     style={{ paddingLeft: 'max(1rem, env(safe-area-inset-left))', paddingRight: 'max(1rem, env(safe-area-inset-right))' }}>
+                    style={{ paddingLeft: 'max(1rem, env(safe-area-inset-left))', paddingRight: 'max(1rem, env(safe-area-inset-right))' }}>
 
                     {/* Back */}
                     <motion.button

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import useGeneral from "../../hooks/useGeneral";
@@ -56,29 +56,29 @@ const EXPERIENCE_OPTIONS = [
 ];
 
 const GOAL_OPTIONS = [
-  { value: "budgeting",   icon: "💰", label: "Smarter Budgeting" },
-  { value: "saving",      icon: "🏦", label: "Build Savings" },
-  { value: "investing",   icon: "📊", label: "Start Investing" },
-  { value: "debt",        icon: "⛓️", label: "Clear Debt" },
-  { value: "retirement",  icon: "🌅", label: "Retire Early" },
-  { value: "taxes",       icon: "🧾", label: "Tax Planning" },
-  { value: "credit",      icon: "💳", label: "Better Credit" },
-  { value: "business",    icon: "🚀", label: "Build a Business" },
+  { value: "budgeting", icon: "💰", label: "Smarter Budgeting" },
+  { value: "saving", icon: "🏦", label: "Build Savings" },
+  { value: "investing", icon: "📊", label: "Start Investing" },
+  { value: "debt", icon: "⛓️", label: "Clear Debt" },
+  { value: "retirement", icon: "🌅", label: "Retire Early" },
+  { value: "taxes", icon: "🧾", label: "Tax Planning" },
+  { value: "credit", icon: "💳", label: "Better Credit" },
+  { value: "business", icon: "🚀", label: "Build a Business" },
 ];
 
 const SITUATION_OPTIONS = [
-  { value: "student",       icon: "🎓", label: "Student",       desc: "Learning while studying" },
-  { value: "employed",      icon: "💼", label: "Salaried",      desc: "9–5, looking to grow wealth" },
-  { value: "self-employed", icon: "⚡", label: "Freelancer",    desc: "Self-employed or side hustle" },
-  { value: "business",      icon: "🏢", label: "Business owner",desc: "Running my own company" },
-  { value: "retired",       icon: "🌿", label: "Retired",       desc: "Managing post-career finances" },
+  { value: "student", icon: "🎓", label: "Student", desc: "Learning while studying" },
+  { value: "employed", icon: "💼", label: "Salaried", desc: "9–5, looking to grow wealth" },
+  { value: "self-employed", icon: "⚡", label: "Freelancer", desc: "Self-employed or side hustle" },
+  { value: "business", icon: "🏢", label: "Business owner", desc: "Running my own company" },
+  { value: "retired", icon: "🌿", label: "Retired", desc: "Managing post-career finances" },
 ];
 
 const TIME_OPTIONS = [
-  { value: "1-2",  icon: "☕", label: "1–2 hrs / week",  desc: "Casual pace" },
-  { value: "3-5",  icon: "🔥", label: "3–5 hrs / week",  desc: "Steady progress" },
+  { value: "1-2", icon: "☕", label: "1–2 hrs / week", desc: "Casual pace" },
+  { value: "3-5", icon: "🔥", label: "3–5 hrs / week", desc: "Steady progress" },
   { value: "6-10", icon: "⚡", label: "6–10 hrs / week", desc: "Fast track" },
-  { value: "10+",  icon: "🚀", label: "10+ hrs / week",  desc: "Fully committed" },
+  { value: "10+", icon: "🚀", label: "10+ hrs / week", desc: "Fully committed" },
 ];
 
 // ─── Animations ───────────────────────────────────────────────────────────────
@@ -232,25 +232,24 @@ const Onboarding = () => {
   const totalSteps = STEPS.length;
   const currentId = STEPS[step].id;
 
-  // Clear error whenever step changes
-  useEffect(() => { setError(""); }, [step]);
-
   const goNext = () => {
     // Per-step validation
     const errs = {
-      experience:        !form.experience       && "Please pick your experience level",
-      goals:             form.goals.length === 0 && "Select at least one goal",
-      situation:         !form.currentSituation && "Please select your situation",
-      commitment:        !form.timeCommitment   && "How much time can you spare?",
-      priority:          (!form.priority || form.priority.trim().length < 6)
-                           && "Tell us a bit more (min 6 characters)",
+      experience: !form.experience && "Please pick your experience level",
+      goals: form.goals.length === 0 && "Select at least one goal",
+      situation: !form.currentSituation && "Please select your situation",
+      commitment: !form.timeCommitment && "How much time can you spare?",
+      priority: (!form.priority || form.priority.trim().length < 6)
+        && "Tell us a bit more (min 6 characters)",
     };
     if (errs[currentId]) { setError(errs[currentId]); return; }
+    setError("");
     setDir(1);
     setStep((s) => Math.min(s + 1, totalSteps - 1));
   };
 
   const goBack = () => {
+    setError("");
     setDir(-1);
     setStep((s) => Math.max(s - 1, 0));
   };
@@ -272,12 +271,12 @@ const Onboarding = () => {
         url: apis().saveOnboarding,
         method: "POST",
         body: {
-          experience:      form.experience,
-          goals:           form.goals,
-          timeCommitment:  form.timeCommitment,
-          learningStyle:   form.learningStyle,
+          experience: form.experience,
+          goals: form.goals,
+          timeCommitment: form.timeCommitment,
+          learningStyle: form.learningStyle,
           currentSituation: form.currentSituation,
-          priority:        form.priority,
+          priority: form.priority,
         },
       });
       if (result?.status) {
@@ -313,14 +312,14 @@ const Onboarding = () => {
   // ── Path preview (shown on last step before submit) ───────────────────────
   const getPreviewModules = () => {
     const map = {
-      budgeting:  { icon: "💰", title: "Personal Budgeting 101",     xp: 120 },
-      saving:     { icon: "🏦", title: "Building Your Emergency Fund", xp: 150 },
-      investing:  { icon: "📊", title: "Investing Fundamentals",       xp: 200 },
-      debt:       { icon: "⛓️", title: "Debt Avalanche Strategy",      xp: 130 },
-      retirement: { icon: "🌅", title: "Retirement Planning Basics",   xp: 180 },
-      taxes:      { icon: "🧾", title: "Tax Optimization Guide",       xp: 160 },
-      credit:     { icon: "💳", title: "Credit Score Mastery",         xp: 140 },
-      business:   { icon: "🚀", title: "Finance for Entrepreneurs",    xp: 220 },
+      budgeting: { icon: "💰", title: "Personal Budgeting 101", xp: 120 },
+      saving: { icon: "🏦", title: "Building Your Emergency Fund", xp: 150 },
+      investing: { icon: "📊", title: "Investing Fundamentals", xp: 200 },
+      debt: { icon: "⛓️", title: "Debt Avalanche Strategy", xp: 130 },
+      retirement: { icon: "🌅", title: "Retirement Planning Basics", xp: 180 },
+      taxes: { icon: "🧾", title: "Tax Optimization Guide", xp: 160 },
+      credit: { icon: "💳", title: "Credit Score Mastery", xp: 140 },
+      business: { icon: "🚀", title: "Finance for Entrepreneurs", xp: 220 },
     };
     return form.goals.slice(0, 3).map((g) => map[g]).filter(Boolean);
   };
@@ -585,7 +584,7 @@ const Onboarding = () => {
         );
 
       // ── 6: Preview your path ──────────────────────────────────────────────────
-      case "preview":
+      case "preview": {
         const modules = getPreviewModules();
         const expLabel = EXPERIENCE_OPTIONS.find((e) => e.value === form.experience)?.title || "";
         const timeLabel = TIME_OPTIONS.find((t) => t.value === form.timeCommitment)?.label || "";
@@ -656,6 +655,7 @@ const Onboarding = () => {
             </div>
           </div>
         );
+      }
 
       default:
         return null;

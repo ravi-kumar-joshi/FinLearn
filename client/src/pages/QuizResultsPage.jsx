@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../Components/Dashboard/Navbar';
@@ -67,15 +67,15 @@ const QuizResultsPage = () => {
     const badge = score === 100
         ? { name: 'Perfect Score', desc: 'Flawless execution!', icon: Trophy, from: 'from-yellow-400', to: 'to-amber-500', glow: 'shadow-amber-200' }
         : score >= 80
-        ? { name: 'Expert', desc: 'Outstanding result!', icon: Award, from: 'from-purple-500', to: 'to-indigo-500', glow: 'shadow-indigo-200' }
-        : score >= PASS_SCORE
-        ? { name: 'Learner', desc: 'Well done, keep going!', icon: Target, from: 'from-blue-400', to: 'to-cyan-500', glow: 'shadow-cyan-200' }
-        : null;
+            ? { name: 'Expert', desc: 'Outstanding result!', icon: Award, from: 'from-purple-500', to: 'to-indigo-500', glow: 'shadow-indigo-200' }
+            : score >= PASS_SCORE
+                ? { name: 'Learner', desc: 'Well done, keep going!', icon: Target, from: 'from-blue-400', to: 'to-cyan-500', glow: 'shadow-cyan-200' }
+                : null;
 
     const message = score === 100 ? '🔥 Perfect! Absolute mastery!'
         : score >= 80 ? '🎉 Excellent work!'
-        : score >= PASS_SCORE ? '👏 You passed!'
-        : '💪 So close — you\'ve got this!';
+            : score >= PASS_SCORE ? '👏 You passed!'
+                : '💪 So close — you\'ve got this!';
 
     const handleShare = () => {
         const text = `I scored ${score}% on the "${moduleTitle}" quiz! 🎓 #FinLearn`;
@@ -136,15 +136,15 @@ const QuizResultsPage = () => {
                                         { label: 'Correct answers', value: `${correctCount} / ${totalQuestions}`, icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50', border: 'border-emerald-100' },
                                         { label: 'XP earned', value: `+${totalXP}`, icon: Zap, color: 'text-amber-600 bg-amber-50', border: 'border-amber-100' },
                                         { label: 'Pass threshold', value: `${PASS_SCORE}%`, icon: Target, color: passed ? 'text-indigo-600 bg-indigo-50' : 'text-red-500 bg-red-50', border: passed ? 'border-indigo-100' : 'border-red-100' },
-                                    ].map(({ label, value, icon: Icon, color, border }) => (
-                                        <div key={label} className={`flex items-center justify-between p-3 rounded-xl border ${border} bg-white`}>
+                                    ].map((item) => (
+                                        <div key={item.label} className={`flex items-center justify-between p-3 rounded-xl border ${item.border} bg-white`}>
                                             <div className="flex items-center gap-2.5">
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color}`}>
-                                                    <Icon size={16} />
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${item.color}`}>
+                                                    <item.icon size={16} />
                                                 </div>
-                                                <span className="text-sm text-gray-600">{label}</span>
+                                                <span className="text-sm text-gray-600">{item.label}</span>
                                             </div>
-                                            <span className="font-bold text-gray-900">{value}</span>
+                                            <span className="font-bold text-gray-900">{item.value}</span>
                                         </div>
                                     ))}
                                 </div>

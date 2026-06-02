@@ -9,7 +9,7 @@ export default function Users() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [success, setSuccess] = useState(null)
-    const [actionLoading, setActionLoading] = useState({})
+    const [_actionLoading, setActionLoading] = useState({})
 
     useEffect(() => {
         load()

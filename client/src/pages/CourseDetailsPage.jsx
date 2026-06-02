@@ -102,10 +102,11 @@ function ProgressRing({ percent, size = 80, stroke = 6 }) {
 }
 
 /** Stat pill badge */
-function StatBadge({ icon: Icon, label, value, accent }) {
+function StatBadge({ icon, label, value, accent }) {
+    const IconComp = icon;
     return (
         <div className="flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3.5 py-1.5 border border-white/20">
-            <Icon size={15} className={accent || 'text-white/80'} />
+            <IconComp size={15} className={accent || 'text-white/80'} />
             <span className="text-white text-sm font-medium">{value}</span>
             {label && <span className="text-white/60 text-xs hidden sm:inline">{label}</span>}
         </div>
@@ -140,8 +141,8 @@ function ModuleRow({ mod, idx, progress, onStart }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
             className={`rounded-xl border transition-all duration-200 ${isActive
-                    ? 'border-indigo-200 bg-indigo-50/50 shadow-sm shadow-indigo-100'
-                    : 'border-gray-100 bg-white hover:border-gray-200'
+                ? 'border-indigo-200 bg-indigo-50/50 shadow-sm shadow-indigo-100'
+                : 'border-gray-100 bg-white hover:border-gray-200'
                 }`}
         >
             <button
@@ -265,13 +266,13 @@ function CourseCard({ course, progress, durationLabel, totalLessonCount, totalXp
                         { label: 'Duration', value: durationLabel, icon: Clock },
                         { label: 'Modules', value: sortedModuleList.length, icon: Layers },
                         { label: 'Lessons', value: totalLessonCount, icon: BookOpen },
-                    ].map(({ label, value, icon: Icon }) => (
-                        <div key={label} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                    ].map((item) => (
+                        <div key={item.label} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
                             <div className="flex items-center gap-1 mb-1">
-                                <Icon size={12} className="text-gray-400" />
-                                <p className="text-xs text-gray-500">{label}</p>
+                                <item.icon size={12} className="text-gray-400" />
+                                <p className="text-xs text-gray-500">{item.label}</p>
                             </div>
-                            <p className="font-bold text-gray-900 text-sm">{value}</p>
+                            <p className="font-bold text-gray-900 text-sm">{item.value}</p>
                         </div>
                     ))}
                 </div>
@@ -303,8 +304,8 @@ function CourseCard({ course, progress, durationLabel, totalLessonCount, totalXp
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className={`w-full py-2.5 rounded-xl flex items-center justify-center gap-2 font-semibold text-sm border transition-colors ${bookmarked
-                            ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                        ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                         }`}
                 >
                     {bookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
@@ -584,14 +585,14 @@ const CourseDetailsPage = () => {
                                                 { icon: BookOpen, label: 'Lessons', value: totalLessonCount },
                                                 { icon: BarChart2, label: 'Level', value: course.difficulty ?? 'Beginner' },
                                                 { icon: Award, label: 'Certificate', value: 'On completion' },
-                                            ].map(({ icon: Icon, label, value }) => (
-                                                <div key={label} className="flex items-center gap-3">
+                                            ].map((item) => (
+                                                <div key={item.label} className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
-                                                        <Icon size={16} className="text-white/80" />
+                                                        <item.icon size={16} className="text-white/80" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-xs text-indigo-200">{label}</p>
-                                                        <p className="text-sm font-bold text-white">{value}</p>
+                                                        <p className="text-xs text-indigo-200">{item.label}</p>
+                                                        <p className="text-sm font-bold text-white">{item.value}</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -611,14 +612,14 @@ const CourseDetailsPage = () => {
                         <div className="lg:col-span-2">
                             {/* tab navigation */}
                             <div className="flex gap-1 bg-white rounded-xl border border-gray-200 p-1 mb-6 shadow-sm">
-                                {tabs.map(({ id, label, icon: Icon }) => (
-                                    <button key={id} type="button" onClick={() => setActiveTab(id)}
-                                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === id
-                                                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
-                                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                {tabs.map((tab) => (
+                                    <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === tab.id
+                                            ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
+                                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                             }`}>
-                                        <Icon size={15} />
-                                        <span className="hidden sm:inline">{label}</span>
+                                        <tab.icon size={15} />
+                                        <span className="hidden sm:inline">{tab.label}</span>
                                     </button>
                                 ))}
                             </div>

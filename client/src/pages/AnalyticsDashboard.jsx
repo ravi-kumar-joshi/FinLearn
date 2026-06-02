@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '../Components/Dashboard/Navbar';
 import SideBar from '../Components/Dashboard/SideBar';
@@ -10,7 +9,6 @@ import {
 import { useSidebarOpen } from '../hooks/useSidebarOpen';
 
 const AnalyticsDashboard = () => {
-    const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useSidebarOpen();
     const [timeRange, setTimeRange] = useState('week');
 

@@ -12,7 +12,7 @@ import { AnimatedXPBar, LevelCard } from "../Components/Dashboard/AnimatedXPBar"
 import httpAction from "../utils/httpAction";
 import apis from "../utils/apis";
 import { COURSE_PROGRESS_UPDATED } from "../utils/courseProgressEvents";
-import { useRealtimeLeaderboard, useRealtimeXP } from "../hooks/useRealtimeXP.js";
+import { useRealtimeXP } from "../hooks/useRealtimeXP.js";
 import { useSidebarOpen } from "../hooks/useSidebarOpen";
 import LeaderboardClient from "../Components/Home/LeaderboardClient";
 import { TrendingUp, BookOpen, Target, Award, Rocket, Shield } from "lucide-react";
@@ -77,7 +77,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   // Real-time user XP (polling)
-  const { userData: realtimeUser, xpHistory } = useRealtimeXP(5000);
+  const { userData: realtimeUser } = useRealtimeXP(5000);
 
   const applyProfile = useCallback((res) => {
     if (res?.status && res.user) {
@@ -173,7 +173,7 @@ const Dashboard = () => {
   // Live XP values (prefer realtimeUser when available)
   const liveXP = realtimeUser?.xp || userData?.xp || {};
   const learningXP = liveXP?.learningXP ?? liveXP?.totalXP ?? 0;
-  const levelProgressPct =
+  const _levelProgressPct =
     liveXP?.maxXPForLevel && liveXP.maxXPForLevel > 0
       ? Math.min(100, ((liveXP.currentXP || 0) / liveXP.maxXPForLevel) * 100)
       : Math.min(100, (learningXP % 1000) / 10);

@@ -111,12 +111,12 @@ export const QuestionCard = ({ question, index, total, onAnswer, answered, selec
                                         )}
                                     </div>
                                     <span className={`font-medium ${showAsCorrect
-                                            ? 'text-green-900'
-                                            : showAsWrong
-                                                ? 'text-red-900'
-                                                : isSelected
-                                                    ? 'text-indigo-900'
-                                                    : 'text-gray-900'
+                                        ? 'text-green-900'
+                                        : showAsWrong
+                                            ? 'text-red-900'
+                                            : isSelected
+                                                ? 'text-indigo-900'
+                                                : 'text-gray-900'
                                         }`}>
                                         {option}
                                     </span>
@@ -132,8 +132,8 @@ export const QuestionCard = ({ question, index, total, onAnswer, answered, selec
                 {showFeedback && (
                     <motion.div
                         className={`p-4 rounded-lg border-l-4 ${isCorrect
-                                ? 'bg-green-50 border-green-500 text-green-900'
-                                : 'bg-red-50 border-red-500 text-red-900'
+                            ? 'bg-green-50 border-green-500 text-green-900'
+                            : 'bg-red-50 border-red-500 text-red-900'
                             }`}
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -181,7 +181,7 @@ export const QuizProgressBar = ({ current, total, xpEarned }) => (
     </div>
 );
 
-export const StreakMultiplier = ({ streak, questionsCorrect }) => {
+export const StreakMultiplier = ({ streak }) => {
     let multiplier = 1;
     if (streak >= 3) multiplier = 1.25;
     if (streak >= 5) multiplier = 1.5;

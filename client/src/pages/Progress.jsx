@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useEffect } from "react"
 import { motion, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion"
 import SideBar from "../Components/Dashboard/SideBar"
 import Navbar from "../Components/Dashboard/Navbar"
@@ -88,7 +88,7 @@ function ChartTip({ active, payload, label }) {
 }
 
 // ─── Animations ───────────────────────────────────────────────────────────────
-const fadeUp = {
+const _fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: (d = 0) => ({
     opacity: 1, y: 0,

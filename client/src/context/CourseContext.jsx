@@ -58,7 +58,7 @@ export function CourseProvider({ courseId, children }) {
 
     // Trigger initial fetch when `courseId` becomes available.
     useEffect(() => {
-        if (courseId) fetchCourse();
+        if (courseId) fetchCourse(); // eslint-disable-line react-hooks/set-state-in-effect
     }, [courseId, fetchCourse]);
 
     // Complete a lesson: sends a PUT request to the backend with XP/score

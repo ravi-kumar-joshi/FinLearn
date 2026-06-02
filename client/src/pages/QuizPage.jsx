@@ -36,11 +36,10 @@ function StepDots({ current, total }) {
         <div className="flex items-center gap-1.5 justify-center my-4">
             {Array.from({ length: total }).map((_, i) => (
                 <motion.div key={i}
-                    className={`rounded-full transition-all duration-300 ${
-                        i < current ? 'bg-indigo-500 w-2 h-2'
-                        : i === current ? 'bg-indigo-600 w-4 h-2'
-                        : 'bg-gray-200 w-2 h-2'
-                    }`}
+                    className={`rounded-full transition-all duration-300 ${i < current ? 'bg-indigo-500 w-2 h-2'
+                            : i === current ? 'bg-indigo-600 w-4 h-2'
+                                : 'bg-gray-200 w-2 h-2'
+                        }`}
                     layout
                 />
             ))}
@@ -215,7 +214,7 @@ const QuizPage = () => {
     );
 
     /* ── quiz UI ── */
-    const scorePreview = answered
+    const _scorePreview = answered
         ? Math.round((Object.keys(selectedAnswers).filter(k => selectedAnswers[k] === questions[Number(k)]?.correctAnswer).length / questions.length) * 100)
         : 0;
 

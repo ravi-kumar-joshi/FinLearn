@@ -141,11 +141,13 @@ export default function Topbar({ isLoggedIn = false, user = null, onAuthChange, 
                 </div>
             </header>
 
-            <AdminLoginModal
-                open={loginOpen}
-                onClose={() => setLoginOpen(false)}
-                onSuccess={handleLoginSuccess}
-            />
+            {loginOpen && (
+                <AdminLoginModal
+                    open={loginOpen}
+                    onClose={() => setLoginOpen(false)}
+                    onSuccess={handleLoginSuccess}
+                />
+            )}
         </>
     )
 }

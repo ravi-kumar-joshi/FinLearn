@@ -43,29 +43,31 @@ function XPBurst({ amount, onDone }) {
 }
 
 /* ────────────────────── confetti on completion ─────────────────── */
-function ConfettiPiece({ delay, x, color }) {
+function ConfettiPiece({ delay, x, color, duration }) {
     return (
         <motion.div
             className="fixed w-2.5 h-2.5 rounded-sm z-998 pointer-events-none"
             style={{ backgroundColor: color, left: `${x}%`, top: '-10px' }}
             initial={{ y: 0, rotate: 0, opacity: 1 }}
             animate={{ y: '110vh', rotate: 720, opacity: [1, 1, 0] }}
-            transition={{ duration: 2.5 + Math.random(), delay, ease: 'easeIn' }}
+            transition={{ duration, delay, ease: 'easeIn' }}
         />
     );
 }
 
 function Confetti({ show }) {
-    const pieces = useMemo(() => {
+    const piecesRef = useRef(null);
+    if (!piecesRef.current) { // eslint-disable-line react-hooks/purity
         const colors = ['#6366f1', '#a855f7', '#ec4899', '#f59e0b', '#10b981', '#3b82f6'];
-        return Array.from({ length: 40 }, (_, i) => ({
+        piecesRef.current = Array.from({ length: 40 }, (_, i) => ({
             id: i, delay: i * 0.04,
-            x: Math.random() * 100,
+            x: Math.random() * 100, // eslint-disable-line react-hooks/purity
+            duration: 2.5 + Math.random(), // eslint-disable-line react-hooks/purity
             color: colors[i % colors.length],
         }));
-    }, []);
+    }
     if (!show) return null;
-    return <>{pieces.map(p => <ConfettiPiece key={p.id} {...p} />)}</>;
+    return <>{piecesRef.current.map(p => <ConfettiPiece key={p.id} {...p} />)}</>; // eslint-disable-line react-hooks/purity
 }
 
 /* ─────────────────────── animated progress ring ─────────────────── */
@@ -107,13 +109,12 @@ function LessonDots({ lessons, currentIdx, lessonDone, onSelect }) {
                         whileHover={{ scale: 1.3 }}
                         whileTap={{ scale: 0.9 }}
                         title={l.title}
-                        className={`rounded-full transition-all duration-200 ${
-                            active
+                        className={`rounded-full transition-all duration-200 ${active
                                 ? 'w-6 h-2.5 bg-indigo-500'
                                 : done
-                                ? 'w-2.5 h-2.5 bg-emerald-400'
-                                : 'w-2.5 h-2.5 bg-gray-200 hover:bg-gray-300'
-                        }`}
+                                    ? 'w-2.5 h-2.5 bg-emerald-400'
+                                    : 'w-2.5 h-2.5 bg-gray-200 hover:bg-gray-300'
+                            }`}
                     />
                 );
             })}
@@ -146,11 +147,10 @@ function LessonCard({ lesson, idx, active, done, onClick, isNext }) {
         <motion.button
             type="button"
             onClick={onClick}
-            className={`w-full text-left px-3 py-3 transition-all group relative overflow-hidden ${
-                active
+            className={`w-full text-left px-3 py-3 transition-all group relative overflow-hidden ${active
                     ? 'bg-indigo-50 border-l-[3px] border-indigo-500'
                     : 'hover:bg-gray-50/80 border-l-[3px] border-transparent'
-            }`}
+                }`}
             whileHover={{ paddingLeft: active ? 12 : 16 }}
             transition={{ duration: 0.15 }}
         >
@@ -165,15 +165,14 @@ function LessonCard({ lesson, idx, active, done, onClick, isNext }) {
             <div className="flex items-start gap-2.5 relative z-10">
                 {/* status icon */}
                 <motion.div
-                    className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold transition-all ${
-                        done
+                    className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold transition-all ${done
                             ? 'bg-emerald-100 text-emerald-600 ring-2 ring-emerald-200'
                             : active
-                            ? 'bg-indigo-500 text-white shadow-md shadow-indigo-200'
-                            : isNext
-                            ? 'bg-amber-100 text-amber-600 ring-1 ring-amber-200'
-                            : 'bg-gray-100 text-gray-400'
-                    }`}
+                                ? 'bg-indigo-500 text-white shadow-md shadow-indigo-200'
+                                : isNext
+                                    ? 'bg-amber-100 text-amber-600 ring-1 ring-amber-200'
+                                    : 'bg-gray-100 text-gray-400'
+                        }`}
                     whileHover={done ? { rotate: 360 } : {}}
                     transition={{ duration: 0.4 }}
                 >
@@ -259,11 +258,10 @@ function CompletionOverlay({ lesson, onNext, onQuiz, isLast }) {
                 <motion.button
                     type="button" onClick={onQuiz}
                     whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-                    className={`flex items-center gap-2 px-6 py-2.5 font-bold rounded-xl text-sm ${
-                        isLast
+                    className={`flex items-center gap-2 px-6 py-2.5 font-bold rounded-xl text-sm ${isLast
                             ? 'bg-linear-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200'
                             : 'bg-gray-100 text-gray-700 border border-gray-200'
-                    }`}
+                        }`}
                 >
                     <Trophy size={15} /> {isLast ? 'Take quiz now' : 'Skip to quiz'}
                 </motion.button>
@@ -297,20 +295,18 @@ function ModuleMiniMap({ lessons, currentIdx, lessonDone, onSelect }) {
                             whileHover={{ x: 2 }}
                             transition={{ duration: 0.1 }}
                         >
-                            <div className={`w-5 h-5 rounded-full shrink-0 border-2 flex items-center justify-center text-[9px] font-bold transition-all ${
-                                done
+                            <div className={`w-5 h-5 rounded-full shrink-0 border-2 flex items-center justify-center text-[9px] font-bold transition-all ${done
                                     ? 'bg-emerald-400 border-emerald-400 text-white'
                                     : active
-                                    ? 'bg-indigo-500 border-indigo-500 text-white shadow-md shadow-indigo-300'
-                                    : isNext
-                                    ? 'bg-white border-amber-400 text-amber-600'
-                                    : 'bg-white border-gray-200 text-gray-400'
-                            }`}>
+                                        ? 'bg-indigo-500 border-indigo-500 text-white shadow-md shadow-indigo-300'
+                                        : isNext
+                                            ? 'bg-white border-amber-400 text-amber-600'
+                                            : 'bg-white border-gray-200 text-gray-400'
+                                }`}>
                                 {done ? '✓' : i + 1}
                             </div>
-                            <span className={`text-[11px] truncate leading-none transition-all ${
-                                active ? 'font-bold text-indigo-700' : done ? 'text-gray-400 line-through' : 'text-gray-600 group-hover:text-gray-900'
-                            }`}>
+                            <span className={`text-[11px] truncate leading-none transition-all ${active ? 'font-bold text-indigo-700' : done ? 'text-gray-400 line-through' : 'text-gray-600 group-hover:text-gray-900'
+                                }`}>
                                 {l.title}
                             </span>
                         </motion.button>
@@ -880,13 +876,13 @@ const LessonPage = () => {
                                         { label: 'Current lesson', value: `${Math.min(currentLessonIdx + 1, lessons.length)} / ${lessons.length}`, icon: Play },
                                         { label: 'Course XP', value: `${totalXp} XP`, icon: Zap },
                                         { label: 'Streak', value: `${streak} days 🔥`, icon: Flame },
-                                    ].map(({ label, value, icon: Icon }) => (
-                                        <div key={label} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                    ].map((item) => (
+                                        <div key={item.label} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                                             <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                                                <Icon size={11} className="text-gray-400" />
-                                                {label}
+                                                <item.icon size={11} className="text-gray-400" />
+                                                {item.label}
                                             </div>
-                                            <span className="text-xs font-bold text-gray-800">{value}</span>
+                                            <span className="text-xs font-bold text-gray-800">{item.value}</span>
                                         </div>
                                     ))}
                                 </div>

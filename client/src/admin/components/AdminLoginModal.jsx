@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   MdEmail, MdLock, MdClose, MdLogin,
   MdVisibility, MdVisibilityOff, MdCheckCircle, MdInfo,
@@ -26,7 +26,7 @@ function validateFields({ email, password }) {
   return errors
 }
 
-function InputField({ icon: Icon, error, touched, children }) {
+function InputField({ icon, error, touched, children }) {
   const hasError = error && touched
   return (
     <div>
@@ -36,7 +36,7 @@ function InputField({ icon: Icon, error, touched, children }) {
           ? 'border-red-500/60 ring-1 ring-red-500/20'
           : 'border-slate-700 focus-within:border-blue-500/60 focus-within:ring-1 focus-within:ring-blue-500/20',
       ].join(' ')}>
-        <Icon className={`shrink-0 text-lg ${hasError ? 'text-red-400' : 'text-slate-500'}`} />
+        {React.createElement(icon, { className: `shrink-0 text-lg ${hasError ? 'text-red-400' : 'text-slate-500'}` })}
         {children}
       </div>
       {hasError && <p className="ml-1 mt-1 text-xs text-red-400">{error}</p>}
@@ -79,21 +79,10 @@ export default function AdminLoginModal({ open, onClose, onSuccess }) {
   const [apiError, setApiError] = useState(null)
   const emailRef = useRef(null)
 
-  function reset() {
-    setFields({ email: '', password: '' })
-    setErrors({})
-    setTouched({})
-    setApiError(null)
-  }
-
+  // Focus email input on mount
   useEffect(() => {
-    if (!open) return
-    reset()
-    setShowPassword(false)
-    setLoading(false)
-    setSuccess(false)
     setTimeout(() => emailRef.current?.focus(), 80)
-  }, [open]) // eslint-disable-line
+  }, []) // eslint-disable-line
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape' && open && !loading) onClose() }

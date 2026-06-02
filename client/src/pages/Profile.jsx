@@ -22,10 +22,10 @@ const stagger = {
 
 // ─── Tab Config ───────────────────────────────────────────────────────────────
 const TABS = [
-  { id: "profile",       label: "Profile",       emoji: "👤" },
-  { id: "security",      label: "Security",      emoji: "🔒" },
+  { id: "profile", label: "Profile", emoji: "👤" },
+  { id: "security", label: "Security", emoji: "🔒" },
   { id: "notifications", label: "Notifications", emoji: "🔔" },
-  { id: "preferences",   label: "Preferences",   emoji: "⚙️" },
+  { id: "preferences", label: "Preferences", emoji: "⚙️" },
 ];
 
 // ─── Loading Skeleton ────────────────────────────────────────────────────────
@@ -257,9 +257,9 @@ const ProfileTab = ({ user, form, setForm, saving, onSave, onDiscard, onAvatarCh
       {/* Stats row — BUG FIX: user?.xp?.totalXP (not user?.xp which is an object) */}
       <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         <StatCard emoji="📚" label="Courses Enrolled" value={user?.coursesEnrolled ?? "0"} colorClass="bg-teal-50" />
-        <StatCard emoji="🏅" label="Badges Earned"   value={user?.badges ?? "0"}          colorClass="bg-emerald-50" />
-        <StatCard emoji="🔥" label="Day Streak"       value={`${user?.streak ?? 0}d`}      colorClass="bg-orange-50" />
-        <StatCard emoji="⚡" label="Total XP"         value={(user?.xp?.totalXP ?? user?.xp ?? 0).toLocaleString()} colorClass="bg-amber-50" />
+        <StatCard emoji="🏅" label="Badges Earned" value={user?.badges ?? "0"} colorClass="bg-emerald-50" />
+        <StatCard emoji="🔥" label="Day Streak" value={`${user?.streak ?? 0}d`} colorClass="bg-orange-50" />
+        <StatCard emoji="⚡" label="Total XP" value={(user?.xp?.totalXP ?? user?.xp ?? 0).toLocaleString()} colorClass="bg-amber-50" />
       </motion.div>
 
       {/* Personal info form */}
@@ -426,9 +426,9 @@ const SecurityTab = () => {
   };
 
   const PW_FIELDS = [
-    { key: "current", label: "Current Password",     placeholder: "Enter current password" },
-    { key: "newPass", label: "New Password",          placeholder: "Minimum 8 characters" },
-    { key: "confirm", label: "Confirm New Password",  placeholder: "Repeat new password" },
+    { key: "current", label: "Current Password", placeholder: "Enter current password" },
+    { key: "newPass", label: "New Password", placeholder: "Minimum 8 characters" },
+    { key: "confirm", label: "Confirm New Password", placeholder: "Repeat new password" },
   ];
 
   return (
@@ -484,7 +484,7 @@ const SecurityTab = () => {
 
       <SectionCard title="Active Sessions">
         {[
-          { device: "Chrome on macOS",  location: "Mumbai, IN", time: "Active now", active: true },
+          { device: "Chrome on macOS", location: "Mumbai, IN", time: "Active now", active: true },
           { device: "Safari on iPhone", location: "Mumbai, IN", time: "2 hours ago", active: false },
         ].map((s, i) => (
           <div key={i} className="flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3">
@@ -521,15 +521,15 @@ const NotificationsTab = () => {
     {
       title: "Learning Activity",
       items: [
-        { key: "courseUpdates", label: "Course Updates",  desc: "New content in enrolled courses" },
-        { key: "newLessons",    label: "New Lessons",     desc: "Reminders for upcoming lessons" },
-        { key: "achievements",  label: "Achievements",    desc: "Badges, milestones and XP updates" },
+        { key: "courseUpdates", label: "Course Updates", desc: "New content in enrolled courses" },
+        { key: "newLessons", label: "New Lessons", desc: "Reminders for upcoming lessons" },
+        { key: "achievements", label: "Achievements", desc: "Badges, milestones and XP updates" },
       ],
     },
     {
       title: "Financial Insights",
       items: [
-        { key: "weeklyDigest",   label: "Weekly Digest",   desc: "Market trends summary every Monday" },
+        { key: "weeklyDigest", label: "Weekly Digest", desc: "Market trends summary every Monday" },
         { key: "marketInsights", label: "Market Insights", desc: "Breaking financial news and analysis" },
       ],
     },
@@ -537,7 +537,7 @@ const NotificationsTab = () => {
       title: "Marketing",
       items: [
         { key: "promotions", label: "Promotions & Offers", desc: "Deals, discounts and new launches" },
-        { key: "appPush",    label: "Push Notifications",  desc: "Real-time alerts on your device" },
+        { key: "appPush", label: "Push Notifications", desc: "Real-time alerts on your device" },
       ],
     },
   ];
@@ -569,7 +569,7 @@ const PreferencesTab = () => {
     { label: "Language", key: "language", options: ["English", "Hindi", "Gujarati", "Tamil", "Telugu"] },
     { label: "Currency", key: "currency", options: ["INR", "USD", "EUR", "GBP", "AED"] },
     { label: "Timezone", key: "timezone", options: ["Asia/Kolkata", "Asia/Dubai", "America/New_York", "Europe/London"] },
-    { label: "Theme",    key: "theme",    options: ["Light", "System"] },
+    { label: "Theme", key: "theme", options: ["Light", "System"] },
   ];
 
   return (
@@ -589,9 +589,9 @@ const PreferencesTab = () => {
 
       <motion.div variants={fadeUp}>
         <SectionCard title="Learning Preferences" subtitle="Customize how FinLearn works for you.">
-          <Toggle checked={learningPrefs.autoPlay}  onChange={() => toggleLP("autoPlay")}  label="Auto-play next lesson"         desc="Continue to next lesson automatically" />
-          <Toggle checked={learningPrefs.subtitles} onChange={() => toggleLP("subtitles")} label="Show subtitles by default"     desc="Display captions on all video lessons" />
-          <Toggle checked={learningPrefs.reminder}  onChange={() => toggleLP("reminder")}  label="Daily learning reminder"       desc="Keep your streak alive with a daily nudge" />
+          <Toggle checked={learningPrefs.autoPlay} onChange={() => toggleLP("autoPlay")} label="Auto-play next lesson" desc="Continue to next lesson automatically" />
+          <Toggle checked={learningPrefs.subtitles} onChange={() => toggleLP("subtitles")} label="Show subtitles by default" desc="Display captions on all video lessons" />
+          <Toggle checked={learningPrefs.reminder} onChange={() => toggleLP("reminder")} label="Daily learning reminder" desc="Keep your streak alive with a daily nudge" />
         </SectionCard>
       </motion.div>
 
@@ -620,17 +620,17 @@ const PreferencesTab = () => {
 // ═══════════════════════════════════════════════════════════════════════════════
 const Profile = () => {
   const [sidebarOpen, setSidebarOpen] = useSidebarOpen();
-  const [activeTab, setActiveTab]     = useState("profile");
-  const [user, setUser]               = useState({});
-  const [saving, setSaving]           = useState(false);
-  const [loading, setLoading]         = useState(true);
+  const [activeTab, setActiveTab] = useState("profile");
+  const [user, setUser] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // BUG FIX: showToast is now actually set to true in handleSave
-  const [showToast, setShowToast]     = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [highlightAvatar, setHighlightAvatar] = useState(false);
-  const [avatarPreview, setAvatarPreview]     = useState(null);
-  const [avatarFile, setAvatarFile]           = useState(null);
-  const [formErrors, setFormErrors]           = useState({});
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
 
   // BUG FIX: Keep a separate "committed" copy so Discard can reset without page reload
   const [committedForm, setCommittedForm] = useState(null);
@@ -648,13 +648,13 @@ const Profile = () => {
         const u = result.user || {};
         setUser(u);
         const fresh = {
-          name:          u.name                      || "",
-          phone:         u.phone                     || "",
-          location:      u.location                  || "",
-          occupation:    u.occupation                || "",
-          bio:           u.bio                       || "",
-          experience:    u.onboarding?.experience    || "",
-          financialGoal: u.onboarding?.goals?.[0]   || "",
+          name: u.name || "",
+          phone: u.phone || "",
+          location: u.location || "",
+          occupation: u.occupation || "",
+          bio: u.bio || "",
+          experience: u.onboarding?.experience || "",
+          financialGoal: u.onboarding?.goals?.[0] || "",
         };
         setForm(fresh);
         setCommittedForm(fresh);   // remember server state for Discard
@@ -684,11 +684,11 @@ const Profile = () => {
   // ── Validation ──────────────────────────────────────────────────────────────
   const validateForm = () => {
     const errs = {};
-    if (!form.name?.trim())             errs.name       = "Name is required";
-    else if (form.name.trim().length < 2) errs.name     = "Name must be at least 2 characters";
-    if (form.phone && !/^[\d\s\-\+\(\)]+$/.test(form.phone)) errs.phone = "Enter a valid phone number";
-    if (form.occupation?.length > 100) errs.occupation  = "Max 100 characters";
-    if (form.bio?.length > 500)        errs.bio         = "Max 500 characters";
+    if (!form.name?.trim()) errs.name = "Name is required";
+    else if (form.name.trim().length < 2) errs.name = "Name must be at least 2 characters";
+    if (form.phone && !/^[\d\s\-+()]+$/.test(form.phone)) errs.phone = "Enter a valid phone number";
+    if (form.occupation?.length > 100) errs.occupation = "Max 100 characters";
+    if (form.bio?.length > 500) errs.bio = "Max 500 characters";
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -703,11 +703,11 @@ const Profile = () => {
         url: apis().updateProfile,
         method: "PUT",
         body: {
-          name:       form.name,
-          phone:      form.phone      || null,
-          location:   form.location   || null,
+          name: form.name,
+          phone: form.phone || null,
+          location: form.location || null,
           occupation: form.occupation || null,
-          bio:        form.bio        || null,
+          bio: form.bio || null,
         },
       });
       if (!profileRes?.status) {
@@ -787,10 +787,10 @@ const Profile = () => {
             highlightAvatar={highlightAvatar}
           />
         );
-      case "security":       return <SecurityTab />;
-      case "notifications":  return <NotificationsTab />;
-      case "preferences":    return <PreferencesTab />;
-      default:               return null;
+      case "security": return <SecurityTab />;
+      case "notifications": return <NotificationsTab />;
+      case "preferences": return <PreferencesTab />;
+      default: return null;
     }
   };
 

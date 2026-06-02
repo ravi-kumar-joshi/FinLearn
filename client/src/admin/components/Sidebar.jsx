@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   MdDashboard, MdMenuBook, MdPeople, MdQuiz,
@@ -37,7 +37,7 @@ const FOOTER_ITEM = { to: '/settings', icon: MdSettings, label: 'Settings' }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function NavItem({ to, icon: Icon, label, badge, collapsed, onNavigate }) {
+function NavItem({ to, icon, label, badge, collapsed, onNavigate }) {
   return (
     <NavLink
       to={to}
@@ -60,7 +60,7 @@ function NavItem({ to, icon: Icon, label, badge, collapsed, onNavigate }) {
           {isActive && (
             <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-emerald-400" />
           )}
-          <Icon className="h-[18px] w-[18px] shrink-0" />
+          {React.createElement(icon, { className: "h-[18px] w-[18px] shrink-0" })}
           {!collapsed && <span className="flex-1 truncate">{label}</span>}
           {!collapsed && badge != null && (
             <span className={`rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums ${isActive ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-700/80 text-slate-400'

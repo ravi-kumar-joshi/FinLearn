@@ -68,20 +68,20 @@ const Tools = () => {
                         transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
                         className="flex gap-2 border-b border-gray-200 mb-8 overflow-x-auto pb-0 scrollbar-none"
                     >
-                        {TABS.map(({ key, label, icon: Icon }, i) => (
+                        {TABS.map((tab, i) => (
                             <motion.button
-                                key={key}
+                                key={tab.key}
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3, delay: 0.15 + i * 0.05, ease: 'easeOut' }}
-                                onClick={() => setActiveTab(key)}
-                                className={`flex items-center gap-2 px-4 py-3 text-sm rounded-t-xl border border-b-0 whitespace-nowrap transition-all duration-200 ${activeTab === key
+                                onClick={() => setActiveTab(tab.key)}
+                                className={`flex items-center gap-2 px-4 py-3 text-sm rounded-t-xl border border-b-0 whitespace-nowrap transition-all duration-200 ${activeTab === tab.key
                                     ? 'bg-white border-gray-200 text-indigo-600 font-semibold shadow-sm'
                                     : 'bg-transparent border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
-                                <Icon size={15} />
-                                {label}
+                                <tab.icon size={15} />
+                                {tab.label}
                             </motion.button>
                         ))}
                     </motion.div>
