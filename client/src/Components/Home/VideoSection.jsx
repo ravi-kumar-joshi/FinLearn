@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 
 // ─── ImageKit Config ─────────────────────────────────────────────────────────
 const IK_ENDPOINT =
-  import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT || 'https://ik.imagekit.io/tz5jjsq';
+  import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT || 'https://ik.imagekit.io/tz5jjsqeb';
 
 const VIDEO_PATH = 'FinancialBasics_Intro.mp4';
 const THUMB_PATH = 'heroleftimg.png';
