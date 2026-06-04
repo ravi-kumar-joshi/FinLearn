@@ -75,7 +75,17 @@ export default function CourseModal({ open, onClose, onSave, initial }) {
     if (!validate()) { setTab('general'); return }
     setSaving(true)
     try {
-      await onSave({ ...course, _id: initial?._id, id: initial?.id })
+      // Ensure every module and lesson has an `order` field required by the backend
+      const prepared = {
+        ...course,
+        modules: (course.modules || []).map((m, mi) => ({
+          ...m,
+          order: (m.order !== undefined && m.order !== null) ? m.order : (mi + 1),
+          lessons: (m.lessons || []).map((l, li) => ({ ...(l || {}), order: (l?.order !== undefined && l?.order !== null) ? l.order : (li + 1) }))
+        }))
+      }
+      console.log('[CourseModal] prepared payload before save:', prepared)
+      await onSave({ ...prepared, _id: initial?._id, id: initial?.id })
       // parent handles closing and refresh; we simply stop the spinner here
     } catch (err) {
       setErrors(e => ({ ...e, _api: err.message || 'Save failed' }))
