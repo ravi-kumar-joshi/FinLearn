@@ -62,6 +62,27 @@ router.post('/courses', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Description is required' })
         }
 
+        // Normalize modules/lessons: ensure `order` and `id` exist to satisfy schema validators
+        const makeId = (prefix = 'id') => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`
+        req.body.modules = (req.body.modules || []).map((m, mi) => ({
+            id: m.id || m._id || makeId('m'),
+            title: m.title || '',
+            description: m.description || '',
+            xpReward: m.xpReward ?? 100,
+            order: (m.order !== undefined && m.order !== null) ? m.order : (mi + 1),
+            lessons: (m.lessons || []).map((l, li) => ({
+                id: l.id || l._id || makeId('l'),
+                title: l.title || 'Untitled lesson',
+                duration: l.duration ?? 15,
+                xpReward: l.xpReward ?? 20,
+                content: (l.content !== undefined && l.content !== null && String(l.content).trim() !== '') ? l.content : '<p></p>',
+                videoUrl: l.videoUrl || null,
+                resources: l.resources || [],
+                order: (l.order !== undefined && l.order !== null) ? l.order : (li + 1),
+                quiz: l.quiz || { questions: [] }
+            }))
+        }))
+
         // Check if slug already exists
         const existingSlug = await Course.findOne({ slug: slug.toLowerCase().trim() })
         if (existingSlug) {
@@ -93,6 +114,27 @@ router.put('/courses/:id', async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ success: false, message: 'Invalid course ID' })
         }
+
+        // Normalize incoming modules/lessons so validators don't fail on missing `order`/`id`/`content`
+        const makeId = (prefix = 'id') => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`
+        req.body.modules = (req.body.modules || []).map((m, mi) => ({
+            id: m.id || m._id || makeId('m'),
+            title: m.title || '',
+            description: m.description || '',
+            xpReward: m.xpReward ?? 100,
+            order: (m.order !== undefined && m.order !== null) ? m.order : (mi + 1),
+            lessons: (m.lessons || []).map((l, li) => ({
+                id: l.id || l._id || makeId('l'),
+                title: l.title || 'Untitled lesson',
+                duration: l.duration ?? 15,
+                xpReward: l.xpReward ?? 20,
+                content: (l.content !== undefined && l.content !== null && String(l.content).trim() !== '') ? l.content : '<p></p>',
+                videoUrl: l.videoUrl || null,
+                resources: l.resources || [],
+                order: (l.order !== undefined && l.order !== null) ? l.order : (li + 1),
+                quiz: l.quiz || { questions: [] }
+            }))
+        }))
 
         const { title, slug, category, description } = req.body
 
