@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 import httpAction from '../utils/httpAction';
 import { useSidebarOpen } from '../hooks/useSidebarOpen';
-import { notifyCourseProgressUpdated } from '../utils/courseProgressEvents';
+import { notifyCourseProgressUpdated, COURSE_PROGRESS_UPDATED } from '../utils/courseProgressEvents';
+import { useSearchParams } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api';
 
@@ -429,30 +430,52 @@ const LessonPage = () => {
     const [streak] = useState(3); // from user profile in real app
     const lessonCompleteInFlight = useRef(false);
     const contentRef = useRef(null);
+    const autoAdvanceTimeout = useRef(null);
 
     /* ── swipe gesture support ── */
     const dragX = useMotionValue(0);
     const dragStart = useRef(0);
 
-    useEffect(() => {
-        let cancelled = false;
-        const load = async () => {
+    const fetchCourse = useCallback(async () => {
+        try {
             setLoading(true);
             const res = await httpAction({ url: `${API_BASE_URL}/courses/${courseId}`, method: 'GET' });
-            if (cancelled) return;
             if (res?.success && res.course) { setCourse(res.course); setProgress(res.progress ?? null); }
             else { setCourse(null); setProgress(null); }
+        } catch (err) {
+            setCourse(null); setProgress(null);
+        } finally {
             setLoading(false);
-        };
-        if (courseId) load();
-        return () => { cancelled = true; };
+        }
     }, [courseId]);
+
+    useEffect(() => {
+        if (courseId) void fetchCourse();
+    }, [courseId, fetchCourse]);
+
+    // Refresh course/progress when other parts of the app notify an update (e.g., quiz completed)
+    useEffect(() => {
+        const handler = (e) => {
+            if (!e?.detail?.courseId) return;
+            if (String(e.detail.courseId) === String(courseId)) void fetchCourse();
+        };
+        window.addEventListener(COURSE_PROGRESS_UPDATED, handler);
+        return () => window.removeEventListener(COURSE_PROGRESS_UPDATED, handler);
+    }, [courseId, fetchCourse]);
 
     const selectedModule = useMemo(() => course?.modules?.find((m) => m.id === moduleId), [course, moduleId]);
     const modProgress = useMemo(() => progress?.modules?.find((m) => m.moduleId === moduleId), [progress, moduleId]);
     const lessons = selectedModule?.lessons ?? [];
 
-    useEffect(() => { setCurrentLessonIdx(0); setShowCompletionOverlay(false); }, [moduleId, courseId]);
+    const [searchParams] = useSearchParams();
+    useEffect(() => {
+        const idxParam = Number(searchParams.get('lessonIdx'));
+        if (!Number.isNaN(idxParam) && idxParam >= 0) setCurrentLessonIdx(Math.max(0, idxParam));
+        else setCurrentLessonIdx(0);
+        setShowCompletionOverlay(false);
+        // re-fetch course/progress for fresh state when module changes
+        if (courseId) void fetchCourse();
+    }, [moduleId, courseId, fetchCourse, searchParams]);
 
     const lessonDone = useCallback((lessonId) =>
         !!modProgress?.lessons?.find((lp) => lp.lessonId === lessonId && lp.completed),
@@ -485,17 +508,37 @@ const LessonPage = () => {
             setShowXPBurst(true);
             setShowConfetti(true);
             setShowCompletionOverlay(true);
+            // auto-hide confetti after a short time
             setTimeout(() => setShowConfetti(false), 3000);
+
+            // schedule auto-advance to next lesson (so UI updates without page refresh)
+            if (autoAdvanceTimeout.current) clearTimeout(autoAdvanceTimeout.current);
+            autoAdvanceTimeout.current = setTimeout(() => {
+                setShowCompletionOverlay(false);
+                if (currentLessonIdx < lessons.length - 1) {
+                    setCurrentLessonIdx(i => i + 1);
+                    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    // end of module -> go to module quiz
+                    navigate(`/dashboard/course/${courseId}/quiz?moduleId=${encodeURIComponent(moduleId)}`);
+                }
+                autoAdvanceTimeout.current = null;
+            }, 1800);
         } finally {
             lessonCompleteInFlight.current = false;
         }
     }, [courseId, currentLesson, lessonProgress]);
 
     const goToNext = () => {
+        // cancel any scheduled auto-advance
+        if (autoAdvanceTimeout.current) { clearTimeout(autoAdvanceTimeout.current); autoAdvanceTimeout.current = null; }
         setShowCompletionOverlay(false);
         if (currentLessonIdx < lessons.length - 1) {
-            setCurrentLessonIdx((i) => i + 1);
+            const next = currentLessonIdx + 1;
+            setCurrentLessonIdx(next);
             contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+            // reflect navigation in URL so the change is shareable / bookmarkable
+            navigate(`/dashboard/course/${courseId}/lesson/${encodeURIComponent(moduleId)}?lessonIdx=${next}`);
         }
     };
 
@@ -527,6 +570,16 @@ const LessonPage = () => {
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
     }, [currentLessonIdx, lessons.length]);
+
+    // cleanup any pending auto-advance timer
+    useEffect(() => {
+        return () => {
+            if (autoAdvanceTimeout.current) {
+                clearTimeout(autoAdvanceTimeout.current);
+                autoAdvanceTimeout.current = null;
+            }
+        };
+    }, []);
 
     /* ── loading state ── */
     if (loading) return (
