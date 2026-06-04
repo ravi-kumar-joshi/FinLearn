@@ -70,7 +70,7 @@ export default function Courses() {
     } catch (err) {
       console.error('[courses] save error:', err, err?.data)
       if (err.status === 403) { setUnauth(true); setError('You need to be an admin to manage courses.') }
-      else setError(`Save failed: ${err.message}`)
+      else setError(`Save failed: ${err?.data?.message || err.message}`)
     }
   }
 

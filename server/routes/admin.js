@@ -43,6 +43,8 @@ router.get('/courses/:id', async (req, res) => {
 
 // CREATE new course
 router.post('/courses', async (req, res) => {
+    console.log('[admin] POST /courses - user:', req.id, 'auth header:', req.headers.authorization)
+    console.log('[admin] POST body sample:', { title: req.body.title, slug: req.body.slug, modulesCount: (req.body.modules || []).length })
     try {
         const { title, slug, category, description } = req.body
 
@@ -82,6 +84,9 @@ router.post('/courses', async (req, res) => {
 
 // UPDATE course
 router.put('/courses/:id', async (req, res) => {
+    console.log('[admin] PUT /courses/:id - user:', req.id, 'auth header:', req.headers.authorization)
+    console.log('[admin] PUT params:', req.params)
+    console.log('[admin] PUT body sample:', { title: req.body.title, slug: req.body.slug, modulesCount: (req.body.modules || []).length })
     try {
         const { id } = req.params
 
