@@ -7,6 +7,7 @@ const IK_ENDPOINT =
   import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT || 'https://ik.imagekit.io/tz5jjsqeb';
 
 const VIDEO_PATH = 'FinancialBasics_Intro.mp4';
+const VIDEO_VERSION = Date.now(); // cache-bust: fresh on every page load
 const THUMB_PATH = 'heroleftimg.png';
 
 const ikUrl = (path, transforms = '') =>
@@ -117,7 +118,7 @@ const VideoModal = memo(({ onClose }) => {
           <video
             ref={videoRef}
             className="w-full h-full"
-            src={ikUrl(VIDEO_PATH)}
+            src={`${ikUrl(VIDEO_PATH)}?v=${VIDEO_VERSION}`}
             controls
             autoPlay
             playsInline
@@ -213,7 +214,7 @@ const ThumbnailCard = memo(({ onClick }) => (
                       flex items-center gap-3 border-t border-gray-100/80">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700
                         flex items-center justify-center shadow-md shrink-0"
-             aria-hidden="true">
+          aria-hidden="true">
           <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
             <path d="M17 10.5V7a2 2 0 00-2-2H5A2 2 0 003 7v10a2 2 0 002 2h10a2 2 0 002-2v-3.5l4 4V6.5l-4 4z" />
           </svg>
@@ -244,7 +245,7 @@ const ThumbnailCard = memo(({ onClick }) => (
 const VideoSection = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const openModal  = useCallback(() => setIsOpen(true),  []);
+  const openModal = useCallback(() => setIsOpen(true), []);
   const closeModal = useCallback(() => setIsOpen(false), []);
 
   return (
