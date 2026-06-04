@@ -57,6 +57,7 @@ const login = async (req, res, next) => {
 
     // Set cookies with appropriate security settings
     const isProd = process.env.NODE_ENV === "production";
+    console.log("NODE_ENV =", process.env.NODE_ENV);
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true, // Prevents XSS attacks

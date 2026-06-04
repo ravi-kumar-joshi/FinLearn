@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 
 const auth = (req, res, next) => {
   try {
-    console.log("=== AUTH DEBUG ===");
-    console.log("Cookies:", req.cookies);
-    console.log("Access Token:", req.cookies?.accessToken);
+    console.log("Origin:", req.headers.origin);
+    console.log("Cookie Header:", req.headers.cookie);
+    console.log("Cookies Parsed:", req.cookies);
     // Extract access token from HTTP-only cookie
     const accessToken = req.cookies.accessToken;
 
