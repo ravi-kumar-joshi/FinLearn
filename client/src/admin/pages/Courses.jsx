@@ -43,15 +43,15 @@ export default function Courses() {
         modules: (payload.modules || []).map((m, mi) => ({
           id: m.id,
           title: m.title,
-          // ensure backend-required order is present
-          order: (m.order !== undefined && m.order !== null) ? m.order : (mi + 1),
+          // force numeric order according to position
+          order: (mi + 1),
           description: m.description || '',
           xpReward: m.xpReward ?? 100,
           lessons: (m.lessons || []).map((l, li) => ({
             id: l.id,
             title: l.title,
-            // lesson order is not required by schema but include for completeness
-            order: (l.order !== undefined && l.order !== null) ? l.order : (li + 1),
+            // force lesson order
+            order: (li + 1),
             duration: l.duration,
             xpReward: l.xpReward ?? 20,
             content: l.content,
