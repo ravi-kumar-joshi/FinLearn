@@ -56,10 +56,12 @@ export default function Courses() {
         const res = await api.updateCourse(id, normalized)
         setCourses(cs => cs.map(x => (x._id === id || x.id === id) ? res.course : x))
         setSuccess(`Course "${payload.title}" updated successfully!`)
+        await load()
       } else {
         const res = await api.createCourse(normalized)
         setCourses(cs => [res.course, ...cs])
         setSuccess(`Course "${payload.title}" created successfully!`)
+        await load()
       }
       setOpen(false); setEditing(null)
     } catch (err) {
