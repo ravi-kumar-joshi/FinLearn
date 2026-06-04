@@ -134,7 +134,7 @@ const sendMail = async (data) => {
     // Log success (in production, use proper logging service)
     if (process.env.NODE_ENV === 'development') {
       console.log('✉️ Email sent successfully to:', data.receiver);
-      console.log('🔑 OTP:', data.otp);
+      // Removed logging of the OTP value to avoid leaking sensitive one-time codes
     }
 
     return success;

@@ -13,9 +13,8 @@ const jwt = require("jsonwebtoken");
 
 const auth = (req, res, next) => {
   try {
-    console.log("Origin:", req.headers.origin);
-    console.log("Cookie Header:", req.headers.cookie);
-    console.log("Cookies Parsed:", req.cookies);
+    // NOTE: Removed debug logs that exposed request origins/cookies to prevent
+    // sensitive token leakage in production logs.
 
     // Primary: HTTP-only cookie — Secondary: Authorization Bearer header
     const accessToken =
