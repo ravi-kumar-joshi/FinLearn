@@ -11,14 +11,42 @@ const labelCls = 'block text-xs font-medium text-slate-300 mb-2'
 
 export default function LessonEditor({ lesson, moduleId, onUpdate, onRemove, isOnlyLesson }) {
     const [editorContent, setEditorContent] = useState(lesson.content || '')
+    const [quiz, setQuiz] = useState(lesson.quiz || { questions: [] })
 
     useEffect(() => {
         setEditorContent(lesson.content || '')
+        setQuiz(lesson.quiz || { questions: [] })
     }, [lesson.content])
 
     const handleContentChange = (content) => {
         setEditorContent(content)
-        onUpdate({ ...lesson, content })
+        onUpdate({ ...lesson, content, quiz })
+    }
+
+    // Quiz helpers
+    const syncUpdate = (nextQuiz) => {
+        setQuiz(nextQuiz)
+        onUpdate({ ...lesson, content: editorContent, quiz: nextQuiz })
+    }
+
+    const addQuestion = () => {
+        const q = { id: `q-${Date.now()}`, question: '', options: ['', '', '', ''], correctAnswer: 0, explanation: '' }
+        syncUpdate({ questions: [...(quiz.questions || []), q] })
+    }
+
+    const removeQuestion = (qid) => {
+        syncUpdate({ questions: (quiz.questions || []).filter(q => q.id !== qid) })
+    }
+
+    const updateQuestion = (qid, patch) => {
+        syncUpdate({ questions: (quiz.questions || []).map(q => q.id === qid ? { ...q, ...patch } : q) })
+    }
+
+    const addOption = (qid) => {
+        const q = (quiz.questions || []).find(x => x.id === qid)
+        if (!q) return
+        const next = { ...q, options: [...q.options, ''] }
+        updateQuestion(qid, next)
     }
 
     return (
@@ -106,6 +134,46 @@ export default function LessonEditor({ lesson, moduleId, onUpdate, onRemove, isO
                     />
                 </div>
                 <p className="text-xs text-slate-500 mt-2">Format lesson content with headings, bold, italics, lists, links, and images.</p>
+            </div>
+
+            {/* Quiz Editor */}
+            <div className="pt-3">
+                <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-slate-200">Quiz</h4>
+                    <button onClick={addQuestion} className="text-xs bg-indigo-700/60 hover:bg-indigo-600 px-2 py-1 rounded">Add Question</button>
+                </div>
+                {(quiz.questions || []).length === 0 && <p className="text-xs text-slate-500">No questions yet.</p>}
+                <div className="space-y-3">
+                    {(quiz.questions || []).map((q, qi) => (
+                        <div key={q.id} className="p-3 bg-slate-900/50 border border-slate-700/40 rounded-lg">
+                            <div className="flex items-start gap-2">
+                                <div className="flex-1">
+                                    <label className={labelCls}>Question {qi + 1}</label>
+                                    <input value={q.question} onChange={e => updateQuestion(q.id, { question: e.target.value })} className={inputCls(false)} placeholder="Question text" />
+                                </div>
+                                <div className="shrink-0">
+                                    <button onClick={() => removeQuestion(q.id)} className="text-xs bg-red-900/50 hover:bg-red-700 px-2 py-1 rounded">Remove</button>
+                                </div>
+                            </div>
+
+                            <div className="mt-2 space-y-2">
+                                {(q.options || []).map((opt, oi) => (
+                                    <div key={oi} className="flex items-center gap-2">
+                                        <input type="radio" name={`correct-${q.id}`} checked={q.correctAnswer === oi} onChange={() => updateQuestion(q.id, { correctAnswer: oi })} />
+                                        <input value={opt} onChange={e => updateQuestion(q.id, { options: q.options.map((o, idx) => idx === oi ? e.target.value : o) })} className={inputCls(false)} placeholder={`Option ${oi + 1}`} />
+                                    </div>
+                                ))}
+                                <div className="flex gap-2">
+                                    <button onClick={() => addOption(q.id)} className="text-xs bg-slate-700/50 hover:bg-slate-700 px-2 py-1 rounded">Add option</button>
+                                </div>
+                                <div>
+                                    <label className={labelCls}>Explanation (optional)</label>
+                                    <textarea value={q.explanation || ''} onChange={e => updateQuestion(q.id, { explanation: e.target.value })} className={inputCls(false)} rows={2} />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     )
