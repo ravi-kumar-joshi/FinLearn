@@ -5,7 +5,11 @@
       "destination": "https://finlearn-1.onrender.com/:path*"
     },
     {
-      "source": "/((?!assets/).*)",
+      "source": "/admin.html",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/((?!assets/|admin\\.html).*)",
       "destination": "/index.html"
     }
   ]

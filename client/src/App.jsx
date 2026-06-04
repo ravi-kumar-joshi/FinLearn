@@ -10,7 +10,7 @@
   - `AuthLayout` provides a consistent layout for authentication-related pages.
 */
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 // ==================== Pages ====================
 import Home from './pages/Home';
@@ -67,6 +67,10 @@ function App() {
           <Route path="/auth/password/change" element={<AuthLayout> <NewPassword /> </AuthLayout>} />
           <Route path="/auth/onboarding" element={<AuthLayout> <Onboarding /> </AuthLayout>} />
         </Route>
+
+        {/* Redirect /admin to the separate admin SPA entrypoint */}
+        <Route path="/admin" element={<Navigate to="/admin.html" replace />} />
+        <Route path="/admin/*" element={<Navigate to="/admin.html" replace />} />
 
         {/* Dashboard and protected user routes */}
         <Route element={<Super />}>

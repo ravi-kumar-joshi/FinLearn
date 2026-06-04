@@ -72,17 +72,19 @@ const login = async (req, res, next) => {
     res.cookie("accessToken", accessToken, cookieOptions(7));
     res.cookie("refreshToken", refreshToken, cookieOptions(30));
 
-    // Return success response (don't send password to client)
+    // Return success response with a usable access token for admin client requests
     res.status(200).json({
       message: "Login successful",
       status: true,
+      token: accessToken,
       user: {
         id: findedUser._id,
         name: findedUser.name,
         email: findedUser.email,
         profileImage: findedUser.profileImage,
-        onboardingCompleted: findedUser.onboarding?.completed || false
-      }
+        onboardingCompleted: findedUser.onboarding?.completed || false,
+        isAdmin: Boolean(findedUser.isAdmin),
+      },
     });
   } catch (error) {
     next(error);

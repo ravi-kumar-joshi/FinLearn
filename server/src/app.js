@@ -103,6 +103,19 @@ strategy(app);
 // internal routes and controllers.
 app.use('/user', authRoutes);
 app.use('/courses', courseRoutes);
+
+// Admin panel page redirect: if someone visits /admin as a page request, 
+// redirect them to the separate admin SPA entrypoint (admin.html).
+// This only triggers for page/HTML requests, not API calls.
+app.get('/admin', (req, res) => {
+  if (req.accepts('html')) {
+    return res.redirect('/admin.html');
+  }
+  // For non-HTML requests, continue to API routes
+  res.status(404).json({ message: 'Not found' });
+});
+
+// Protect all admin API routes with auth + admin middleware
 app.use('/admin', adminRoutes);
 app.use('/certificates', certificateRoutes);
 app.use('/api', chatRoutes);

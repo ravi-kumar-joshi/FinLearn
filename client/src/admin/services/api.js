@@ -37,7 +37,7 @@ export async function getLeaderboard(limit = 10) { return request(`/user/leaderb
 export async function login(email, password) {
   const data = await request('/user/login', { method: 'POST', body: JSON.stringify({ email, password }) })
   if (data?.token) localStorage.setItem('adminToken', data.token)
-  return data
+  return data?.user ?? data
 }
 export async function logout() {
   try { await request('/user/logout') } catch { /* best-effort */ }
