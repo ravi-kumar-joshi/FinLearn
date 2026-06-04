@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CheckCircle2, ExternalLink, AlertTriangle } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
+const API_BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api';
 const SITE_URL = 'https://finlearn.app';
 
 const VerifyPage = () => {

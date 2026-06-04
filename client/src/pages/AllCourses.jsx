@@ -13,7 +13,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebarOpen } from '../hooks/useSidebarOpen';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
+const API_BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api';
 const CATALOG_POLL_MS = 30000;
 
 const CATEGORIES = ['All', 'Budgeting', 'Investing', 'Tax', 'Taxes', 'Savings', 'Debt', 'Retirement', 'Banking'];

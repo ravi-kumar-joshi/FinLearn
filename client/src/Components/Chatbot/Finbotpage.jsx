@@ -58,9 +58,12 @@ export default function FinBotPage() {
     inputRef.current?.focus();
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
+      // Chat endpoint: server mounts chatRoutes at /api, and Vercel proxies /api/* → Render/*
+      const chatBase = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api';
+      const res = await fetch(`${chatBase}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // send auth cookies for session-aware chat
         body: JSON.stringify({ message: userMsg, sessionId }),
       });
       const data = await res.json();
@@ -177,22 +180,20 @@ export default function FinBotPage() {
                 >
                   {/* Avatar */}
                   <div
-                    className={`shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs font-bold shadow ${
-                      msg.role === "bot"
+                    className={`shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs font-bold shadow ${msg.role === "bot"
                         ? "bg-gradient-to-br from-emerald-400 to-teal-500 text-white"
                         : "bg-gradient-to-br from-slate-600 to-slate-800 text-white"
-                    }`}
+                      }`}
                   >
                     {msg.role === "bot" ? "🎓" : <User size={11} />}
                   </div>
 
                   {/* Bubble */}
                   <div
-                    className={`max-w-[78%] sm:max-w-[65%] px-3 py-2 sm:px-3.5 sm:py-2.5 text-[13px] sm:text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
-                      msg.role === "user"
+                    className={`max-w-[78%] sm:max-w-[65%] px-3 py-2 sm:px-3.5 sm:py-2.5 text-[13px] sm:text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${msg.role === "user"
                         ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl rounded-br-sm"
                         : "bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm"
-                    }`}
+                      }`}
                   >
                     {formatMessage(msg.text)}
                   </div>

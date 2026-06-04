@@ -21,9 +21,6 @@ import httpAction from '../utils/httpAction';
 import apis from '../utils/apis';
 import { notifyCourseProgressUpdated } from '../utils/courseProgressEvents';
 
-// Optional environment override for API base URL (rarely used here).
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
-
 const CourseContext = createContext(null);
 
 // Convenience hook to consume the CourseContext

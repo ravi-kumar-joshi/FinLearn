@@ -13,7 +13,9 @@ import httpAction from '../../utils/httpAction';
 import { notifyCourseProgressUpdated } from '../../utils/courseProgressEvents';
 import { useSidebarOpen } from '../../hooks/useSidebarOpen';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
+// In production, route through Vercel proxy (/api/*) to avoid cross-origin issues.
+// In dev, call the local Express server directly.
+const API_BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api';
 
 // ── Sidebar Module Item ────────────────────────────────────────────────────
 const ModuleItem = ({ module, modProgress, isActive, onClick }) => {

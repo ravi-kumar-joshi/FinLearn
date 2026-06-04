@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'https://finlearn-1.onrender.com' : '/')
+// In production, route through Vercel proxy (/api/*); in dev, use local server
+const API_BASE = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api'
 
 async function request(path, opts = {}) {
   const token = localStorage.getItem('adminToken')

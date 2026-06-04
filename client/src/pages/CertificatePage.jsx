@@ -22,7 +22,7 @@ import {
     nativeShareCertificate,
 } from '../utils/certificateShare';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
+const API_BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api';
 
 const CertificateCard = React.forwardRef(
     ({ studentName, courseName, completionDate, totalXP, verifyId, instructor }, ref) => {

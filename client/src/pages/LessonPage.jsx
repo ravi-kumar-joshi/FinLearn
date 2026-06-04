@@ -14,7 +14,7 @@ import httpAction from '../utils/httpAction';
 import { useSidebarOpen } from '../hooks/useSidebarOpen';
 import { notifyCourseProgressUpdated } from '../utils/courseProgressEvents';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
+const API_BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 function formatMins(mins) {
@@ -110,10 +110,10 @@ function LessonDots({ lessons, currentIdx, lessonDone, onSelect }) {
                         whileTap={{ scale: 0.9 }}
                         title={l.title}
                         className={`rounded-full transition-all duration-200 ${active
-                                ? 'w-6 h-2.5 bg-indigo-500'
-                                : done
-                                    ? 'w-2.5 h-2.5 bg-emerald-400'
-                                    : 'w-2.5 h-2.5 bg-gray-200 hover:bg-gray-300'
+                            ? 'w-6 h-2.5 bg-indigo-500'
+                            : done
+                                ? 'w-2.5 h-2.5 bg-emerald-400'
+                                : 'w-2.5 h-2.5 bg-gray-200 hover:bg-gray-300'
                             }`}
                     />
                 );
@@ -148,8 +148,8 @@ function LessonCard({ lesson, idx, active, done, onClick, isNext }) {
             type="button"
             onClick={onClick}
             className={`w-full text-left px-3 py-3 transition-all group relative overflow-hidden ${active
-                    ? 'bg-indigo-50 border-l-[3px] border-indigo-500'
-                    : 'hover:bg-gray-50/80 border-l-[3px] border-transparent'
+                ? 'bg-indigo-50 border-l-[3px] border-indigo-500'
+                : 'hover:bg-gray-50/80 border-l-[3px] border-transparent'
                 }`}
             whileHover={{ paddingLeft: active ? 12 : 16 }}
             transition={{ duration: 0.15 }}
@@ -166,12 +166,12 @@ function LessonCard({ lesson, idx, active, done, onClick, isNext }) {
                 {/* status icon */}
                 <motion.div
                     className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold transition-all ${done
-                            ? 'bg-emerald-100 text-emerald-600 ring-2 ring-emerald-200'
-                            : active
-                                ? 'bg-indigo-500 text-white shadow-md shadow-indigo-200'
-                                : isNext
-                                    ? 'bg-amber-100 text-amber-600 ring-1 ring-amber-200'
-                                    : 'bg-gray-100 text-gray-400'
+                        ? 'bg-emerald-100 text-emerald-600 ring-2 ring-emerald-200'
+                        : active
+                            ? 'bg-indigo-500 text-white shadow-md shadow-indigo-200'
+                            : isNext
+                                ? 'bg-amber-100 text-amber-600 ring-1 ring-amber-200'
+                                : 'bg-gray-100 text-gray-400'
                         }`}
                     whileHover={done ? { rotate: 360 } : {}}
                     transition={{ duration: 0.4 }}
@@ -259,8 +259,8 @@ function CompletionOverlay({ lesson, onNext, onQuiz, isLast }) {
                     type="button" onClick={onQuiz}
                     whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                     className={`flex items-center gap-2 px-6 py-2.5 font-bold rounded-xl text-sm ${isLast
-                            ? 'bg-linear-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200'
-                            : 'bg-gray-100 text-gray-700 border border-gray-200'
+                        ? 'bg-linear-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-200'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                         }`}
                 >
                     <Trophy size={15} /> {isLast ? 'Take quiz now' : 'Skip to quiz'}
@@ -296,12 +296,12 @@ function ModuleMiniMap({ lessons, currentIdx, lessonDone, onSelect }) {
                             transition={{ duration: 0.1 }}
                         >
                             <div className={`w-5 h-5 rounded-full shrink-0 border-2 flex items-center justify-center text-[9px] font-bold transition-all ${done
-                                    ? 'bg-emerald-400 border-emerald-400 text-white'
-                                    : active
-                                        ? 'bg-indigo-500 border-indigo-500 text-white shadow-md shadow-indigo-300'
-                                        : isNext
-                                            ? 'bg-white border-amber-400 text-amber-600'
-                                            : 'bg-white border-gray-200 text-gray-400'
+                                ? 'bg-emerald-400 border-emerald-400 text-white'
+                                : active
+                                    ? 'bg-indigo-500 border-indigo-500 text-white shadow-md shadow-indigo-300'
+                                    : isNext
+                                        ? 'bg-white border-amber-400 text-amber-600'
+                                        : 'bg-white border-gray-200 text-gray-400'
                                 }`}>
                                 {done ? '✓' : i + 1}
                             </div>

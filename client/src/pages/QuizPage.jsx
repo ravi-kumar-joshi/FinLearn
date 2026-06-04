@@ -11,7 +11,7 @@ import { collectModuleQuizQuestions } from '../utils/moduleQuizQuestions';
 import { ArrowLeft, Trophy, Zap, CheckCircle2, Target, BookOpen, ChevronRight } from 'lucide-react';
 import { useSidebarOpen } from '../hooks/useSidebarOpen';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finlearn-1.onrender.com';
+const API_BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api';
 const PASS_SCORE = 70;
 
 /* ── shared page shell ── */
@@ -37,8 +37,8 @@ function StepDots({ current, total }) {
             {Array.from({ length: total }).map((_, i) => (
                 <motion.div key={i}
                     className={`rounded-full transition-all duration-300 ${i < current ? 'bg-indigo-500 w-2 h-2'
-                            : i === current ? 'bg-indigo-600 w-4 h-2'
-                                : 'bg-gray-200 w-2 h-2'
+                        : i === current ? 'bg-indigo-600 w-4 h-2'
+                            : 'bg-gray-200 w-2 h-2'
                         }`}
                     layout
                 />
