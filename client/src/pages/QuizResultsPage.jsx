@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../Components/Dashboard/Navbar';
 import SideBar from '../Components/Dashboard/SideBar';
@@ -54,6 +54,8 @@ const QuizResultsPage = () => {
     const [copied, setCopied] = useState(false);
 
     const state = location.state || {};
+    const [searchParams] = useSearchParams();
+    const resolvedModuleId = state.moduleId || searchParams.get('moduleId');
     const totalXP = state.totalXP || 0;
     const correctCount = state.correctCount ?? 0;
     const totalQuestions = state.totalQuestions ?? 0;
@@ -96,7 +98,7 @@ const QuizResultsPage = () => {
             if (cancelled) return;
             if (res?.success && res.course) {
                 setCourse(res.course);
-                const moduleId = state.moduleId;
+                const moduleId = resolvedModuleId;
                 if (moduleId && Array.isArray(res.course.modules)) {
                     const idx = res.course.modules.findIndex(m => m.id === moduleId);
                     const nextIdx = idx + 1;
@@ -190,6 +192,20 @@ const QuizResultsPage = () => {
                                 </p>
                             </div>
                         </motion.div>
+
+                        {/* Prominent continue button for quick navigation */}
+                        {passed && (
+                            <div className="max-w-2xl mx-auto mt-6 flex justify-center">
+                                <motion.button type="button" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                                    onClick={() => {
+                                        if (nextModuleId) navigate(`/dashboard/course/${courseId}/lesson/${encodeURIComponent(nextModuleId)}`);
+                                        else navigate(`/dashboard/course/${courseId}`);
+                                    }}
+                                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-md shadow-indigo-200 text-sm">
+                                    {nextModuleId ? 'Continue to next module' : 'Finish course'}
+                                </motion.button>
+                            </div>
+                        )}
 
                         {/* badge unlock */}
                         <AnimatePresence>
