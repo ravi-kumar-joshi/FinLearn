@@ -40,13 +40,28 @@ app.set('trust proxy', 1);
 
 // CORS configuration: allow requests from configured origin and send
 // credentials (cookies) so authentication works across origins during dev.
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://fin-learn-client-ttsd.vercel.app',
+];
+
 app.use(
   cors({
-    origin: process.env.ORIGIN || 'http://localhost:5173',
+    origin: function (origin, callback) {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        (origin && origin.endsWith('.vercel.app'))
+      ) {
+        return callback(null, true);
+      }
+
+      console.log('CORS blocked origin:', origin);
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   })
 );
-
 // Session middleware configuration: controls cookie security and lifetime.
 app.use(
   session({
