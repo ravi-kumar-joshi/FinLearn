@@ -180,6 +180,7 @@ const Dashboard = () => {
 
   const dashboardMeta = userData?.dashboard;
   const streakDays = userData?.leaderboardStats?.streak ?? 0;
+  const longestStreakDays = userData?.leaderboardStats?.longestStreak ?? 0;
 
   const stats = [
     {
@@ -350,7 +351,7 @@ const Dashboard = () => {
             <div className="space-y-6">
               <DailyStreak
                 streak={streakDays}
-                longestStreak={streakDays}
+                longestStreak={longestStreakDays}
                 todayProgress={dashboardMeta?.weeklyProgressPct ?? 0}
                 lessonsThisWeek={dashboardMeta?.lessonsCompletedThisWeek ?? 0}
                 weeklyGoal={dashboardMeta?.weeklyGoal ?? 3}
