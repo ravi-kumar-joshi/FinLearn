@@ -173,10 +173,6 @@ const Dashboard = () => {
   // Live XP values (prefer realtimeUser when available)
   const liveXP = realtimeUser?.xp || userData?.xp || {};
   const learningXP = liveXP?.learningXP ?? liveXP?.totalXP ?? 0;
-  const _levelProgressPct =
-    liveXP?.maxXPForLevel && liveXP.maxXPForLevel > 0
-      ? Math.min(100, ((liveXP.currentXP || 0) / liveXP.maxXPForLevel) * 100)
-      : Math.min(100, (learningXP % 1000) / 10);
 
   const dashboardMeta = userData?.dashboard;
   const streakDays = userData?.leaderboardStats?.streak ?? 0;
@@ -219,7 +215,7 @@ const Dashboard = () => {
 
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -227,74 +223,90 @@ const Dashboard = () => {
       <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       <main className={`pt-16 transition-all duration-300 ${sidebarOpen ? "lg:ml-64" : "lg:ml-16"}`}>
-        <div className="p-4 lg:p-6">
+        <div className="p-3 sm:p-4 lg:p-6 max-w-[1440px] mx-auto">
+
+          {/* ── Page Header ── */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           >
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Learning Adventure</h1>
-            <p className="text-gray-600">Stack XP, unlock badges, and conquer weekly mission goals.</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1">
+              Learning Adventure
+            </h1>
+            <p className="text-sm sm:text-base text-gray-500">
+              Stack XP, unlock badges, and conquer weekly mission goals.
+            </p>
           </motion.div>
 
+          {/* ── XP Progress Banner ── */}
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.45 }}
-            className="mb-6 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-5 shadow-lg"
+            className="mb-4 sm:mb-6 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-4 sm:p-5 shadow-lg"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold">XP Progress</h2>
-                <p className="text-sm opacity-90">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-xl font-bold">XP Progress</h2>
+                <p className="text-xs sm:text-sm opacity-90 truncate">
                   Level {liveXP?.level ?? 1} • {learningXP.toLocaleString()} XP from courses
                 </p>
               </div>
-              <Rocket className="w-6 h-6" />
+              <Rocket className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
             </div>
 
-            <div className="mt-4">
+            <div className="mt-3 sm:mt-4">
               <AnimatedXPBar
                 currentXP={liveXP?.currentXP || 0}
                 maxXP={liveXP?.maxXPForLevel || Math.max(1000, liveXP?.totalXP || 1000)}
                 showLabel={false}
                 size="md"
                 color="from-white to-white"
+                variant="light"
               />
             </div>
 
-            <p className="mt-2 text-sm opacity-90">Gain XP by completing lessons and quizzes.</p>
+            <p className="mt-2 text-xs sm:text-sm opacity-90">
+              Gain XP by completing lessons and quizzes.
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {/* ── Stats Cards ── */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
                 <motion.div
                   key={index}
-                  whileHover={{ y: -5 }}
+                  whileHover={{ y: -4 }}
                   transition={{ type: "spring", stiffness: 260, damping: 18 }}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-indigo-200"
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-5 hover:shadow-md hover:border-indigo-200"
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`${stat.color} p-3 rounded-lg`}>
-                      <Icon className="w-6 h-6 text-white" />
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <div className={`${stat.color} p-2 sm:p-3 rounded-lg`}>
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
-                    <Shield className="w-5 h-5 text-gray-400" />
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-gray-300" />
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</p>
-                    <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                    <p className="text-xs text-teal-600 font-medium">{stat.change}</p>
-                  </div>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900 mb-0.5 truncate">
+                    {stat.value}
+                  </p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-0.5 truncate">{stat.label}</p>
+                  <p className="text-[10px] sm:text-xs text-teal-600 font-medium truncate">
+                    {stat.change}
+                  </p>
                 </motion.div>
               );
             })}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
+          {/* ── Main Content Grid ── */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+
+            {/* Left / Main Column */}
+            <div className="xl:col-span-2 space-y-4 sm:space-y-6">
               <CourseSuggestions
                 suggestions={suggestedCourses}
                 loading={loading}
@@ -317,7 +329,7 @@ const Dashboard = () => {
                     </button>
                   </p>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                     {continueCourses.map((course) => (
                       <CourseCard
                         key={course.id}
@@ -330,16 +342,16 @@ const Dashboard = () => {
               </Panel>
 
               <Panel title="Weekly Challenge">
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 text-sm mb-3">
                   Complete {dashboardMeta?.weeklyGoal ?? 3} lessons this week. You&apos;ve finished{" "}
                   <strong>{dashboardMeta?.lessonsCompletedThisWeek ?? 0}</strong> in the last 7 days.
                 </p>
-                <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                <div className="h-2.5 rounded-full bg-gray-200 overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${dashboardMeta?.weeklyProgressPct ?? 0}%` }}
                     transition={{ duration: 1 }}
-                    className="h-full bg-indigo-500"
+                    className="h-full bg-indigo-500 rounded-full"
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
@@ -348,7 +360,8 @@ const Dashboard = () => {
               </Panel>
             </div>
 
-            <div className="space-y-6">
+            {/* Right / Sidebar Column */}
+            <div className="space-y-4 sm:space-y-6 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto xl:pr-1 scrollbar-thin">
               <DailyStreak
                 streak={streakDays}
                 longestStreak={longestStreakDays}
@@ -357,10 +370,7 @@ const Dashboard = () => {
                 weeklyGoal={dashboardMeta?.weeklyGoal ?? 3}
               />
 
-              {/* Real-time leaderboard (client) */}
-              <div>
-                <LeaderboardClient />
-              </div>
+              <LeaderboardClient />
 
               <CompletedCourses
                 completedCourses={completedList}

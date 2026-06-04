@@ -5,11 +5,10 @@ import { LinearProgress } from "@mui/material";
 
 /**
  * Returns an array of 7 day-objects for the current week (Mon–Sun).
- * Each day has { label, date, isToday, isPast, isFuture }.
  */
 function getWeekDays() {
   const now = new Date();
-  const dayOfWeek = now.getDay(); // 0=Sun … 6=Sat
+  const dayOfWeek = now.getDay();
   const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
   const monday = new Date(now);
   monday.setDate(now.getDate() + mondayOffset);
@@ -41,25 +40,21 @@ const DailyStreak = ({
   const flameControls = useAnimation();
 
   const weekDays = useMemo(() => getWeekDays(), []);
-
-  // Auto-claim when weekly goal is met
   const isGoalMet = lessonsThisWeek >= weeklyGoal;
 
   const [particlePositions] = useState(() =>
     [...Array(8)].map(() => ({
-      x: Math.random() * 240 - 120,
-      y: Math.random() * 240 - 120,
+      x: Math.random() * 200 - 100,
+      y: Math.random() * 200 - 100,
     }))
   );
 
-  // Animate streak counter
   useEffect(() => {
     const duration = 1200;
     const start = Date.now();
     const tick = () => {
       const elapsed = Date.now() - start;
       const factor = Math.min(1, elapsed / duration);
-      // Ease-out
       const eased = 1 - Math.pow(1 - factor, 3);
       setAnimatedStreak(Math.floor(streak * eased));
       if (factor < 1) requestAnimationFrame(tick);
@@ -67,7 +62,6 @@ const DailyStreak = ({
     tick();
   }, [streak]);
 
-  // Animate progress bar
   useEffect(() => {
     const duration = 1000;
     const start = Date.now();
@@ -81,7 +75,6 @@ const DailyStreak = ({
     tick();
   }, [todayProgress]);
 
-  // Flame pulse animation
   useEffect(() => {
     let cancelled = false;
     const grow = async () => {
@@ -101,12 +94,9 @@ const DailyStreak = ({
       }
     };
     grow();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [flameControls]);
 
-  // Trigger celebration when goal is met
   useEffect(() => {
     if (isGoalMet) {
       setShowCelebration(true);
@@ -115,17 +105,15 @@ const DailyStreak = ({
     }
   }, [isGoalMet]);
 
-  // Determine which week-days are "active" (past days always count as active,
-  // today counts if lessons > 0 this week)
   const activeDayCount = Math.min(lessonsThisWeek, 7);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02, y: -5 }}
+      whileHover={{ scale: 1.015, y: -3 }}
       transition={{ duration: 0.3 }}
-      className="bg-linear-to-br from-orange-50 to-red-50 rounded-xl shadow-sm border border-orange-200 p-6 relative overflow-hidden"
+      className="bg-linear-to-br from-orange-50 to-red-50 rounded-xl shadow-sm border border-orange-200 p-4 sm:p-5 relative overflow-hidden"
     >
       {/* Celebration particles */}
       {showCelebration && (
@@ -141,7 +129,7 @@ const DailyStreak = ({
                 y: pos.y,
               }}
               transition={{ duration: 1.5, delay: i * 0.08 }}
-              className="absolute left-1/2 top-1/2 text-2xl"
+              className="absolute left-1/2 top-1/2 text-xl sm:text-2xl"
             >
               {i % 2 === 0 ? "✨" : "🔥"}
             </motion.div>
@@ -150,38 +138,33 @@ const DailyStreak = ({
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <motion.div animate={flameControls} className="relative">
-            <Flame className="w-6 h-6 text-orange-500" />
-            <motion.div
-              animate={flameControls}
-              className="absolute inset-0 w-6 h-6 rounded-full bg-orange-400 opacity-0 blur-sm"
-              style={{ filter: "blur(4px)" }}
-            />
+            <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
           </motion.div>
-          <h2 className="text-xl font-semibold text-gray-900">Daily Streak</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">Daily Streak</h2>
         </div>
         <motion.div
           animate={{ rotate: showCelebration ? 360 : 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Trophy className="w-5 h-5 text-yellow-500" />
+          <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
         </motion.div>
       </div>
 
       {/* Streak counter */}
-      <div className="text-center mb-5">
+      <div className="text-center mb-4 sm:mb-5">
         <motion.div
           key={animatedStreak}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 10 }}
-          className="text-5xl font-bold text-orange-600 mb-1"
+          className="text-4xl sm:text-5xl font-bold text-orange-600 mb-0.5"
         >
           {animatedStreak}
         </motion.div>
-        <p className="text-sm text-gray-600">
+        <p className="text-xs sm:text-sm text-gray-600">
           {streak === 0
             ? "Complete a lesson to start your streak!"
             : `${streak} day${streak === 1 ? "" : "s"} in a row`}
@@ -189,16 +172,16 @@ const DailyStreak = ({
       </div>
 
       {/* Week day indicators */}
-      <div className="flex items-center justify-between mb-5 px-1">
+      <div className="flex items-center justify-between mb-4 sm:mb-5 px-0.5">
         {weekDays.map((day, i) => {
           const isActive = i < activeDayCount;
           return (
-            <div key={day.label} className="flex flex-col items-center gap-1">
+            <div key={day.label} className="flex flex-col items-center gap-0.5 sm:gap-1">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1 + i * 0.05, type: "spring", stiffness: 300 }}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${day.isToday
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-semibold transition-colors ${day.isToday
                     ? isActive
                       ? "bg-orange-500 text-white ring-2 ring-orange-300"
                       : "bg-orange-100 text-orange-600 ring-2 ring-orange-300"
@@ -210,12 +193,12 @@ const DailyStreak = ({
                   }`}
               >
                 {isActive && !day.isToday ? (
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 ) : (
                   day.label.charAt(0)
                 )}
               </motion.div>
-              <span className={`text-[10px] ${day.isToday ? "font-bold text-orange-600" : "text-gray-500"}`}>
+              <span className={`text-[9px] sm:text-[10px] ${day.isToday ? "font-bold text-orange-600" : "text-gray-500"}`}>
                 {day.label}
               </span>
             </div>
@@ -224,17 +207,16 @@ const DailyStreak = ({
       </div>
 
       {/* Weekly progress */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">
+      <div className="mb-3 sm:mb-4">
+        <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+          <span className="text-xs sm:text-sm font-medium text-gray-700">
             This week&apos;s lessons
           </span>
           <motion.span
             key={animatedProgress}
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
-            className={`text-sm font-semibold ${isGoalMet ? "text-green-600" : "text-orange-600"
-              }`}
+            className={`text-xs sm:text-sm font-semibold ${isGoalMet ? "text-green-600" : "text-orange-600"}`}
           >
             {lessonsThisWeek}/{weeklyGoal}
           </motion.span>
@@ -244,7 +226,7 @@ const DailyStreak = ({
             variant="determinate"
             value={Math.min(100, animatedProgress)}
             sx={{
-              height: 8,
+              height: 7,
               borderRadius: 4,
               backgroundColor: "#fed7aa",
               "& .MuiLinearProgress-bar": {
@@ -266,26 +248,24 @@ const DailyStreak = ({
       </div>
 
       {/* Stats row */}
-      <div className="flex items-center justify-between pt-4 border-t border-orange-200">
-        <motion.div whileHover={{ scale: 1.05 }} className="text-center">
-          <div className="text-2xl font-bold text-gray-900">{longestStreak}</div>
-          <p className="text-xs text-gray-600">Best Streak</p>
+      <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-orange-200">
+        <motion.div whileHover={{ scale: 1.05 }} className="text-center px-1">
+          <div className="text-xl sm:text-2xl font-bold text-gray-900">{longestStreak}</div>
+          <p className="text-[10px] sm:text-xs text-gray-500">Best Streak</p>
         </motion.div>
         <motion.div whileHover={{ scale: 1.05 }} className="text-center">
           <motion.div
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="text-2xl"
+            className="text-lg sm:text-2xl"
           >
             🔥
           </motion.div>
-          <p className="text-xs text-gray-600">Keep Going!</p>
+          <p className="text-[10px] sm:text-xs text-gray-500">Keep Going!</p>
         </motion.div>
-        <motion.div whileHover={{ scale: 1.05 }} className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
-            {lessonsThisWeek}
-          </div>
-          <p className="text-xs text-gray-600">This Week</p>
+        <motion.div whileHover={{ scale: 1.05 }} className="text-center px-1">
+          <div className="text-xl sm:text-2xl font-bold text-gray-900">{lessonsThisWeek}</div>
+          <p className="text-[10px] sm:text-xs text-gray-500">This Week</p>
         </motion.div>
       </div>
 
@@ -294,25 +274,23 @@ const DailyStreak = ({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className={`mt-4 p-3 rounded-lg border ${isGoalMet
-            ? "bg-green-50 border-green-200"
-            : "bg-white border-orange-200"
+        className={`mt-3 sm:mt-4 p-2.5 sm:p-3 rounded-lg border ${isGoalMet ? "bg-green-50 border-green-200" : "bg-white border-orange-200"
           }`}
       >
-        <div className="flex items-center space-x-2 text-sm">
+        <div className="flex items-center gap-2 text-xs sm:text-sm">
           {isGoalMet ? (
             <>
-              <Trophy className="w-4 h-4 text-green-500" />
+              <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500 shrink-0" />
               <span className="text-green-700 font-medium">
                 Weekly goal complete! Great job! 🎉
               </span>
             </>
           ) : (
             <>
-              <Calendar className="w-4 h-4 text-orange-500" />
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500 shrink-0" />
               <span className="text-gray-700">
-                {lessonsThisWeek} lesson{lessonsThisWeek === 1 ? "" : "s"}{" "}
-                toward your weekly goal — {weeklyGoal - lessonsThisWeek} more to go!
+                {lessonsThisWeek} lesson{lessonsThisWeek === 1 ? "" : "s"} toward your goal
+                {weeklyGoal - lessonsThisWeek > 0 && ` — ${weeklyGoal - lessonsThisWeek} more to go!`}
               </span>
             </>
           )}

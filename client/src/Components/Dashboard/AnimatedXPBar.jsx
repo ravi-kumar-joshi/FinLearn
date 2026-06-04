@@ -3,7 +3,9 @@ import { motion } from 'framer-motion';
 
 /**
  * Animated XP Progress Bar Component
- * Shows real-time XP progress with smooth animations
+ * Shows real-time XP progress with smooth animations.
+ *
+ * @param {string} variant - "light" (default, for dark backgrounds) or "dark" (for light backgrounds)
  */
 export const AnimatedXPBar = ({
     currentXP = 0,
@@ -11,30 +13,43 @@ export const AnimatedXPBar = ({
     showLabel = true,
     animated = true,
     size = 'md',
-    color = 'from-green-500 to-emerald-500'
+    color = 'from-white to-white',
+    variant = 'light',
 }) => {
-    const percentage = Math.min(100, (currentXP / maxXP) * 100);
+    const safeMax = Math.max(1, maxXP);
+    const percentage = Math.min(100, (currentXP / safeMax) * 100);
 
-    const sizeClasses = {
-        sm: { bar: 'h-2', container: 'px-2 py-1', text: 'text-xs' },
-        md: { bar: 'h-3', container: 'px-3 py-2', text: 'text-sm' },
-        lg: { bar: 'h-4', container: 'px-4 py-3', text: 'text-base' },
+    const sizeConfig = {
+        sm: { bar: 'h-2', text: 'text-xs', gap: 'mb-1' },
+        md: { bar: 'h-3 sm:h-3.5', text: 'text-sm', gap: 'mb-2' },
+        lg: { bar: 'h-4 sm:h-5', text: 'text-base', gap: 'mb-2' },
     };
 
-    const selectedSize = sizeClasses[size] || sizeClasses.md;
+    const s = sizeConfig[size] || sizeConfig.md;
+
+    // Variant-based colors
+    const isLight = variant === 'light';
+    const trackBg = isLight ? 'bg-white/20' : 'bg-gray-200';
+    const labelColor = isLight ? 'text-white/90' : 'text-gray-600';
+    const valueColor = isLight ? 'text-white' : 'text-gray-800';
+    const accentColor = isLight ? 'text-blue-100' : 'text-blue-600';
+    const subColor = isLight ? 'text-white/70' : 'text-gray-500';
 
     return (
-        <div className={`w-full ${selectedSize.container}`}>
+        <div className="w-full">
+            {/* Optional label row */}
             {showLabel && (
-                <div className={`flex justify-between items-center mb-2 ${selectedSize.text}`}>
-                    <span className="text-gray-600 font-medium">XP Progress</span>
-                    <span className="text-gray-700 font-semibold">
+                <div className={`flex flex-wrap justify-between items-center gap-1 ${s.gap} ${s.text}`}>
+                    <span className={`font-medium ${labelColor}`}>XP Progress</span>
+                    <span className={`font-semibold ${valueColor}`}>
                         {currentXP.toLocaleString()} / {maxXP.toLocaleString()}
                     </span>
                 </div>
             )}
 
-            <div className={`${selectedSize.bar} bg-gray-200 rounded-full overflow-hidden relative`}>
+            {/* Track */}
+            <div className={`${s.bar} ${trackBg} rounded-full overflow-hidden relative`}>
+                {/* Fill */}
                 <motion.div
                     className={`h-full bg-linear-to-r ${color} rounded-full relative`}
                     initial={{ width: 0 }}
@@ -44,37 +59,35 @@ export const AnimatedXPBar = ({
                         ease: 'easeOut',
                     }}
                     style={{
-                        boxShadow: `0 0 20px rgba(34, 197, 94, 0.5)`,
+                        boxShadow: isLight
+                            ? '0 0 12px rgba(255, 255, 255, 0.5)'
+                            : '0 0 12px rgba(34, 197, 94, 0.4)',
                     }}
                 >
                     {/* Shimmer effect */}
-                    {animated && (
+                    {animated && percentage > 2 && (
                         <motion.div
-                            className="absolute inset-0 bg-linear-to-r from-transparent via-white to-transparent opacity-30"
-                            animate={{
-                                x: ['100%', '-100%'],
-                            }}
+                            className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent"
+                            animate={{ x: ['100%', '-100%'] }}
                             transition={{
-                                duration: 2,
+                                duration: 2.5,
                                 repeat: Infinity,
                                 ease: 'linear',
                             }}
-                            style={{
-                                width: '20%',
-                            }}
+                            style={{ width: '25%' }}
                         />
                     )}
                 </motion.div>
             </div>
 
-            {/* XP Info */}
+            {/* Bottom info */}
             {showLabel && (
-                <div className={`mt-2 text-right ${selectedSize.text}`}>
-                    <span className="text-blue-600 font-bold">
+                <div className={`mt-2 flex flex-wrap items-center justify-between gap-1 ${s.text}`}>
+                    <span className={`font-bold ${accentColor}`}>
                         {percentage.toFixed(1)}%
                     </span>
-                    <span className="text-gray-500 ml-2">
-                        {(maxXP - currentXP).toLocaleString()} XP to next level
+                    <span className={subColor}>
+                        {Math.max(0, maxXP - currentXP).toLocaleString()} XP to next level
                     </span>
                 </div>
             )}
@@ -123,31 +136,32 @@ export const LevelCard = ({
     title = "Learner",
     animated = true
 }) => {
-    const percentage = Math.min(100, (currentXP / maxXP) * 100);
+    const safeMax = Math.max(1, maxXP);
+    const percentage = Math.min(100, (currentXP / safeMax) * 100);
 
     return (
-        <div className="bg-linear-to-br from-blue-600 via-blue-700 to-indigo-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+        <div className="bg-linear-to-br from-blue-600 via-blue-700 to-indigo-900 rounded-2xl p-5 sm:p-6 text-white shadow-xl relative overflow-hidden">
             {/* Glow background */}
-            <div className="absolute inset-0 opacity-30">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-blue-400 rounded-full blur-3xl opacity-20"></div>
-                <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-400 rounded-full blur-3xl opacity-20"></div>
+            <div className="absolute inset-0 opacity-30 pointer-events-none">
+                <div className="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-blue-400 rounded-full blur-3xl opacity-20"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 sm:w-40 sm:h-40 bg-indigo-400 rounded-full blur-3xl opacity-20"></div>
             </div>
 
             <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <p className="text-blue-100 text-sm font-semibold mb-1">LEVEL</p>
-                        <h2 className="text-5xl font-bold">{level}</h2>
+                        <h2 className="text-4xl sm:text-5xl font-bold">{level}</h2>
                     </div>
-                    <div className="text-6xl">
+                    <div className="text-5xl sm:text-6xl">
                         {level <= 5 ? '🌱' : level <= 10 ? '🌿' : level <= 20 ? '🌳' : '👑'}
                     </div>
                 </div>
 
-                <p className="text-blue-100 text-lg font-semibold mb-4">{title}</p>
+                <p className="text-blue-100 text-base sm:text-lg font-semibold mb-4">{title}</p>
 
                 <div className="mb-4">
-                    <div className="h-3 bg-blue-900 rounded-full overflow-hidden mb-2">
+                    <div className="h-3 bg-blue-900/60 rounded-full overflow-hidden mb-2">
                         <motion.div
                             className="h-full bg-linear-to-r from-yellow-300 via-green-300 to-cyan-300"
                             initial={{ width: 0 }}
@@ -161,14 +175,14 @@ export const LevelCard = ({
                             }}
                         />
                     </div>
-                    <div className="flex justify-between text-xs text-blue-100">
+                    <div className="flex flex-wrap justify-between gap-1 text-xs text-blue-100">
                         <span>{currentXP.toLocaleString()} XP</span>
                         <span>{maxXP.toLocaleString()} XP</span>
                     </div>
                 </div>
 
                 <p className="text-blue-100 text-sm">
-                    {(maxXP - currentXP).toLocaleString()} XP to next level
+                    {Math.max(0, maxXP - currentXP).toLocaleString()} XP to next level
                 </p>
             </div>
         </div>
