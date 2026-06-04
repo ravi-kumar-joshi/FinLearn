@@ -40,6 +40,7 @@ import ForgetPassword from './Components/Auth/ForgetPassword';
 import Verification from './Components/Auth/Verification';
 import NewPassword from './Components/Auth/NewPassword';
 import Onboarding from './Components/Auth/Onboarding';
+import GoogleCallback from './Components/Auth/GoogleCallback'; // OAuth token exchange
 import Super from './Components/Auth/Super'; // Protected route wrapper
 
 function App() {
@@ -56,6 +57,9 @@ function App() {
         <Route path="/auth/login" element={<AuthLayout> <Login /> </AuthLayout>} />
         <Route path="/auth/register" element={<AuthLayout> <Register /> </AuthLayout>} />
         <Route path="/auth/password/forgot" element={<AuthLayout> <ForgetPassword /> </AuthLayout>} />
+
+        {/* Google OAuth callback: exchanges code for cookies on the Vercel domain */}
+        <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
         {/* The `Super` component protects these routes and redirects unauthenticated users */}
         <Route element={<Super />}>

@@ -48,8 +48,17 @@ const updatePassword = async (req, res, next) => {
     await findedUser.save();
 
     // Clear login tokens (force new login)
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+    // Attributes must match the original Set-Cookie for Android Chrome to actually clear them
+    const isProd = process.env.NODE_ENV === "production";
+    const clearOpts = {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      partitioned: isProd,
+      path: "/",
+    };
+    res.clearCookie("accessToken", clearOpts);
+    res.clearCookie("refreshToken", clearOpts);
 
     res.status(200).json({
       message: "Password updated successfully",

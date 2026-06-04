@@ -8,9 +8,9 @@ const apis = () => {
   // requests point to the express server at port 5050. Change the
   // production URL to your deployed backend when ready.
 
- const base = isDevelopment
-  ? 'http://localhost:5050/'
-  : '/api/';
+  const base = isDevelopment
+    ? 'http://localhost:5050/'
+    : '/api/';
 
   // Each key represents a logical API endpoint. Keep paths relative to `base`.
   const list = {
@@ -19,6 +19,10 @@ const apis = () => {
     loginUser: `${base}user/login`,
     // POST: user registration data
     registerUser: `${base}user/register`,
+    // POST: refresh access token using refreshToken cookie (Android session keep-alive)
+    refreshToken: `${base}user/refresh-token`,
+    // POST: exchange Google OAuth code for auth cookies on Vercel domain
+    setTokenCookies: `${base}user/set-token-cookies`,
     // GET: check access / roles for current session
     getAccess: `${base}user/access`,
     // GET/POST: logout the current user and clear session

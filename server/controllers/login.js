@@ -56,22 +56,21 @@ const login = async (req, res, next) => {
     const { accessToken, refreshToken } = generateToken(findedUser, "7d");
 
     // Set cookies with appropriate security settings
+    // Android Chrome requires Partitioned (CHIPS) flag for cross-site cookies
     const isProd = process.env.NODE_ENV === "production";
     console.log("NODE_ENV =", process.env.NODE_ENV);
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true, // Prevents XSS attacks
-      secure: isProd, // HTTPS only in production
-      sameSite: isProd ? 'none' : 'lax', // CSRF protection
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    const cookieOptions = (maxDays) => ({
+      httpOnly: true,          // Prevents XSS attacks
+      secure: isProd,          // HTTPS only in production
+      sameSite: isProd ? 'none' : 'lax', // Required for cross-domain on Android
+      partitioned: isProd,     // CHIPS - prevents Android Chrome cookie blocking
+      maxAge: maxDays * 24 * 60 * 60 * 1000,
+      path: '/',               // Explicit path for consistent clearCookie behavior
     });
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-    });
+    res.cookie("accessToken", accessToken, cookieOptions(7));
+    res.cookie("refreshToken", refreshToken, cookieOptions(30));
 
     // Return success response (don't send password to client)
     res.status(200).json({

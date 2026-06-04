@@ -93,14 +93,16 @@ const forgotPassword = async (req, res, next) => {
 
     const { accessToken } = generateToken(user, "15m"); // Short-lived token
 
-    // Set cookie with environment-aware settings
+    // Set cookie with environment-aware settings (Android CHIPS compatible)
     const isProd = process.env.NODE_ENV === "production";
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? "none" : "lax",
-      maxAge: 15 * 60 * 1000 // 15 minutes
+      partitioned: isProd,       // CHIPS — Android Chrome cross-site cookie support
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/',
     });
 
     // Send success response

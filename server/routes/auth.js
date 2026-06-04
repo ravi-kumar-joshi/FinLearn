@@ -7,6 +7,8 @@ const register = require("../controllers/register");
 const getUserProfile = require("../controllers/getUserProfile");
 const getAccess = require("../controllers/getAccess");
 const logout = require("../controllers/logout");
+const refreshToken = require("../controllers/refreshToken");
+const setTokenCookies = require("../controllers/setTokenCookies");
 const forgotPassword = require("../controllers/forgotPassword");
 const getOtpExpTime = require("../controllers/getOtpExpTime");
 const verifyOtp = require("../controllers/verifyOtp");
@@ -32,6 +34,13 @@ router.post("/login", login);
 
 
 router.post("/register", register);
+
+
+// POST: refresh access token using the refreshToken cookie (Android session persistence)
+router.post("/refresh-token", refreshToken);
+
+// POST: exchange a short-lived OAuth code for proper auth cookies on the Vercel domain
+router.post("/set-token-cookies", setTokenCookies);
 
 
 router.post("/password/forget", forgotPassword);

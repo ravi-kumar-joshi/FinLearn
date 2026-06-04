@@ -63,6 +63,8 @@ app.use(
   })
 );
 // Session middleware configuration: controls cookie security and lifetime.
+// `partitioned: true` adds the CHIPS (Cookies Having Independent Partitioned State)
+// attribute — required for Android Chrome 118+ to accept cross-site session cookies.
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -71,6 +73,7 @@ app.use(
     cookie: {
       secure: true,
       sameSite: 'none',
+      partitioned: true,   // CHIPS — prevents Android Chrome from blocking session cookie
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   })
