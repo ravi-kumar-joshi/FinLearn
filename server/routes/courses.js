@@ -1,5 +1,6 @@
 const express = require('express');
 const Course = require('../models/Course.js');
+const User = require('../models/User.js');
 const UserProgress = require('../models/UserProgress.js');
 const auth = require('../middlewares/auth.js');
 const optionalAuth = require('../middlewares/optionalAuth.js');
@@ -190,6 +191,24 @@ router.put('/:courseId/lesson/:lessonId/complete', auth, async (req, res) => {
             progress.totalXPEarned += xpEarned;
             progress.lastAccessedAt = new Date();
 
+            // Update User XP
+            const user = await User.findById(userId);
+
+            if (user) {
+                user.xp.totalXP += xpEarned;
+                user.xp.currentXP += xpEarned;
+
+                while (user.xp.currentXP >= user.xp.maxXPForLevel) {
+                    user.xp.currentXP -= user.xp.maxXPForLevel;
+                    user.xp.level += 1;
+                    user.xp.maxXPForLevel = Math.floor(
+                        user.xp.maxXPForLevel * 1.2
+                    );
+                }
+
+                await user.save();
+            }
+
             await progress.save();
         }
 
@@ -246,6 +265,24 @@ router.put(
             modProgress.quizPassed = quizScore >= 70;
             modProgress.xpEarned = (modProgress.xpEarned || 0) + xpReward;
             progress.totalXPEarned += xpReward;
+
+            // Update User XP
+            const user = await User.findById(userId);
+
+            if (user) {
+                user.xp.totalXP += xpReward;
+                user.xp.currentXP += xpReward;
+
+                while (user.xp.currentXP >= user.xp.maxXPForLevel) {
+                    user.xp.currentXP -= user.xp.maxXPForLevel;
+                    user.xp.level += 1;
+                    user.xp.maxXPForLevel = Math.floor(
+                        user.xp.maxXPForLevel * 1.2
+                    );
+                }
+
+                await user.save();
+            }
 
             // Unlock the next module
             const modIndex = progress.modules.findIndex((m) => m.moduleId === moduleId);
