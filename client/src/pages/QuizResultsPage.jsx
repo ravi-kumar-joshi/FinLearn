@@ -5,6 +5,7 @@ import Navbar from '../Components/Dashboard/Navbar';
 import SideBar from '../Components/Dashboard/SideBar';
 import { Award, Trophy, Zap, Target, TrendingUp, Gift, CheckCircle2, BarChart3, Share2, ArrowLeft, RefreshCw, XCircle } from 'lucide-react';
 import Confetti from '../Components/Dashboard/Confetti';
+import httpAction from '../utils/httpAction';
 import { useSidebarOpen } from '../hooks/useSidebarOpen';
 
 /* ── animated count-up ── */
@@ -83,6 +84,35 @@ const QuizResultsPage = () => {
     };
 
     const scoreColor = score >= 80 ? 'text-emerald-600' : score >= PASS_SCORE ? 'text-indigo-600' : 'text-red-500';
+
+    const [course, setCourse] = useState(null);
+    const [nextModuleId, setNextModuleId] = useState(null);
+    const [isLastModule, setIsLastModule] = useState(false);
+
+    useEffect(() => {
+        let cancelled = false;
+        const load = async () => {
+            const res = await httpAction({ url: `/api/courses/${courseId}`, method: 'GET' });
+            if (cancelled) return;
+            if (res?.success && res.course) {
+                setCourse(res.course);
+                const moduleId = state.moduleId;
+                if (moduleId && Array.isArray(res.course.modules)) {
+                    const idx = res.course.modules.findIndex(m => m.id === moduleId);
+                    const nextIdx = idx + 1;
+                    if (nextIdx < res.course.modules.length) {
+                        setNextModuleId(res.course.modules[nextIdx].id);
+                        setIsLastModule(false);
+                    } else {
+                        setNextModuleId(null);
+                        setIsLastModule(true);
+                    }
+                }
+            }
+        };
+        load();
+        return () => { cancelled = true; };
+    }, [courseId, state.moduleId]);
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -206,9 +236,12 @@ const QuizResultsPage = () => {
                                         <Gift size={18} className="text-indigo-500" /> Claim Certificate
                                     </motion.button>
                                     <motion.button type="button" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                                        onClick={() => navigate(`/dashboard/course/${courseId}`)}
+                                        onClick={() => {
+                                            if (nextModuleId) navigate(`/dashboard/course/${courseId}/lesson/${encodeURIComponent(nextModuleId)}`);
+                                            else navigate(`/dashboard/course/${courseId}`);
+                                        }}
                                         className="py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md shadow-indigo-200 text-sm">
-                                        <TrendingUp size={18} /> Next Module
+                                        <TrendingUp size={18} /> {nextModuleId ? 'Next Module' : 'Finish Course'}
                                     </motion.button>
                                 </>
                             ) : (

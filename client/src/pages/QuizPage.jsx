@@ -189,7 +189,16 @@ const QuizPage = () => {
 
         // If quiz was failed, navigate to results page to show retry option
         navigate(`/dashboard/course/${courseId}/quiz-result`, {
-            state: { selectedAnswers, totalXP, correctCount, totalQuestions: questions.length, quizScorePct: scorePct, moduleTitle: module.title, modulePassed: scorePct >= PASS_SCORE },
+            state: {
+                selectedAnswers,
+                totalXP,
+                correctCount,
+                totalQuestions: questions.length,
+                quizScorePct: scorePct,
+                moduleTitle: module.title,
+                modulePassed: scorePct >= PASS_SCORE,
+                moduleId: module.id,
+            },
         });
     };
 
