@@ -8,7 +8,7 @@ import { XPReward } from '../Components/Shared/GamificationComponents';
 import httpAction from '../utils/httpAction';
 import { notifyCourseProgressUpdated } from '../utils/courseProgressEvents';
 import { collectModuleQuizQuestions } from '../utils/moduleQuizQuestions';
-import { ArrowLeft, Trophy, Zap, CheckCircle2, Target, BookOpen, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Trophy, Zap, CheckCircle2, Target, BookOpen, ChevronRight, Sparkles, Medal, Rocket } from 'lucide-react';
 import { useSidebarOpen } from '../hooks/useSidebarOpen';
 
 const API_BASE_URL = import.meta.env.MODE === 'development' ? 'http://localhost:5050' : '/api';
@@ -47,6 +47,31 @@ function StepDots({ current, total }) {
     );
 }
 
+function CompletionCelebration({ title, isLast, onClose }) {
+    return (
+        <motion.div className="fixed inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="bg-white rounded-2xl p-8 shadow-xl text-center">
+                <div className="flex items-center justify-center mb-4">
+                    <Sparkles size={34} className="text-amber-400" />
+                </div>
+                <h3 className="text-xl font-black text-gray-900 mb-2">Module Complete! 🎉</h3>
+                <p className="text-sm text-gray-500 mb-4">{title}</p>
+                <div className="flex items-center gap-3 justify-center">
+                    {!isLast && (
+                        <motion.button onClick={onClose} whileHover={{ scale: 1.03 }}
+                            className="px-5 py-2 bg-indigo-600 text-white rounded-xl font-bold">Next Module</motion.button>
+                    )}
+                    {isLast && (
+                        <motion.button onClick={onClose} whileHover={{ scale: 1.03 }}
+                            className="px-5 py-2 bg-indigo-600 text-white rounded-xl font-bold">View Certificate</motion.button>
+                    )}
+                </div>
+            </div>
+        </motion.div>
+    );
+}
+
 const QuizPage = () => {
     const { courseId } = useParams();
     const navigate = useNavigate();
@@ -62,6 +87,8 @@ const QuizPage = () => {
     const [totalXP, setTotalXP] = useState(0);
     const [showXP, setShowXP] = useState(false);
     const [xpGained, setXpGained] = useState(0);
+    const [showCompletionCelebration, setShowCompletionCelebration] = useState(false);
+    const [nextModuleInfo, setNextModuleInfo] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -114,16 +141,53 @@ const QuizPage = () => {
             setShowFeedback(false);
             return;
         }
+
+        // Calculate quiz score
         const correctCount = questions.reduce((n, q, idx) => (selectedAnswers[idx] === q.correctAnswer ? n + 1 : n), 0);
         const scorePct = Math.round((correctCount / questions.length) * 100);
+
+        // Mark module complete if passed
         if (scorePct >= PASS_SCORE) {
             const res = await httpAction({
                 url: `${API_BASE_URL}/courses/${courseId}/module/${module.id}/complete`,
                 method: 'PUT',
                 body: { quizScore: scorePct },
             });
-            if (res?.progress) { setProgress(res.progress); notifyCourseProgressUpdated(courseId); }
+            if (res?.progress) {
+                setProgress(res.progress);
+                notifyCourseProgressUpdated(courseId);
+            }
         }
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // AUTO-ADVANCE: Find next module and navigate automatically if passed
+        // ═══════════════════════════════════════════════════════════════════════════════
+        if (scorePct >= PASS_SCORE && course?.modules?.length > 0) {
+            const currentModuleIndex = course.modules.findIndex(m => m.id === module.id);
+            const nextModuleIndex = currentModuleIndex + 1;
+
+            // If there's a next module, show celebration and navigate to it
+            if (nextModuleIndex < course.modules.length) {
+                const nextModule = course.modules[nextModuleIndex];
+                setShowCompletionCelebration(true);
+                setNextModuleInfo({ isLastModule: false, nextModuleId: nextModule.id, nextModuleTitle: nextModule.title });
+                // Navigate to next module's lessons with a delay to show celebration
+                setTimeout(() => {
+                    navigate(`/dashboard/course/${courseId}/lesson/${encodeURIComponent(nextModule.id)}`);
+                }, 2500);
+                return;
+            } else {
+                // Last module completed - show celebration and navigate to certificate
+                setShowCompletionCelebration(true);
+                setNextModuleInfo({ isLastModule: true });
+                setTimeout(() => {
+                    navigate(`/dashboard/course/${courseId}/certificate`);
+                }, 2500);
+                return;
+            }
+        }
+
+        // If quiz was failed, navigate to results page to show retry option
         navigate(`/dashboard/course/${courseId}/quiz-result`, {
             state: { selectedAnswers, totalXP, correctCount, totalQuestions: questions.length, quizScorePct: scorePct, moduleTitle: module.title, modulePassed: scorePct >= PASS_SCORE },
         });
@@ -153,6 +217,21 @@ const QuizPage = () => {
             </div>
         </Shell>
     );
+
+    // Celebration overlay when auto-advancing
+    if (showCompletionCelebration && nextModuleInfo) {
+        return (
+            <Shell sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
+                <div className="min-h-screen flex items-center justify-center">
+                    <CompletionCelebration
+                        title={module?.title}
+                        isLast={nextModuleInfo.isLastModule}
+                        onClose={() => { setShowCompletionCelebration(false); }}
+                    />
+                </div>
+            </Shell>
+        );
+    }
 
     /* ── no questions ── */
     if (!questions.length) {
