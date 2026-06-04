@@ -5,16 +5,26 @@ async function request(path, opts = {}) {
   const token = localStorage.getItem('adminToken')
   const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   const { headers: optHeaders, ...restOpts } = opts
+  // Debug: log request details
+  try {
+    console.log('[api] request:', { path, method: restOpts.method || 'GET', headers: { ...headers, ...(optHeaders || {}) }, body: restOpts.body })
+  } catch (e) { /* ignore logging errors */ }
+
   const res = await fetch(`${API_BASE.replace(/\/$/, '')}${path}`, {
     credentials: 'include',
     ...restOpts,
     headers: { ...headers, ...(optHeaders || {}) },
   })
   const data = await res.json().catch(() => null)
+  // Debug: log response details
+  try {
+    console.log('[api] response:', { path, status: res.status, ok: res.ok, data })
+  } catch (e) { /* ignore */ }
   if (!res.ok) {
     const err = new Error(data?.message || res.statusText || 'Request failed')
     err.status = res.status
     err.data = data
+    console.error('[api] error:', { path, status: res.status, data })
     throw err
   }
   return data

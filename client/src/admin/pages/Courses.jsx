@@ -51,20 +51,24 @@ export default function Courses() {
           }))
         }))
       }
+      console.log('[courses] saving payload:', normalized)
       if (payload._id || payload.id) {
         const id = payload._id || payload.id
         const res = await api.updateCourse(id, normalized)
+        console.log('[courses] update response:', res)
         setCourses(cs => cs.map(x => (x._id === id || x.id === id) ? res.course : x))
         setSuccess(`Course "${payload.title}" updated successfully!`)
         await load()
       } else {
         const res = await api.createCourse(normalized)
+        console.log('[courses] create response:', res)
         setCourses(cs => [res.course, ...cs])
         setSuccess(`Course "${payload.title}" created successfully!`)
         await load()
       }
       setOpen(false); setEditing(null)
     } catch (err) {
+      console.error('[courses] save error:', err, err?.data)
       if (err.status === 403) { setUnauth(true); setError('You need to be an admin to manage courses.') }
       else setError(`Save failed: ${err.message}`)
     }
