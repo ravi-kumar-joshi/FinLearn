@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { MdDelete, MdClose } from 'react-icons/md'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
+import ReactQuill from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
 
 const inputCls = (err) =>
     `w-full px-3 py-2 bg-slate-800 border rounded-lg text-sm text-slate-100 placeholder:text-slate-600 outline-none transition-colors focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/20 ${err ? 'border-red-500/60' : 'border-slate-700'
