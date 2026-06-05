@@ -38,30 +38,44 @@ export default function Courses() {
   async function handleSave(payload) {
     try {
       setError(null); setSuccess(null)
+      // Defensive normalization: prefer payload values, fall back to currently editing course
+      const source = payload || editing || {}
+      const modulesSource = (payload && Array.isArray(payload.modules) && payload.modules.length) ? payload.modules : (editing && Array.isArray(editing.modules) ? editing.modules : [])
+
       const normalized = {
-        ...payload,
-        modules: (payload.modules || []).map((m, mi) => ({
-          id: m.id,
-          title: m.title,
+        // include top-level fields with fallbacks
+        title: payload.title ?? editing?.title ?? '',
+        slug: payload.slug ?? editing?.slug ?? '',
+        category: payload.category ?? editing?.category ?? 'Budgeting',
+        description: payload.description ?? editing?.description ?? '',
+        thumbnail: payload.thumbnail ?? editing?.thumbnail ?? '',
+        instructor: payload.instructor ?? editing?.instructor ?? 'FinanceQuest Team',
+        duration: payload.duration ?? editing?.duration ?? 0,
+        rating: payload.rating ?? editing?.rating ?? 5,
+        isPublished: (payload.isPublished !== undefined) ? payload.isPublished : (editing?.isPublished ?? true),
+        // Ensure modules array exists and is fully expanded
+        modules: (modulesSource || []).map((m, mi) => ({
+          id: m.id || m._id,
+          title: m.title || '',
           // force numeric order according to position
-          order: (mi + 1),
+          order: (m.order !== undefined && m.order !== null) ? m.order : (mi + 1),
           description: m.description || '',
           xpReward: m.xpReward ?? 100,
           lessons: (m.lessons || []).map((l, li) => ({
-            id: l.id,
-            title: l.title,
+            id: l.id || l._id,
+            title: l.title || '',
             // force lesson order
-            order: (li + 1),
-            duration: l.duration,
+            order: (l.order !== undefined && l.order !== null) ? l.order : (li + 1),
+            duration: l.duration ?? 15,
             xpReward: l.xpReward ?? 20,
-            content: l.content,
+            content: l.content ?? '',
             videoUrl: l.videoUrl || null,
             resources: l.resources || [],
-            quiz: { questions: l.quiz?.questions || [] }
+            quiz: l.quiz?.questions ? { questions: l.quiz.questions } : (l.quiz || { questions: [] })
           }))
         }))
       }
-      console.log('[courses] saving payload:', normalized)
+      console.log('[courses] saving payload (final normalized):', normalized)
       if (payload._id || payload.id) {
         const rawId = payload._id || payload.id
         const id = String(rawId).trim().replace(/^\/+|\/+$/g, '')
