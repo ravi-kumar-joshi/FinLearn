@@ -5,12 +5,24 @@ async function request(path, opts = {}) {
   const token = localStorage.getItem('adminToken')
   const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   const { headers: optHeaders, ...restOpts } = opts
-  // Debug: log request details
+  // Debug: log request details and parsed body when possible
   try {
-    console.log('[api] request:', { path, method: restOpts.method || 'GET', headers: { ...headers, ...(optHeaders || {}) }, body: restOpts.body })
+    const method = restOpts.method || 'GET'
+    // parse JSON body if present so we can inspect the real object
+    let parsedBody = null
+    if (restOpts.body) {
+      try { parsedBody = JSON.parse(restOpts.body) } catch (e) { parsedBody = restOpts.body }
+    }
+    console.log('[api] request:', { path, method, headers: { ...headers, ...(optHeaders || {}) }, body: restOpts.body })
+    console.log('[api] compiled payload object:', parsedBody)
   } catch (e) { /* ignore logging errors */ }
 
-  const res = await fetch(`${API_BASE.replace(/\/$/, '')}${path}`, {
+  // Build URL cleanly: strip trailing slash from base and ensure single leading slash on path
+  const base = API_BASE.replace(/\/$/, '')
+  const cleanPath = path.startsWith('/') ? path : `/${String(path).replace(/^\/+/, '')}`
+  const url = `${base}${cleanPath}`
+
+  const res = await fetch(url, {
     credentials: 'include',
     ...restOpts,
     headers: { ...headers, ...(optHeaders || {}) },
