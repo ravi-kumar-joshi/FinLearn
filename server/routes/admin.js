@@ -109,6 +109,13 @@ router.put('/courses/:id', async (req, res) => {
     console.log('[admin] PUT params:', req.params)
     console.log('[admin] PUT body sample:', { title: req.body.title, slug: req.body.slug, modulesCount: (req.body.modules || []).length })
     try {
+        console.log('[admin] PUT full body keys:', Object.keys(req.body))
+        console.log('[admin] PUT headers content-type:', req.headers['content-type'], 'content-length:', req.headers['content-length'])
+        // Print a truncated JSON of the body for safety
+        const raw = JSON.stringify(req.body)
+        console.log('[admin] PUT full body (truncated 4000 chars):', raw.length > 4000 ? raw.slice(0, 4000) + '...[truncated]' : raw)
+    } catch (e) { console.error('Error logging PUT body', e) }
+    try {
         const { id } = req.params
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
