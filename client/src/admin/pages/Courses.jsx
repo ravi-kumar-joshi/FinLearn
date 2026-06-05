@@ -75,19 +75,19 @@ export default function Courses() {
           }))
         }))
       }
-      console.log('[courses] saving payload (final normalized):', normalized)
+      
       if (payload._id || payload.id) {
         const rawId = payload._id || payload.id
         const id = String(rawId).trim().replace(/^\/+|\/+$/g, '')
-        console.log('[courses] calling updateCourse', { id, payload: normalized })
+        
         const res = await api.updateCourse(id, normalized)
-        console.log('[courses] update response:', res)
+        
         setCourses(cs => cs.map(x => (x._id === id || x.id === id) ? res.course : x))
         setSuccess(`Course "${payload.title}" updated successfully!`)
         await load()
       } else {
         const res = await api.createCourse(normalized)
-        console.log('[courses] create response:', res)
+        
         setCourses(cs => [res.course, ...cs])
         setSuccess(`Course "${payload.title}" created successfully!`)
         await load()

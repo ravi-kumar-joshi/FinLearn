@@ -84,7 +84,7 @@ export default function CourseModal({ open, onClose, onSave, initial }) {
           lessons: (m.lessons || []).map((l, li) => ({ ...(l || {}), order: (l?.order !== undefined && l?.order !== null) ? l.order : (li + 1) }))
         }))
       }
-      console.log('[CourseModal] prepared payload before save:', prepared)
+      
       await onSave({ ...prepared, _id: initial?._id, id: initial?.id })
       // parent handles closing and refresh; we simply stop the spinner here
     } catch (err) {

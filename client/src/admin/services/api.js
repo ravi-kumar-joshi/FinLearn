@@ -13,8 +13,7 @@ async function request(path, opts = {}) {
     if (restOpts.body) {
       try { parsedBody = JSON.parse(restOpts.body) } catch (e) { parsedBody = restOpts.body }
     }
-    console.log('[api] request:', { path, method, headers: { ...headers, ...(optHeaders || {}) }, body: restOpts.body })
-    console.log('[api] compiled payload object:', parsedBody)
+   
   } catch (e) { /* ignore logging errors */ }
 
   // Build URL cleanly: strip trailing slash from base and ensure single leading slash on path
@@ -30,7 +29,7 @@ async function request(path, opts = {}) {
   const data = await res.json().catch(() => null)
   // Debug: log response details
   try {
-    console.log('[api] response:', { path, status: res.status, ok: res.ok, data })
+    
   } catch (e) { /* ignore */ }
   if (!res.ok) {
     const err = new Error(data?.message || res.statusText || 'Request failed')
