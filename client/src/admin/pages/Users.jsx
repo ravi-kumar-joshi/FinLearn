@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+ import React, { useState, useEffect } from 'react'
 import AdminLayout from '../../layouts/AdminLayout'
 import UserTable from '../components/UserTable'
 import api from '../services/api'
