@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import logo from "../../asset/apple-touch-icon.png"; // Update path if needed
 
 const Footer = () => {
@@ -47,39 +48,39 @@ const Footer = () => {
 
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/dashboard/all-courses"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Budgeting
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/dashboard/all-courses"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Investing
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/dashboard/all-courses"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Banking
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/dashboard/all-courses"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Tax Planning
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -90,39 +91,39 @@ const Footer = () => {
 
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/about"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   About Us
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/blog"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Blog
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/careers"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Careers
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/contact"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -133,30 +134,30 @@ const Footer = () => {
 
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/help"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Help Center
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/privacy"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/terms"
                   className="hover:text-teal-400 transition duration-300"
                 >
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

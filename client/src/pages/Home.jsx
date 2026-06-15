@@ -4,10 +4,13 @@ import HeroSection from '../Components/Home/HeroSection'
 import WhyChooseSection from '../Components/Home/WhyChooseSection'
 import AboutSection from '../Components/Home/AboutSection'
 import CourseModulesSection from '../Components/Home/CourseModulesSection'
+import FeaturesSection from '../Components/Home/FeaturesSection'
 import WhyStudentsLoveSection from '../Components/Home/WhyStudentsLoveSection'
 import TestimonialsSection from '../Components/Home/TestimonialsSection'
 import VideoSection from '../Components/Home/VideoSection'
+import WatchVideoSection from '../Components/Home/WatchVideoSection'
 import PricingSection from '../Components/Home/PricingSection'
+import ContactSection from '../Components/Home/ContactSection'
 import FinalCTASection from '../Components/Home/FinalCTASection'
 import Footer from '../Components/Home/Footer'
 
@@ -19,10 +22,13 @@ function Home() {
       <WhyChooseSection />
       <AboutSection />
       <CourseModulesSection />
+      <FeaturesSection />
       <WhyStudentsLoveSection />
       <TestimonialsSection />
       <VideoSection />
+      <WatchVideoSection />
       <PricingSection />
+      <ContactSection />
       <FinalCTASection />
       <Footer />
     </div>

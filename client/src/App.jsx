@@ -28,6 +28,13 @@ import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import CourseDetailsPage from './pages/CourseDetailsPage';
 import VerifyPage from './pages/VerifyPage';
 import FinBotPage from './Components/Chatbot/Finbotpage';
+import AboutUs from './pages/AboutUs';
+import Blog from './pages/Blog';
+import Careers from './pages/Careers';
+import Contact from './pages/Contact';
+import HelpCenter from './pages/HelpCenter';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 // ==================== Layouts ====================
 // AuthLayout: Provides consistent styling for all auth pages
@@ -49,6 +56,15 @@ function App() {
       <Routes>
         {/* Public landing page */}
         <Route path="/" element={<Home />} />
+
+        {/* Public pages */}
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
 
         {/* Public Verification Route: used after email verification flows */}
         <Route path="/verify/:verifyId" element={<VerifyPage />} />
