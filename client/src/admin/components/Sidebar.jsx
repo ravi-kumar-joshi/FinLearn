@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   MdDashboard, MdMenuBook, MdPeople, MdQuiz,
@@ -6,38 +6,14 @@ import {
   MdChevronRight, MdChevronLeft,
 } from 'react-icons/md'
 import finlearnLogo from '../../asset/apple-touch-icon.png'
-
-// ─── Nav config (single source of truth) ────────────────────────────────────
-
-const NAV_SECTIONS = [
-  {
-    label: 'Overview',
-    items: [
-      { to: '/admin/dashboard', icon: MdDashboard, label: 'Dashboard' },
-      { to: '/admin/analytics', icon: MdBarChart, label: 'Analytics', badge: 3 },
-      { to: '/admin/reports', icon: MdDescription, label: 'Reports' },
-    ],
-  },
-  {
-    label: 'Content',
-    items: [
-      { to: '/admin/courses', icon: MdMenuBook, label: 'Courses', badge: 12 },
-      { to: '/admin/quizzes', icon: MdQuiz, label: 'Quizzes' },
-    ],
-  },
-  {
-    label: 'People',
-    items: [
-      { to: '/admin/users', icon: MdPeople, label: 'Users', badge: 240 },
-    ],
-  },
-]
-
-const FOOTER_ITEM = { to: '/admin/settings', icon: MdSettings, label: 'Settings' }
+import { useDashboardCounts } from '../hooks/useDashboardCounts'
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 function NavItem({ to, icon, label, badge, collapsed, onNavigate }) {
+  const badgeValue = badge?.count ?? badge
+  const isLoading = badge?.loading ?? false
+
   return (
     <NavLink
       to={to}
@@ -62,10 +38,10 @@ function NavItem({ to, icon, label, badge, collapsed, onNavigate }) {
           )}
           {React.createElement(icon, { className: "h-[18px] w-[18px] shrink-0" })}
           {!collapsed && <span className="flex-1 truncate">{label}</span>}
-          {!collapsed && badge != null && (
+          {!collapsed && badgeValue != null && (
             <span className={`rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums ${isActive ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-700/80 text-slate-400'
               }`}>
-              {badge}
+              {isLoading ? '—' : badgeValue}
             </span>
           )}
         </>
@@ -106,8 +82,36 @@ function NavSection({ label, items, collapsed, onNavigate }) {
 
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
 
+const FOOTER_ITEM = { to: '/admin/settings', icon: MdSettings, label: 'Settings' }
+
 export default function Sidebar({ mobileOpen = false, onNavigate }) {
   const [collapsed, setCollapsed] = useState(false)
+  const { courses, quizzes, users, loading } = useDashboardCounts()
+
+  // Dynamic nav sections with real counts
+  const NAV_SECTIONS = useMemo(() => [
+    {
+      label: 'Overview',
+      items: [
+        { to: '/admin/dashboard', icon: MdDashboard, label: 'Dashboard' },
+        { to: '/admin/analytics', icon: MdBarChart, label: 'Analytics' },
+        { to: '/admin/reports', icon: MdDescription, label: 'Reports' },
+      ],
+    },
+    {
+      label: 'Content',
+      items: [
+        { to: '/admin/courses', icon: MdMenuBook, label: 'Courses', badge: { count: courses, loading } },
+        { to: '/admin/quizzes', icon: MdQuiz, label: 'Quizzes', badge: { count: quizzes, loading } },
+      ],
+    },
+    {
+      label: 'People',
+      items: [
+        { to: '/admin/users', icon: MdPeople, label: 'Users', badge: { count: users, loading } },
+      ],
+    },
+  ], [courses, quizzes, users, loading])
 
   return (
     <aside

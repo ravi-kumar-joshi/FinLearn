@@ -47,6 +47,12 @@ export async function createCourse(payload) { return request('/admin/courses', {
 export async function updateCourse(id, payload) { return request(`/admin/courses/${id}`, { method: 'PUT', body: JSON.stringify(payload) }) }
 export async function deleteCourse(id) { return request(`/admin/courses/${id}`, { method: 'DELETE' }) }
 
+// Quizzes
+export async function getQuizzes() { return request('/admin/quizzes') }
+export async function createQuiz(payload) { return request('/admin/quizzes', { method: 'POST', body: JSON.stringify(payload) }) }
+export async function updateQuiz(id, payload) { return request(`/admin/quizzes/${id}`, { method: 'PUT', body: JSON.stringify(payload) }) }
+export async function deleteQuiz(id) { return request(`/admin/quizzes/${id}`, { method: 'DELETE' }) }
+
 // Users
 export async function getUsers() { return request('/admin/users') }
 export async function adjustUserXP(id, op, amount) { return request(`/admin/users/${id}/xp`, { method: 'PUT', body: JSON.stringify({ op, amount }) }) }
@@ -65,4 +71,4 @@ export async function logout() {
   finally { localStorage.removeItem('adminToken') }
 }
 
-export default { getCourses, createCourse, updateCourse, deleteCourse, getUsers, adjustUserXP, toggleBanUser, resetUser, getLeaderboard, login, logout }
+export default { getCourses, createCourse, updateCourse, deleteCourse, getQuizzes, createQuiz, updateQuiz, deleteQuiz, getUsers, adjustUserXP, toggleBanUser, resetUser, getLeaderboard, login, logout }

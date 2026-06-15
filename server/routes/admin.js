@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const Course = require('../models/Course')
 const User = require('../models/User')
+const Quiz = require('../models/Quiz')
 const auth = require('../middlewares/auth')
 const adminOnly = require('../middlewares/admin')
 
@@ -327,6 +328,173 @@ router.put('/users/:id/reset', async (req, res) => {
         res.json({ success: true, user, message: 'User progress reset successfully' })
     } catch (err) {
         console.error('Error resetting user:', err)
+        res.status(500).json({ success: false, message: err.message })
+    }
+})
+
+// ============ QUIZZES CRUD ============
+
+// GET all quizzes
+router.get('/quizzes', async (req, res) => {
+    try {
+        console.log('[admin] GET /quizzes - fetching all quizzes')
+        const quizzes = await Quiz.find().sort({ createdAt: -1 }).lean()
+        console.log('[admin] GET /quizzes - found', quizzes.length, 'quizzes')
+        res.json({ success: true, quizzes })
+    } catch (err) {
+        console.error('[admin] Error fetching quizzes:', err)
+        res.status(500).json({ success: false, message: err.message })
+    }
+})
+
+// GET single quiz
+router.get('/quizzes/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'Invalid quiz ID' })
+        }
+        const quiz = await Quiz.findById(id).lean()
+        if (!quiz) {
+            return res.status(404).json({ success: false, message: 'Quiz not found' })
+        }
+        res.json({ success: true, quiz })
+    } catch (err) {
+        console.error('[admin] Error fetching quiz:', err)
+        res.status(500).json({ success: false, message: err.message })
+    }
+})
+
+// CREATE new quiz
+router.post('/quizzes', async (req, res) => {
+    console.log('[admin] POST /quizzes - user:', req.id)
+    console.log('[admin] POST body sample:', { 
+        title: req.body.title, 
+        questionsCount: (req.body.questions || []).length 
+    })
+    try {
+        const { title, description, category, difficulty, questions, timeLimit, passingScore, xpReward, isPublished } = req.body
+
+        // Validation
+        if (!title || !title.trim()) {
+            return res.status(400).json({ success: false, message: 'Title is required' })
+        }
+        if (!questions || !Array.isArray(questions) || questions.length === 0) {
+            return res.status(400).json({ success: false, message: 'At least one question is required' })
+        }
+
+        // Validate each question
+        for (let i = 0; i < questions.length; i++) {
+            const q = questions[i]
+            if (!q.question || !q.question.trim()) {
+                return res.status(400).json({ success: false, message: `Question ${i + 1} must have a question text` })
+            }
+            if (!q.options || !Array.isArray(q.options) || q.options.length < 2) {
+                return res.status(400).json({ success: false, message: `Question ${i + 1} must have at least 2 options` })
+            }
+            if (q.correctAnswer === undefined || q.correctAnswer === null || q.correctAnswer < 0 || q.correctAnswer >= q.options.length) {
+                return res.status(400).json({ success: false, message: `Question ${i + 1} must have a valid correct answer index` })
+            }
+        }
+
+        // Ensure each question has an ID
+        const makeId = (prefix = 'q') => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`
+        req.body.questions = questions.map((q, i) => ({
+            id: q.id || makeId('q'),
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation || '',
+            xpReward: q.xpReward || 10,
+        }))
+
+        const quiz = await Quiz.create({
+            ...req.body,
+            createdBy: req.id,
+        })
+        
+        console.log('[admin] POST /quizzes - quiz created successfully:', quiz._id)
+        res.status(201).json({ success: true, quiz })
+    } catch (err) {
+        console.error('[admin] Error creating quiz:', err)
+        res.status(500).json({ success: false, message: err.message })
+    }
+})
+
+// UPDATE quiz
+router.put('/quizzes/:id', async (req, res) => {
+    console.log('[admin] PUT /quizzes/:id - user:', req.id)
+    console.log('[admin] PUT params:', req.params)
+    try {
+        const { id } = req.params
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'Invalid quiz ID' })
+        }
+
+        const { title, description, category, difficulty, questions, timeLimit, passingScore, xpReward, isPublished } = req.body
+
+        // Validation
+        if (title && !title.trim()) {
+            return res.status(400).json({ success: false, message: 'Title cannot be empty' })
+        }
+        if (questions && (!Array.isArray(questions) || questions.length === 0)) {
+            return res.status(400).json({ success: false, message: 'At least one question is required' })
+        }
+
+        // Validate each question if provided
+        if (questions) {
+            for (let i = 0; i < questions.length; i++) {
+                const q = questions[i]
+                if (!q.question || !q.question.trim()) {
+                    return res.status(400).json({ success: false, message: `Question ${i + 1} must have a question text` })
+                }
+                if (!q.options || !Array.isArray(q.options) || q.options.length < 2) {
+                    return res.status(400).json({ success: false, message: `Question ${i + 1} must have at least 2 options` })
+                }
+                if (q.correctAnswer === undefined || q.correctAnswer === null || q.correctAnswer < 0 || q.correctAnswer >= q.options.length) {
+                    return res.status(400).json({ success: false, message: `Question ${i + 1} must have a valid correct answer index` })
+                }
+            }
+        }
+
+        const quiz = await Quiz.findByIdAndUpdate(
+            id,
+            req.body,
+            { new: true, runValidators: true }
+        )
+
+        if (!quiz) {
+            return res.status(404).json({ success: false, message: 'Quiz not found' })
+        }
+
+        console.log('[admin] PUT /quizzes/:id - quiz updated successfully:', quiz._id)
+        res.json({ success: true, quiz })
+    } catch (err) {
+        console.error('[admin] Error updating quiz:', err)
+        res.status(500).json({ success: false, message: err.message })
+    }
+})
+
+// DELETE quiz
+router.delete('/quizzes/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'Invalid quiz ID' })
+        }
+
+        const quiz = await Quiz.findByIdAndDelete(id)
+
+        if (!quiz) {
+            return res.status(404).json({ success: false, message: 'Quiz not found' })
+        }
+
+        console.log('[admin] DELETE /quizzes/:id - quiz deleted successfully:', quiz._id)
+        res.json({ success: true, message: 'Quiz deleted successfully', quiz })
+    } catch (err) {
+        console.error('[admin] Error deleting quiz:', err)
         res.status(500).json({ success: false, message: err.message })
     }
 })

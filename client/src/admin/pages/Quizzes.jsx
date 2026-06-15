@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import api from '../services/api'
+import api, { getQuizzes, createQuiz, updateQuiz, deleteQuiz } from '../services/api'
 
 export default function Quizzes() {
     const [data, setData] = useState({
@@ -16,15 +16,9 @@ export default function Quizzes() {
     async function load() {
         try {
             setData(s => ({ ...s, loading: true, error: null }))
-            // Mock data for now since quizzes endpoint might not exist
+            const quizzesRes = await getQuizzes()
             setData({
-                quizzes: [
-                    { id: 1, title: 'Basics of Savings', questions: 10, attempts: 245, avgScore: 78, category: 'Savings' },
-                    { id: 2, title: 'Investment Fundamentals', questions: 15, attempts: 189, avgScore: 72, category: 'Investing' },
-                    { id: 3, title: 'Budgeting 101', questions: 8, attempts: 312, avgScore: 85, category: 'Budgeting' },
-                    { id: 4, title: 'Debt Management', questions: 12, attempts: 156, avgScore: 68, category: 'Debt' },
-                    { id: 5, title: 'Retirement Planning', questions: 20, attempts: 98, avgScore: 71, category: 'Retirement' },
-                ],
+                quizzes: quizzesRes.quizzes || [],
                 loading: false,
                 unauth: false,
                 error: null
@@ -36,6 +30,18 @@ export default function Quizzes() {
             } else {
                 setData(s => ({ ...s, error: err.message, loading: false }))
             }
+        }
+    }
+
+    async function handleDelete(id) {
+        if (!confirm('Are you sure you want to delete this quiz?')) return
+        
+        try {
+            await deleteQuiz(id)
+            load() // Reload the quizzes list
+        } catch (err) {
+            console.error('Error deleting quiz:', err)
+            alert('Failed to delete quiz: ' + err.message)
         }
     }
 
@@ -69,8 +75,8 @@ export default function Quizzes() {
     }
 
     const totalQuizzes = data.quizzes.length
-    const totalAttempts = data.quizzes.reduce((s, q) => s + q.attempts, 0)
-    const avgScore = Math.round(data.quizzes.reduce((s, q) => s + q.avgScore, 0) / totalQuizzes)
+    const totalAttempts = data.quizzes.reduce((s, q) => s + (q.attempts || 0), 0)
+    const avgScore = totalQuizzes > 0 ? Math.round(data.quizzes.reduce((s, q) => s + (q.avgScore || 0), 0) / totalQuizzes) : 0
 
     return (
         <div className="space-y-6">
@@ -116,24 +122,27 @@ export default function Quizzes() {
                         </thead>
                         <tbody className="divide-y divide-slate-700">
                             {data.quizzes.map(quiz => (
-                                <tr key={quiz.id} className="hover:bg-slate-700/30 transition-colors">
+                                <tr key={quiz._id} className="hover:bg-slate-700/30 transition-colors">
                                     <td className="px-4 py-3">
                                         <div className="font-medium text-slate-200">{quiz.title}</div>
+                                        {quiz.description && (
+                                            <div className="text-xs text-slate-400 mt-1">{quiz.description}</div>
+                                        )}
                                     </td>
                                     <td className="px-4 py-3">
                                         <span className="px-2 py-1 bg-slate-700 text-slate-300 rounded text-xs">
                                             {quiz.category}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-center text-slate-300">{quiz.questions}</td>
-                                    <td className="px-4 py-3 text-center text-slate-300">{quiz.attempts}</td>
+                                    <td className="px-4 py-3 text-center text-slate-300">{quiz.questions?.length || 0}</td>
+                                    <td className="px-4 py-3 text-center text-slate-300">{quiz.attempts || 0}</td>
                                     <td className="px-4 py-3 text-center">
                                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                                             quiz.avgScore >= 80 ? 'bg-emerald-900/30 text-emerald-400' :
                                             quiz.avgScore >= 60 ? 'bg-yellow-900/30 text-yellow-400' :
                                             'bg-red-900/30 text-red-400'
                                         }`}>
-                                            {quiz.avgScore}%
+                                            {quiz.avgScore || 0}%
                                         </span>
                                     </td>
                                     <td className="px-4 py-3 text-center">
@@ -141,7 +150,11 @@ export default function Quizzes() {
                                             <button className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors" title="Edit">
                                                 ✏️
                                             </button>
-                                            <button className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded transition-colors" title="Delete">
+                                            <button 
+                                                onClick={() => handleDelete(quiz._id)}
+                                                className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded transition-colors" 
+                                                title="Delete"
+                                            >
                                                 🗑️
                                             </button>
                                         </div>
