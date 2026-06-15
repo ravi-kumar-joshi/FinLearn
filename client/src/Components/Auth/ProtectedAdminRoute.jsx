@@ -27,11 +27,16 @@ const ProtectedAdminRoute = () => {
     setLoading(true);
     const result = await httpAction(data);
 
+    console.log('ProtectedAdminRoute - API Result:', result);
+    console.log('ProtectedAdminRoute - Role check:', result?.role, result?.user?.role);
+
     if (result?.status) {
-      // Check if user has admin role
-      const userRole = result.role || result.user?.role;
+      // Check if user has admin role - check multiple possible locations
+      const userRole = result.role || result.user?.role || result.data?.role;
+      console.log('ProtectedAdminRoute - Final role:', userRole, 'Is admin:', userRole === 'admin');
       setIsAdmin(userRole === 'admin');
     } else {
+      console.log('ProtectedAdminRoute - Auth failed:', result);
       setIsAdmin(false);
     }
     setLoading(false);
