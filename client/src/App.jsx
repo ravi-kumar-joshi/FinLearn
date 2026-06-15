@@ -1,14 +1,4 @@
-/*
-  client/src/App.jsx
 
-  Purpose:
-  - Define the top-level routes for the SPA using React Router.
-  - Grouped routes include public pages, auth pages, and protected dashboard routes.
-
-  Notes for new developers:
-  - `Super` wraps protected routes and ensures only authenticated users can access them.
-  - `AuthLayout` provides a consistent layout for authentication-related pages.
-*/
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 
