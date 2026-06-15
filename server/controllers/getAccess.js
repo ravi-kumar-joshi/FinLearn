@@ -9,6 +9,7 @@ const getAccess = async (req, res, next) => {
       message: "success",
       status: true,
       onboardingCompleted: findedUser?.onboarding?.completed || false,
+      isAdmin: findedUser?.isAdmin || false,
     });
   } catch (error) {
     next(error);
