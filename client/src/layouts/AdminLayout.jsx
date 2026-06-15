@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react'
+import { Outlet } from 'react-router-dom'
 import Sidebar from '../admin/components/Sidebar'
 import Topbar from '../admin/components/Topbar'
 
-export default function AdminLayout({ children }) {
+export default function AdminLayout() {
 
   const [user, setUser] = useState(() => {
     try {
@@ -64,7 +65,7 @@ export default function AdminLayout({ children }) {
         />
 
         <main className="p-4 sm:p-6 bg-slate-900 flex-1 overflow-auto">
-          {children}
+          <Outlet />
         </main>
 
       </div>

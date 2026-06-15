@@ -1,5 +1,4 @@
  import React, { useState, useEffect } from 'react'
-import AdminLayout from '../../layouts/AdminLayout'
 import UserTable from '../components/UserTable'
 import api from '../services/api'
 
@@ -82,21 +81,18 @@ export default function Users() {
 
     if (unauth) {
         return (
-            <AdminLayout>
-                <div className="p-6 text-center text-slate-300">
-                    <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
-                        <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
-                        <p className="text-sm text-slate-400">You need to sign in as an admin to manage users.</p>
-                        <p className="text-sm text-slate-400 mt-2">Use the "Sign In" button in the top right to log in.</p>
-                    </div>
+            <div className="p-6 text-center text-slate-300">
+                <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                    <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
+                    <p className="text-sm text-slate-400">You need to sign in as an admin to manage users.</p>
+                    <p className="text-sm text-slate-400 mt-2">Use the "Sign In" button in the top right to log in.</p>
                 </div>
-            </AdminLayout>
+            </div>
         )
     }
 
     return (
-        <AdminLayout>
-            <div className="space-y-4">
+        <div className="space-y-4">
                 {/* Header */}
                 <div>
                     <h2 className="text-2xl font-semibold">Users & Gamification</h2>
@@ -147,7 +143,6 @@ export default function Users() {
                         </div>
                     </div>
                 )}
-            </div>
-        </AdminLayout>
+        </div>
     )
 }

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import AdminLayout from '../../layouts/AdminLayout'
 import api from '../services/api'
 
 export default function Quizzes() {
@@ -42,36 +41,30 @@ export default function Quizzes() {
 
     if (data.unauth) {
         return (
-            <AdminLayout>
-                <div className="p-6 text-center text-slate-300">
-                    <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
-                        <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
-                        <p className="text-sm text-slate-400">You need to sign in as an admin to manage quizzes.</p>
-                    </div>
+            <div className="p-6 text-center text-slate-300">
+                <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                    <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
+                    <p className="text-sm text-slate-400">You need to sign in as an admin to manage quizzes.</p>
                 </div>
-            </AdminLayout>
+            </div>
         )
     }
 
     if (data.loading) {
         return (
-            <AdminLayout>
-                <div className="p-8 text-center text-slate-400">
-                    <div className="inline-block animate-spin text-2xl">⏳</div>
-                    <p className="mt-4">Loading quizzes...</p>
-                </div>
-            </AdminLayout>
+            <div className="p-8 text-center text-slate-400">
+                <div className="inline-block animate-spin text-2xl">⏳</div>
+                <p className="mt-4">Loading quizzes...</p>
+            </div>
         )
     }
 
     if (data.error) {
         return (
-            <AdminLayout>
-                <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
-                    <p className="text-red-400 font-medium">Error loading quizzes</p>
-                    <p className="text-sm text-slate-400 mt-2">{data.error}</p>
-                </div>
-            </AdminLayout>
+            <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                <p className="text-red-400 font-medium">Error loading quizzes</p>
+                <p className="text-sm text-slate-400 mt-2">{data.error}</p>
+            </div>
         )
     }
 
@@ -80,8 +73,7 @@ export default function Quizzes() {
     const avgScore = Math.round(data.quizzes.reduce((s, q) => s + q.avgScore, 0) / totalQuizzes)
 
     return (
-        <AdminLayout>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -171,7 +163,6 @@ export default function Quizzes() {
                         </button>
                     </div>
                 )}
-            </div>
-        </AdminLayout>
+        </div>
     )
 }

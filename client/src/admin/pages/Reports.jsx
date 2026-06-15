@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import AdminLayout from '../../layouts/AdminLayout'
 import api from '../services/api'
 
 export default function Reports() {
@@ -41,36 +40,30 @@ export default function Reports() {
 
     if (data.unauth) {
         return (
-            <AdminLayout>
-                <div className="p-6 text-center text-slate-300">
-                    <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
-                        <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
-                        <p className="text-sm text-slate-400">You need to sign in as an admin to view reports.</p>
-                    </div>
+            <div className="p-6 text-center text-slate-300">
+                <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                    <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
+                    <p className="text-sm text-slate-400">You need to sign in as an admin to view reports.</p>
                 </div>
-            </AdminLayout>
+            </div>
         )
     }
 
     if (data.loading) {
         return (
-            <AdminLayout>
-                <div className="p-8 text-center text-slate-400">
-                    <div className="inline-block animate-spin text-2xl">⏳</div>
-                    <p className="mt-4">Loading reports...</p>
-                </div>
-            </AdminLayout>
+            <div className="p-8 text-center text-slate-400">
+                <div className="inline-block animate-spin text-2xl">⏳</div>
+                <p className="mt-4">Loading reports...</p>
+            </div>
         )
     }
 
     if (data.error) {
         return (
-            <AdminLayout>
-                <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
-                    <p className="text-red-400 font-medium">Error loading reports</p>
-                    <p className="text-sm text-slate-400 mt-2">{data.error}</p>
-                </div>
-            </AdminLayout>
+            <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                <p className="text-red-400 font-medium">Error loading reports</p>
+                <p className="text-sm text-slate-400 mt-2">{data.error}</p>
+            </div>
         )
     }
 
@@ -79,8 +72,7 @@ export default function Reports() {
     const totalXP = data.users.reduce((s, u) => s + (u.xp?.totalXP || 0), 0)
 
     return (
-        <AdminLayout>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 {/* Header */}
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold">Reports</h1>
@@ -182,7 +174,6 @@ export default function Reports() {
                         </button>
                     </div>
                 </div>
-            </div>
-        </AdminLayout>
+        </div>
     )
 }

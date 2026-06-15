@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import AdminLayout from '../../layouts/AdminLayout'
 import StatsCard from '../components/StatsCard'
 import SimpleChart from '../components/SimpleChart'
 import api from '../services/api'
@@ -44,36 +43,30 @@ export default function Analytics() {
 
     if (data.unauth) {
         return (
-            <AdminLayout>
-                <div className="p-6 text-center text-slate-300">
-                    <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
-                        <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
-                        <p className="text-sm text-slate-400">You need to sign in as an admin to view analytics.</p>
-                    </div>
+            <div className="p-6 text-center text-slate-300">
+                <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                    <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
+                    <p className="text-sm text-slate-400">You need to sign in as an admin to view analytics.</p>
                 </div>
-            </AdminLayout>
+            </div>
         )
     }
 
     if (data.loading) {
         return (
-            <AdminLayout>
-                <div className="p-8 text-center text-slate-400">
-                    <div className="inline-block animate-spin text-2xl">⏳</div>
-                    <p className="mt-4">Loading analytics...</p>
-                </div>
-            </AdminLayout>
+            <div className="p-8 text-center text-slate-400">
+                <div className="inline-block animate-spin text-2xl">⏳</div>
+                <p className="mt-4">Loading analytics...</p>
+            </div>
         )
     }
 
     if (data.error) {
         return (
-            <AdminLayout>
-                <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
-                    <p className="text-red-400 font-medium">Error loading analytics</p>
-                    <p className="text-sm text-slate-400 mt-2">{data.error}</p>
-                </div>
-            </AdminLayout>
+            <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                <p className="text-red-400 font-medium">Error loading analytics</p>
+                <p className="text-sm text-slate-400 mt-2">{data.error}</p>
+            </div>
         )
     }
 
@@ -86,8 +79,7 @@ export default function Analytics() {
     const completionData = [45, 52, 61, 58, 72, 85, 92]
 
     return (
-        <AdminLayout>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -188,7 +180,6 @@ export default function Analytics() {
                         </div>
                     </div>
                 </div>
-            </div>
-        </AdminLayout>
+        </div>
     )
 }

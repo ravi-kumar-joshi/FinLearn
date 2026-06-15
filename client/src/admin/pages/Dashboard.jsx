@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import AdminLayout from '../../layouts/AdminLayout'
 import StatsCard from '../components/StatsCard'
 import Leaderboard from '../components/Leaderboard'
 import SimpleChart from '../components/SimpleChart'
@@ -50,37 +49,31 @@ export default function Dashboard() {
 
     if (stats.unauth) {
         return (
-            <AdminLayout>
-                <div className="p-6 text-center text-slate-300">
-                    <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
-                        <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
-                        <p className="text-sm text-slate-400">You need to sign in as an admin to view the dashboard.</p>
-                        <p className="text-sm text-slate-400 mt-2">Use the "Sign In" button in the top right to log in.</p>
-                    </div>
+            <div className="p-6 text-center text-slate-300">
+                <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                    <p className="mb-4 font-medium text-red-400">Admin Access Required</p>
+                    <p className="text-sm text-slate-400">You need to sign in as an admin to view the dashboard.</p>
+                    <p className="text-sm text-slate-400 mt-2">Use the "Sign In" button in the top right to log in.</p>
                 </div>
-            </AdminLayout>
+            </div>
         )
     }
 
     if (stats.loading) {
         return (
-            <AdminLayout>
-                <div className="p-8 text-center text-slate-400">
-                    <div className="inline-block animate-spin text-2xl">⏳</div>
-                    <p className="mt-4">Loading dashboard...</p>
-                </div>
-            </AdminLayout>
+            <div className="p-8 text-center text-slate-400">
+                <div className="inline-block animate-spin text-2xl">⏳</div>
+                <p className="mt-4">Loading dashboard...</p>
+            </div>
         )
     }
 
     if (stats.error) {
         return (
-            <AdminLayout>
-                <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
-                    <p className="text-red-400 font-medium">Error loading dashboard</p>
-                    <p className="text-sm text-slate-400 mt-2">{stats.error}</p>
-                </div>
-            </AdminLayout>
+            <div className="bg-red-900/30 border border-red-800 rounded-lg p-6">
+                <p className="text-red-400 font-medium">Error loading dashboard</p>
+                <p className="text-sm text-slate-400 mt-2">{stats.error}</p>
+            </div>
         )
     }
 
@@ -98,8 +91,7 @@ export default function Dashboard() {
     ).toFixed(1)
 
     return (
-        <AdminLayout>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 {/* Header */}
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
@@ -201,7 +193,6 @@ export default function Dashboard() {
                         })}
                     </div>
                 </div>
-            </div>
-        </AdminLayout>
+        </div>
     )
 }

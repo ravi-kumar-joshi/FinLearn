@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { MdAdd, MdCheckCircle, MdErrorOutline, MdRefresh, MdLock } from 'react-icons/md'
-import AdminLayout from '../../layouts/AdminLayout'
 import CourseTable from '../components/CourseTable'
 import CourseModal from '../components/CourseModal'
 import api from '../services/api'
@@ -117,20 +116,17 @@ export default function Courses() {
   }
 
   if (unauth) return (
-    <AdminLayout>
-      <div className="flex items-center justify-center h-64">
-        <div className="bg-red-900/20 border border-red-800/60 rounded-xl p-8 max-w-md text-center">
-          <MdLock className="text-red-400 text-4xl mx-auto mb-3" />
+    <div className="flex items-center justify-center h-64">
+      <div className="bg-red-900/20 border border-red-800/60 rounded-xl p-8 max-w-md text-center">
+        <MdLock className="text-red-400 text-4xl mx-auto mb-3" />
           <p className="font-medium text-red-400 mb-1">Admin access required</p>
           <p className="text-sm text-slate-400">Sign in with admin credentials using the button in the top right.</p>
         </div>
       </div>
-    </AdminLayout>
   )
 
   return (
-    <AdminLayout>
-      <div className="space-y-4">
+    <div className="space-y-4">
 
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -179,6 +175,5 @@ export default function Courses() {
           allCourses={courses}
         />
       </div>
-    </AdminLayout>
   )
 }

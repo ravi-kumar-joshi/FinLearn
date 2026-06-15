@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import AdminLayout from '../../layouts/AdminLayout'
 
 export default function Settings() {
     const [settings, setSettings] = useState({
@@ -31,8 +30,7 @@ export default function Settings() {
     }
 
     return (
-        <AdminLayout>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 {/* Header */}
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold">Settings</h1>
@@ -193,7 +191,6 @@ export default function Settings() {
                         Save Settings
                     </button>
                 </div>
-            </div>
-        </AdminLayout>
+        </div>
     )
 }
