@@ -82,7 +82,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Phone</h3>
-                    <p className="text-gray-600">+91 98765 43210</p>
+                    <p className="text-gray-600">+91xxxxxxxx</p>
                     <p className="text-sm text-gray-500">Mon-Fri, 9am-6pm IST</p>
                   </div>
                 </div>

@@ -29,8 +29,6 @@ import CourseDetailsPage from './pages/CourseDetailsPage';
 import VerifyPage from './pages/VerifyPage';
 import FinBotPage from './Components/Chatbot/Finbotpage';
 import AboutUs from './pages/AboutUs';
-import Blog from './pages/Blog';
-import Careers from './pages/Careers';
 import Contact from './pages/Contact';
 import HelpCenter from './pages/HelpCenter';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -59,8 +57,6 @@ function App() {
 
         {/* Public pages */}
         <Route path="/about" element={<AboutUs />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
