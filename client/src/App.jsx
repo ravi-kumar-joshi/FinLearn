@@ -23,6 +23,15 @@ import Contact from './pages/Contact';
 import HelpCenter from './pages/HelpCenter';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import ProtectedAdminRoute from './Components/Auth/ProtectedAdminRoute';
+import AdminLayout from './layouts/AdminLayout';
+import AdminDashboard from './admin/pages/Dashboard';
+import AdminCourses from './admin/pages/Courses';
+import AdminUsers from './admin/pages/Users';
+import AdminAnalytics from './admin/pages/Analytics';
+import AdminReports from './admin/pages/Reports';
+import AdminQuizzes from './admin/pages/Quizzes';
+import AdminSettings from './admin/pages/Settings';
 
 // ==================== Layouts ====================
 // AuthLayout: Provides consistent styling for all auth pages
@@ -70,9 +79,19 @@ function App() {
           <Route path="/auth/onboarding" element={<AuthLayout> <Onboarding /> </AuthLayout>} />
         </Route>
 
-        {/* Redirect /admin to the separate admin SPA entrypoint */}
-        <Route path="/admin" element={<Navigate to="/admin.html" replace />} />
-        <Route path="/admin/*" element={<Navigate to="/admin.html" replace />} />
+        {/* Admin Routes - Protected */}
+        <Route element={<ProtectedAdminRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/analytics" element={<AdminAnalytics />} />
+            <Route path="/admin/reports" element={<AdminReports />} />
+            <Route path="/admin/courses" element={<AdminCourses />} />
+            <Route path="/admin/quizzes" element={<AdminQuizzes />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+          </Route>
+        </Route>
 
         {/* Dashboard and protected user routes */}
         <Route element={<Super />}>

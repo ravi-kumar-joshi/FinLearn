@@ -13,27 +13,27 @@ const NAV_SECTIONS = [
   {
     label: 'Overview',
     items: [
-      { to: '/', icon: MdDashboard, label: 'Dashboard' },
-      { to: '/analytics', icon: MdBarChart, label: 'Analytics', badge: 3 },
-      { to: '/reports', icon: MdDescription, label: 'Reports' },
+      { to: '/admin/dashboard', icon: MdDashboard, label: 'Dashboard' },
+      { to: '/admin/analytics', icon: MdBarChart, label: 'Analytics', badge: 3 },
+      { to: '/admin/reports', icon: MdDescription, label: 'Reports' },
     ],
   },
   {
     label: 'Content',
     items: [
-      { to: '/courses', icon: MdMenuBook, label: 'Courses', badge: 12 },
-      { to: '/quizzes', icon: MdQuiz, label: 'Quizzes' },
+      { to: '/admin/courses', icon: MdMenuBook, label: 'Courses', badge: 12 },
+      { to: '/admin/quizzes', icon: MdQuiz, label: 'Quizzes' },
     ],
   },
   {
     label: 'People',
     items: [
-      { to: '/users', icon: MdPeople, label: 'Users', badge: 240 },
+      { to: '/admin/users', icon: MdPeople, label: 'Users', badge: 240 },
     ],
   },
 ]
 
-const FOOTER_ITEM = { to: '/settings', icon: MdSettings, label: 'Settings' }
+const FOOTER_ITEM = { to: '/admin/settings', icon: MdSettings, label: 'Settings' }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
