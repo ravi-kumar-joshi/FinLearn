@@ -17,7 +17,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/FinLearn.git
+git clone https://github.com/ravi-kumar-joshi/FinLearn.git
 cd FinLearn
 
 # Install dependencies
@@ -64,7 +64,7 @@ cd ../client && npm run dev  # Terminal 2
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/FinLearn.git
+   git clone https://github.com/ravi-kumar-joshi/FinLearn.git
    cd FinLearn
    ```
 
@@ -221,8 +221,8 @@ This project is licensed under the MIT License.
 
 ## 📞 Contact
 
-- **GitHub**: [yourusername/FinLearn](https://github.com/yourusername/FinLearn)
-- **Issues**: [Report Bug](https://github.com/yourusername/FinLearn/issues)
+- **GitHub**: [ravi-kumar-joshi/FinLearn](https://github.com/ravi-kumar-joshi/FinLearn)
+- **Issues**: [Report Bug](https://github.com/ravi-kumar-joshi/FinLearn/issues)
 
 ---
 
