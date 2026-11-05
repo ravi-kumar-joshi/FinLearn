@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../Components/Dashboard/Navbar';
 import SideBar from '../Components/Dashboard/SideBar';
 import { QuestionCard, QuizProgressBar } from '../Components/Shared/QuizComponents';
-import { XPReward } from '../Components/Shared/GamificationComponents';
 import httpAction from '../utils/httpAction';
 import { notifyCourseProgressUpdated } from '../utils/courseProgressEvents';
 import { collectModuleQuizQuestions } from '../utils/moduleQuizQuestions';
@@ -84,9 +83,6 @@ const QuizPage = () => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedAnswers, setSelectedAnswers] = useState({});
     const [showFeedback, setShowFeedback] = useState(false);
-    const [totalXP, setTotalXP] = useState(0);
-    const [showXP, setShowXP] = useState(false);
-    const [xpGained, setXpGained] = useState(0);
     const [showCompletionCelebration, setShowCompletionCelebration] = useState(false);
     const [nextModuleInfo, setNextModuleInfo] = useState(null);
 
@@ -120,18 +116,12 @@ const QuizPage = () => {
     }, [module?.id]);
 
     const question = questions[currentQuestion];
-    const answered = selectedAnswers[currentQuestion] !== undefined && selectedAnswers[currentQuestion] !== null;
+    const answered = Object.prototype.hasOwnProperty.call(selectedAnswers, currentQuestion);
 
     const handleAnswer = (optionIdx) => {
         if (answered) return;
         setSelectedAnswers((prev) => ({ ...prev, [currentQuestion]: optionIdx }));
-        const isCorrect = optionIdx === question.correctAnswer;
-        const xpEarned = isCorrect ? 40 : 10;
-        setXpGained(xpEarned);
-        setTotalXP((prev) => prev + xpEarned);
         setShowFeedback(true);
-        setShowXP(true);
-        setTimeout(() => setShowXP(false), 1500);
     };
 
     const handleNextQuestion = async () => {
@@ -142,27 +132,24 @@ const QuizPage = () => {
             return;
         }
 
-        // Calculate quiz score
-        const correctCount = questions.reduce((n, q, idx) => (selectedAnswers[idx] === q.correctAnswer ? n + 1 : n), 0);
-        const scorePct = Math.round((correctCount / questions.length) * 100);
-
-        // Mark module complete if passed
-        if (scorePct >= PASS_SCORE) {
-            const res = await httpAction({
-                url: `${API_BASE_URL}/courses/${courseId}/module/${module.id}/complete`,
-                method: 'PUT',
-                body: { quizScore: scorePct },
-            });
-            if (res?.progress) {
-                setProgress(res.progress);
-                notifyCourseProgressUpdated(courseId);
-            }
-        }
+        const answers = questions.map((_, index) =>
+            Number.isInteger(selectedAnswers[index]) ? selectedAnswers[index] : null
+        );
+        const res = await httpAction({
+            url: `${API_BASE_URL}/courses/${courseId}/module/${module.id}/complete`,
+            method: 'PUT',
+            body: { answers },
+        });
+        if (!res?.success || !res.progress) return;
+        setProgress(res.progress);
+        notifyCourseProgressUpdated(courseId);
+        const scorePct = res.quizScore;
+        const modulePassed = res.quizPassed;
 
         // ═══════════════════════════════════════════════════════════════════════════════
         // AUTO-ADVANCE: Find next module and navigate automatically if passed
         // ═══════════════════════════════════════════════════════════════════════════════
-        if (scorePct >= PASS_SCORE && course?.modules?.length > 0) {
+        if (modulePassed && course?.modules?.length > 0) {
             const currentModuleIndex = course.modules.findIndex(m => m.id === module.id);
             const nextModuleIndex = currentModuleIndex + 1;
 
@@ -191,12 +178,12 @@ const QuizPage = () => {
         navigate(`/dashboard/course/${courseId}/quiz-result`, {
             state: {
                 selectedAnswers,
-                totalXP,
-                correctCount,
+                totalXP: res.xpEarned || 0,
+                correctCount: res.correctCount ?? 0,
                 totalQuestions: questions.length,
                 quizScorePct: scorePct,
                 moduleTitle: module.title,
-                modulePassed: scorePct >= PASS_SCORE,
+                modulePassed,
                 moduleId: module.id,
             },
         });
@@ -264,10 +251,13 @@ const QuizPage = () => {
                             onClick={async () => {
                                 const res = await httpAction({
                                     url: `${API_BASE_URL}/courses/${courseId}/module/${module.id}/complete`,
-                                    method: 'PUT', body: { quizScore: 100 },
+                                    method: 'PUT', body: { answers: [] },
                                 });
-                                if (res?.progress) { setProgress(res.progress); notifyCourseProgressUpdated(courseId); }
-                                navigate(`/dashboard/course/${courseId}/player`);
+                                if (res?.success && res?.quizPassed && res?.progress) {
+                                    setProgress(res.progress);
+                                    notifyCourseProgressUpdated(courseId);
+                                    navigate(`/dashboard/course/${courseId}/player`);
+                                }
                             }}>
                             Complete module
                         </motion.button>
@@ -302,10 +292,6 @@ const QuizPage = () => {
     );
 
     /* ── quiz UI ── */
-    const _scorePreview = answered
-        ? Math.round((Object.keys(selectedAnswers).filter(k => selectedAnswers[k] === questions[Number(k)]?.correctAnswer).length / questions.length) * 100)
-        : 0;
-
     return (
         <Shell sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
             <div className="p-4 lg:p-8">
@@ -331,8 +317,8 @@ const QuizPage = () => {
                             <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 shrink-0">
                                 <Zap size={16} className="text-amber-500" />
                                 <div>
-                                    <p className="text-xs text-amber-600">XP so far</p>
-                                    <p className="font-extrabold text-amber-800 leading-none">{totalXP}</p>
+                                    <p className="text-xs text-amber-600">Module reward</p>
+                                    <p className="font-extrabold text-amber-800 leading-none">{module.xpReward || 0} XP</p>
                                 </div>
                             </div>
                         </div>
@@ -340,7 +326,7 @@ const QuizPage = () => {
 
                     {/* progress bar */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 mb-4">
-                        <QuizProgressBar current={currentQuestion + 1} total={questions.length} xpEarned={totalXP} />
+                        <QuizProgressBar current={currentQuestion + 1} total={questions.length} />
                         <StepDots current={currentQuestion} total={questions.length} />
                     </div>
 
@@ -359,10 +345,8 @@ const QuizPage = () => {
                                     </span>
                                     {answered && (
                                         <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
-                                            className={`text-xs font-bold px-2.5 py-1 rounded-full ${selectedAnswers[currentQuestion] === question.correctAnswer
-                                                ? 'bg-emerald-400/20 text-emerald-200'
-                                                : 'bg-red-400/20 text-red-200'}`}>
-                                            {selectedAnswers[currentQuestion] === question.correctAnswer ? '✓ Correct +40 XP' : '✗ Wrong +10 XP'}
+                                            className="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-400/20 text-indigo-100">
+                                            Answer saved
                                         </motion.span>
                                     )}
                                 </div>
@@ -376,7 +360,6 @@ const QuizPage = () => {
                                     onAnswer={handleAnswer}
                                     answered={answered}
                                     selectedAnswer={selectedAnswers[currentQuestion]}
-                                    showFeedback={showFeedback}
                                 />
 
                                 <AnimatePresence>
@@ -404,7 +387,6 @@ const QuizPage = () => {
                     </p>
                 </div>
             </div>
-            <XPReward amount={xpGained} show={showXP} onComplete={() => setShowXP(false)} />
         </Shell>
     );
 };

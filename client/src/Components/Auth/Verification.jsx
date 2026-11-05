@@ -17,7 +17,6 @@ import toast from "react-hot-toast";
 
 const Verification = () => {
   const { navigate, loading, setLoading } = useGeneral();
-  const [otpTime, setOtpTime] = useState(2 * 60 * 1000);
   const [userEmail, setUserEmail] = useState("");
   const [endTime, setEndTime] = useState(0);
 
@@ -39,27 +38,27 @@ const Verification = () => {
     otp6: Yup.string().required(),
   });
 
-  // Fetch OTP expiry time + user email
+  // Recover the email and expiry returned by the public password-reset request.
   const loadOtpTime = useCallback(async () => {
-    const config = { url: apis().getOtpExpTime };
-    setLoading(true);
-    const result = await httpAction(config);
-    setLoading(false);
-
-    if (result?.status) {
-      setOtpTime(result.time);
-      setUserEmail(result.email);
-      setEndTime(Date.now() + result.time);
-    }
-  }, [setLoading]);
+    const email = sessionStorage.getItem("passwordResetEmail") || "";
+    const expiresAt = Number(sessionStorage.getItem("passwordResetExpiresAt"));
+    setUserEmail(email);
+    const remaining = Number.isFinite(expiresAt) ? Math.max(0, expiresAt - Date.now()) : 0;
+    setEndTime(Date.now() + remaining);
+  }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    let active = true;
     loadOtpTime();
-    setTimeout(() => {
+    const timer = setTimeout(() => {
+      if (!active) return;
       const first = document.getElementById("otp-1");
       if (first) first.focus();
     }, 150);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
   }, [loadOtpTime]);
 
   // Auto shift to next input
@@ -75,6 +74,12 @@ const Verification = () => {
 
   // FIXED SUBMIT HANDLER
   const submitHandler = async (values) => {
+    if (!userEmail) {
+      toast.error("Start password reset by entering your email first");
+      navigate("/auth/password/forget");
+      return;
+    }
+
     const code =
       (values.otp1 ?? "") +
       (values.otp2 ?? "") +
@@ -91,23 +96,34 @@ const Verification = () => {
     const payload = {
       url: apis().verifyOtp,
       method: "POST",
-      body: { otp: Number(code) }, // FIXED: send as NUMBER
+      body: { email: userEmail, otp: Number(code) },
     };
 
     setLoading(true);
-    const result = await httpAction(payload);
-    setLoading(false);
-
-    if (result?.status) {
-      toast.success(result.message || "OTP verified!");
-      navigate("/auth/password/change");
-    } else {
-      toast.error(result?.message || "Invalid OTP");
+    try {
+      const result = await httpAction(payload);
+      if (result?.status) {
+        sessionStorage.setItem("passwordResetToken", result.resetToken);
+        toast.success(result.message || "OTP verified!");
+        navigate("/auth/password/change");
+      } else {
+        toast.error(result?.message || "Invalid OTP");
+      }
+    } catch (error) {
+      toast.error(error?.message || "Invalid OTP");
+    } finally {
+      setLoading(false);
     }
   };
 
   // RESEND OTP
   const resendOtpHandler = async () => {
+    if (!userEmail) {
+      toast.error("Start password reset by entering your email first");
+      navigate("/auth/password/forget");
+      return;
+    }
+
     const payload = {
       url: apis().forgetPassword,
       method: "POST",
@@ -115,12 +131,18 @@ const Verification = () => {
     };
 
     setLoading(true);
-    const result = await httpAction(payload);
-    setLoading(false);
-
-    if (result?.status) {
-      toast.success(result.message || "OTP resent!");
-      loadOtpTime();
+    try {
+      const result = await httpAction(payload);
+      if (result?.status) {
+        sessionStorage.removeItem("passwordResetToken");
+        sessionStorage.setItem("passwordResetExpiresAt", String(result.expiresAt));
+        toast.success(result.message || "OTP resent!");
+        loadOtpTime();
+      }
+    } catch (error) {
+      toast.error(error?.message || "Could not resend the code");
+    } finally {
+      setLoading(false);
     }
   };
 

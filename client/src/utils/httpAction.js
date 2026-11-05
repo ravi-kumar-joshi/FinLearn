@@ -51,7 +51,7 @@ const makeTimeout = (ms) => {
  * Single fetch attempt with timeout.
  * Throws on network error or non-2xx status.
  */
-async function doFetch(url, method, body, timeoutMs = 25000) {
+async function doFetch(url, method, body, timeoutMs = 25000, headers = {}) {
   if (!isOnline()) {
     const err = new Error("No internet connection — please check your network");
     err.isNetworkError = true;
@@ -63,7 +63,7 @@ async function doFetch(url, method, body, timeoutMs = 25000) {
     const response = await fetch(url, {
       method,
       body: body ? JSON.stringify(body) : null,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...headers },
       credentials: "include", // send HttpOnly auth cookies
       signal: controller.signal,
     });
@@ -155,6 +155,7 @@ async function attemptRefresh() {
  * @param {string}   data.url          - API endpoint URL (required)
  * @param {string}  [data.method=GET]  - HTTP method
  * @param {Object}  [data.body]        - JSON body
+ * @param {Object}  [data.headers]     - Additional request headers
  * @param {number}  [data.timeout]     - Request timeout in ms (default 25000)
  * @param {number}  [data.retries]     - Max retry count for transient errors (default 2)
  * @param {boolean} [data.silent]      - Suppress toast notifications (default false)
@@ -179,7 +180,7 @@ const httpAction = async (data) => {
         await sleep(delay);
       }
 
-      return await doFetch(data.url, method, data.body, timeoutMs);
+      return await doFetch(data.url, method, data.body, timeoutMs, data.headers);
     } catch (err) {
       lastError = err;
 
@@ -189,7 +190,7 @@ const httpAction = async (data) => {
         if (refreshed) {
           // Retry the original request with the new access token cookie
           try {
-            return await doFetch(data.url, method, data.body, timeoutMs);
+            return await doFetch(data.url, method, data.body, timeoutMs, data.headers);
           } catch (retryErr) {
             lastError = retryErr;
             // fall through to retry loop
@@ -206,6 +207,12 @@ const httpAction = async (data) => {
 
       // ── 403: unauthorized — handled by redirect in caller ──────────
       if (err.status === 403) {
+        if (data.surfaceError) {
+          return {
+            status: false,
+            message: err.message || "You are not allowed to do that",
+          };
+        }
         // Don't toast or retry — caller (e.g. Super) redirects to /auth/login
         return null;
       }
@@ -220,19 +227,23 @@ const httpAction = async (data) => {
     }
   }
 
+  const failureMessage = !lastError
+    ? "Something went wrong"
+    : lastError.isNetworkError
+      ? (lastError.message || "Network error — please check your connection")
+      : lastError.status >= 500
+        ? "Server is temporarily unavailable. Please try again."
+        : lastError.message?.includes("Google Sign-In")
+          ? "This account was registered with Google. Please use 'Continue with Google' to log in."
+          : (lastError.message || "Something went wrong");
+
   // ── All retries exhausted — surface error to user ─────────────────
   if (!data.silent && lastError) {
-    if (lastError.isNetworkError) {
-      toast.error(lastError.message || "Network error — please check your connection");
-    } else if (lastError.status >= 500) {
-      toast.error("Server is temporarily unavailable. Please try again.");
-    } else if (lastError.message?.includes("Google Sign-In")) {
-      toast.error(
-        "This account was registered with Google. Please use 'Continue with Google' to log in."
-      );
-    } else {
-      toast.error(lastError.message || "Something went wrong");
-    }
+    toast.error(failureMessage);
+  }
+
+  if (data.surfaceError) {
+    return { status: false, message: failureMessage };
   }
 
   if (import.meta.env.MODE === "development") {

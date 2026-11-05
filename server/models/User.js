@@ -70,7 +70,7 @@ const userSchema = new mongoose.Schema(
 
     password_otp: {
       otp: {
-        type: Number,
+        type: String,
         default: null
       },
       time: {
@@ -82,6 +82,11 @@ const userSchema = new mongoose.Schema(
         default: 5, // Changed from 4 to 5 for better UX
         min: 0,
         max: 5
+      },
+      verify_attempts: {
+        type: Number,
+        default: 0,
+        min: 0
       },
       last_attempt_time: {
         type: Date,

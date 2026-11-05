@@ -1,71 +1,122 @@
 /**
  * Verify OTP Controller
- * 
- * Verifies the OTP sent to user's email for password reset
- * OTP must be valid and not expired (2 minute window)
- * 
- * @module controllers/verifyOtp
- * @async
- * @param {Object} req.body - Request body
- * @param {number} req.body.otp - 6-digit OTP code
- * @returns {Object} Success message if OTP is valid
- * @throws {Error} 400 - Incorrect or expired OTP
+ *
+ * Checks the hashed password-reset OTP and atomically consumes it.
+ * A second request with the same code cannot issue another reset token.
  */
 
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const {
+  RESET_WINDOW_MS,
+  MAX_VERIFY_ATTEMPTS,
+  hashOtp,
+  safeEqual,
+} = require("../utils/passwordResetOtp");
+
+function httpError(message, statusCode) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+}
 
 const verifyOtp = async (req, res, next) => {
-  const otp = Number(req.body.otp);
-
   try {
-    // Validate OTP format
-    if (!otp || otp < 100000 || otp > 999999) {
-      const error = new Error("Invalid OTP format. Must be 6 digits");
-      error.statusCode = 400;
-      throw error;
+    const body = req.body ?? {};
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const otp = Number(body.otp);
+
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      throw httpError("Email is required", 400);
     }
 
-    // Find user with matching OTP
-    const findedUser = await User.findOne({
-      "password_otp.otp": otp,
-    });
-
-    if (!findedUser) {
-      const error = new Error("Incorrect OTP");
-      error.statusCode = 400;
-      throw error;
+    if (!Number.isInteger(otp) || otp < 100000 || otp > 999999) {
+      throw httpError("Invalid OTP format. Must be 6 digits", 400);
     }
 
-    // Check if OTP has expired (2 minute window)
-    const currentTime = Date.now();
-    const otpExpiry = findedUser.password_otp.time;
-
-    if (otpExpiry < currentTime) {
-      const error = new Error("OTP has expired. Please request a new one");
-      error.statusCode = 400;
-      throw error;
+    if (!process.env.ACCESS_TOKEN_KEY) {
+      throw new Error("JWT secret keys not configured in environment variables");
     }
 
-    // Double-check OTP matches (redundant but safe)
-    if (findedUser.password_otp.otp !== otp) {
-      const error = new Error("Incorrect OTP");
-      error.statusCode = 400;
-      throw error;
+    const user = await User.findOne({ email });
+    const stored = user?.password_otp;
+    const storedHash = stored?.otp;
+
+    if (!user || storedHash == null || storedHash === "") {
+      throw httpError("Incorrect OTP", 400);
     }
 
-    // Mark OTP as verified
-    findedUser.password_otp.status = true;
+    const verifyAttempts = stored.verify_attempts ?? 0;
+    if (verifyAttempts >= MAX_VERIFY_ATTEMPTS) {
+      throw httpError("Too many incorrect attempts. Request a new code", 429);
+    }
 
-    // Clear OTP to prevent reuse
-    findedUser.password_otp.otp = null;
+    const otpExpiry = stored.time;
+    if (!Number.isFinite(otpExpiry) || otpExpiry <= Date.now()) {
+      throw httpError("OTP has expired. Please request a new one", 400);
+    }
 
-    await findedUser.save();
+    if (!safeEqual(storedHash, hashOtp(email, otp))) {
+      const nextAttempts = verifyAttempts + 1;
+      const update = nextAttempts >= MAX_VERIFY_ATTEMPTS
+        ? {
+            $set: {
+              "password_otp.otp": null,
+              "password_otp.status": false,
+              "password_otp.verify_attempts": nextAttempts,
+            },
+          }
+        : { $inc: { "password_otp.verify_attempts": 1 } };
+
+      await User.updateOne(
+        { _id: user._id, "password_otp.otp": storedHash },
+        update
+      );
+      throw httpError("Incorrect OTP", 400);
+    }
+
+    const consumed = await User.findOneAndUpdate(
+      {
+        _id: user._id,
+        "password_otp.otp": storedHash,
+        "password_otp.status": false,
+        "password_otp.time": { $gt: Date.now() },
+      },
+      {
+        $set: {
+          "password_otp.status": true,
+          "password_otp.otp": null,
+          "password_otp.time": Date.now() + RESET_WINDOW_MS,
+          "password_otp.verify_attempts": 0,
+        },
+      },
+      { new: true }
+    );
+
+    if (!consumed) {
+      throw httpError("Incorrect OTP", 400);
+    }
+
+    const resetToken = jwt.sign(
+      {
+        email: consumed.email,
+        id: consumed._id,
+        purpose: "password_reset",
+      },
+      process.env.ACCESS_TOKEN_KEY,
+      {
+        expiresIn: "10m",
+        algorithm: "HS256",
+        issuer: "financial-literacy-hub",
+        audience: "api-client",
+      }
+    );
 
     res.status(200).json({
       message: "OTP verified successfully",
       status: true,
+      resetToken,
     });
-
   } catch (error) {
     next(error);
   }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import "./auth.css";
@@ -12,6 +12,8 @@ import toast from "react-hot-toast";
 
 const ForgetPassword = () => {
   const { navigate, loading, setLoading } = useGeneral();
+  const [errorMessage, setErrorMessage] = useState("");
+  const submitLock = useRef(false);
 
   const initialState = { email: "" };
 
@@ -20,13 +22,34 @@ const ForgetPassword = () => {
   });
 
   const submitHandler = async (values) => {
-    const data = { url: apis().forgetPassword, method: "POST", body: { email: values.email } };
+    if (submitLock.current) return;
+    submitLock.current = true;
+    const email = values.email.trim().toLowerCase();
+    const data = {
+      url: apis().forgetPassword,
+      method: "POST",
+      body: { email },
+      silent: true,
+      surfaceError: true,
+    };
+    setErrorMessage("");
     setLoading(true);
-    const result = await httpAction(data);
-    setLoading(false);
-    if (result?.status) {
-      toast.success(result?.message || "OTP sent");
-      navigate("/auth/otp/verify");
+    try {
+      const result = await httpAction(data);
+      if (result?.status) {
+        sessionStorage.removeItem("passwordResetToken");
+        sessionStorage.setItem("passwordResetEmail", email);
+        sessionStorage.setItem("passwordResetExpiresAt", String(result.expiresAt));
+        toast.success(result?.message || "OTP sent");
+        navigate("/auth/otp/verify");
+      } else {
+        setErrorMessage(result?.message || "Could not send a reset code. Please try again.");
+      }
+    } catch (error) {
+      setErrorMessage(error?.message || "Could not send a reset code. Please try again.");
+    } finally {
+      submitLock.current = false;
+      setLoading(false);
     }
   };
 
@@ -43,6 +66,10 @@ const ForgetPassword = () => {
                 <h2 className="mt-3 text-2xl font-semibold text-gray-800">Find your account</h2>
                 <p className="text-gray-500 text-sm">Enter your registered email</p>
               </div>
+
+              {errorMessage ? (
+                <p role="alert" className="text-sm text-red-600">{errorMessage}</p>
+              ) : null}
 
               <TextField
                 label="Registered Email"

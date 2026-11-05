@@ -134,60 +134,66 @@ const CourseContent = () => {
 
     // Complete a lesson
     const handleLessonComplete = async () => {
-        if (!activeLesson || lessonProgress?.completed) return;
-        if (lessonCompleteInFlight.current) return;
+        if (!activeLesson || lessonProgress?.completed) return { success: true, progress };
+        if (lessonCompleteInFlight.current) return null;
         lessonCompleteInFlight.current = true;
         try {
             const res = await httpAction({
                 url: `${API_BASE_URL}/courses/${courseId}/lesson/${activeLesson.id}/complete`,
                 method: 'PUT',
-                body: {
-                    xpEarned: activeLesson.xpReward || 20,
-                },
+                body: {},
             });
-            if (!res?.progress) return;
+            if (!res?.progress) return null;
             setProgress(res.progress);
             notifyCourseProgressUpdated(courseId);
-            setXpGain(activeLesson.xpReward || 20);
+            const completedLesson = res.progress.modules
+                ?.flatMap((module) => module.lessons || [])
+                .find((lesson) => lesson.lessonId === activeLesson.id);
+            setXpGain(completedLesson?.xpEarned || 0);
             if (res.newBadges?.length) setNewBadges(res.newBadges);
             setTimeout(() => setXpGain(null), 2000);
+            return res;
         } catch (e) {
             console.error(e);
+            return null;
         } finally {
             lessonCompleteInFlight.current = false;
         }
     };
 
     // Complete a module (after quiz pass)
-    const handleModuleComplete = async (quizScore) => {
-        if (!activeModule?.id || moduleCompleteInFlight.current) return;
+    const handleModuleComplete = async (answers) => {
+        if (!activeModule?.id || moduleCompleteInFlight.current) return null;
         moduleCompleteInFlight.current = true;
         try {
             const res = await httpAction({
                 url: `${API_BASE_URL}/courses/${courseId}/module/${activeModule.id}/complete`,
                 method: 'PUT',
-                body: { quizScore },
+                body: { answers },
             });
-            if (!res?.progress) return;
+            if (!res?.progress) return null;
             setProgress(res.progress);
             notifyCourseProgressUpdated(courseId);
-            setCelebrate(true);
+            if (res.quizPassed) setCelebrate(true);
             if (res.courseCompleted) setCourseComplete(true);
-            setTimeout(() => setCelebrate(false), 3000);
+            if (res.quizPassed) setTimeout(() => setCelebrate(false), 3000);
+            return res;
         } catch (e) {
             console.error(e);
+            return null;
         } finally {
             moduleCompleteInFlight.current = false;
         }
     };
 
-    const goNextLesson = () => {
+    const goNextLesson = async () => {
         if (activeLessonIdx < (activeModule?.lessons?.length || 0) - 1) {
             setActiveLessonIdx(a => a + 1);
             handleLessonComplete();
         } else {
             // Last lesson — show quiz
-            handleLessonComplete();
+            const result = await handleLessonComplete();
+            if (!result?.progress) return;
             setShowQuiz(true);
         }
     };

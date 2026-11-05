@@ -23,6 +23,23 @@
 
 const nodemailer = require("nodemailer");
 
+let transporter;
+
+function getTransporter() {
+  const user = process.env.MAIL_USER;
+  const pass = process.env.MAIL_PASSWORD;
+  if (!user || !pass) {
+    throw new Error("MAIL_USER and MAIL_PASSWORD must be configured");
+  }
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user, pass },
+    });
+  }
+  return transporter;
+}
+
 const sendMail = async (data) => {
   try {
     // Validate required parameters
@@ -30,23 +47,7 @@ const sendMail = async (data) => {
       throw new Error("Receiver email and OTP are required");
     }
 
-    // Validate environment variable
-    if (!process.env.MAIL_PASSWORD) {
-      throw new Error("MAIL_PASSWORD not configured in environment");
-    }
-
-    /**
-     * Gmail SMTP Configuration
-     * Uses Gmail App Password (not regular password)
-     * To generate: Google Account > Security > 2-Step Verification > App Passwords
-     */
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "6396rahulj@gmail.com", // TODO: Move to environment variable
-        pass: process.env.MAIL_PASSWORD, // Gmail App Password
-      },
-    });
+    const transporter = getTransporter();
 
     /**
      * Email Configuration
@@ -55,7 +56,7 @@ const sendMail = async (data) => {
     const mailOptions = {
       from: {
         name: "Financial Literacy Hub",
-        address: "6396rahulj@gmail.com" // TODO: Move to environment variable
+        address: process.env.MAIL_USER,
       },
       to: data.receiver,
       subject: data.subject || "Your OTP for Password Reset",

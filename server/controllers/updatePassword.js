@@ -1,54 +1,57 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
+const { PASSWORD_MIN, PASSWORD_MAX } = require("../utils/passwordResetOtp");
 
 const updatePassword = async (req, res, next) => {
-  const { password } = req.body;
-  const id = req.id;
-
   try {
-    // Basic validation
-    if (!password || password.length < 6) {
-      const error = new Error("Password must be at least 6 characters");
+    const password = req.body?.password;
+    const id = req.id;
+
+    if (typeof password !== "string" || password.length < PASSWORD_MIN) {
+      const error = new Error(`Password must be at least ${PASSWORD_MIN} characters`);
       error.statusCode = 400;
       throw error;
     }
 
-    const findedUser = await User.findById(id);
-    if (!findedUser) {
-      const error = new Error("User not found");
-      error.statusCode = 404;
-      throw error;
-    }
-
-    // Check if OTP was verified
-    if (!findedUser.password_otp.status) {
-      const error = new Error("OTP not verified");
+    if (password.length > PASSWORD_MAX) {
+      const error = new Error(`Password must be at most ${PASSWORD_MAX} characters`);
       error.statusCode = 400;
       throw error;
     }
 
-    // Check if OTP expired already
-    if (findedUser.password_otp.time < Date.now()) {
-      const error = new Error("OTP expired");
-      error.statusCode = 400;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      const error = new Error("Invalid password reset session");
+      error.statusCode = 403;
       throw error;
     }
 
-    // Hash new password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Update password
-    findedUser.password = hashedPassword;
+    const updatedUser = await User.findOneAndUpdate(
+      {
+        _id: id,
+        "password_otp.status": true,
+        "password_otp.time": { $gte: Date.now() },
+      },
+      {
+        $set: {
+          password: hashedPassword,
+          "password_otp.status": false,
+          "password_otp.otp": null,
+          "password_otp.time": null,
+          "password_otp.verify_attempts": 0,
+        },
+      },
+      { new: true }
+    );
 
-    // Clear OTP & status
-    findedUser.password_otp.status = false;
-    findedUser.password_otp.otp = null;   // IMPORTANT (delete OTP)
-    findedUser.password_otp.time = null;  // Remove expiry too
+    if (!updatedUser) {
+      const error = new Error("Password reset verification is missing or expired");
+      error.statusCode = 400;
+      throw error;
+    }
 
-    await findedUser.save();
-
-    // Clear login tokens (force new login)
-    // Attributes must match the original Set-Cookie for Android Chrome to actually clear them
     const isProd = process.env.NODE_ENV === "production";
     const clearOpts = {
       httpOnly: true,
@@ -65,6 +68,10 @@ const updatePassword = async (req, res, next) => {
       status: true,
     });
   } catch (error) {
+    if (error.name === "CastError") {
+      error.statusCode = 400;
+      error.message = "Invalid password reset session";
+    }
     next(error);
   }
 };

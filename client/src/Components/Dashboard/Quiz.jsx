@@ -17,6 +17,8 @@ const Quiz = ({ module, modProgress, onComplete }) => {
     const [showFeedback, setShowFeedback] = useState(false);
     const [finished, setFinished] = useState(false);
     const [finalScore, setFinalScore] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
     const finalizeOnce = useRef(false);
 
     const passed = !!modProgress?.quizPassed;
@@ -30,13 +32,28 @@ const Quiz = ({ module, modProgress, onComplete }) => {
         setShowFeedback(true);
     };
 
-    const computeScore = (ans) => {
-        if (!questions.length) return 100;
-        let correct = 0;
-        for (let i = 0; i < questions.length; i++) {
-            if (ans[i] === questions[i].correctAnswer) correct += 1;
+    const submitAnswers = async (answerMap) => {
+        if (finalizeOnce.current) return;
+        finalizeOnce.current = true;
+        setSubmitting(true);
+        setSubmitError('');
+        try {
+            const result = await onComplete(
+                questions.map((_, index) =>
+                    Number.isInteger(answerMap[index]) ? answerMap[index] : null
+                )
+            );
+            if (!result?.success || !Number.isFinite(result.quizScore)) {
+                throw new Error(result?.message || 'Unable to submit quiz');
+            }
+            setFinalScore(result.quizScore);
+            setFinished(true);
+        } catch (error) {
+            setSubmitError(error.message || 'Unable to submit quiz');
+            finalizeOnce.current = false;
+        } finally {
+            setSubmitting(false);
         }
-        return Math.round((correct / questions.length) * 100);
     };
 
     const goNext = () => {
@@ -44,13 +61,7 @@ const Quiz = ({ module, modProgress, onComplete }) => {
             setCurrent((c) => c + 1);
             setShowFeedback(false);
         } else {
-            const sc = computeScore({ ...answers, [current]: answers[current] });
-            setFinalScore(sc);
-            setFinished(true);
-            if (sc >= PASS_SCORE && !passed && !finalizeOnce.current) {
-                finalizeOnce.current = true;
-                onComplete(sc);
-            }
+            submitAnswers({ ...answers, [current]: answers[current] });
         }
     };
 
@@ -85,10 +96,17 @@ const Quiz = ({ module, modProgress, onComplete }) => {
                         ? ' Complete the module to continue when you’re ready.'
                         : ' Finish all lessons first, then you can finalize this module here.'}
                 </p>
-                {doneLessons && !passed && (
+                {finished ? (
+                    <p style={{ color: '#059669', marginBottom: 20 }}>
+                        Module complete. You can continue to the next module.
+                    </p>
+                ) : null}
+                {submitError && <p role="alert" style={{ color: '#dc2626', marginBottom: 12 }}>{submitError}</p>}
+                {doneLessons && !passed && !finished && (
                     <button
                         type="button"
-                        onClick={() => onComplete(100)}
+                        disabled={submitting}
+                        onClick={() => submitAnswers([])}
                         style={{
                             padding: '12px 28px',
                             background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
@@ -100,7 +118,7 @@ const Quiz = ({ module, modProgress, onComplete }) => {
                             cursor: 'pointer',
                         }}
                     >
-                        Complete module (no quiz)
+                        {submitting ? 'Submitting…' : 'Complete module (no quiz)'}
                     </button>
                 )}
             </div>
@@ -127,6 +145,8 @@ const Quiz = ({ module, modProgress, onComplete }) => {
                             setShowFeedback(false);
                             setFinished(false);
                             setFinalScore(null);
+                            setSubmitError('');
+                            finalizeOnce.current = false;
                         }}
                         style={{
                             display: 'inline-flex',
@@ -159,8 +179,10 @@ const Quiz = ({ module, modProgress, onComplete }) => {
                         onAnswer={handleAnswer}
                         answered={answeredForCurrent}
                         selectedAnswer={answers[current]}
-                        showFeedback={showFeedback}
                     />
+                    {submitError && (
+                        <p role="alert" style={{ color: '#dc2626', marginTop: 16 }}>{submitError}</p>
+                    )}
                     {answeredForCurrent && showFeedback && (
                         <motion.div
                             initial={{ opacity: 0, y: 8 }}
@@ -169,6 +191,7 @@ const Quiz = ({ module, modProgress, onComplete }) => {
                         >
                             <button
                                 type="button"
+                                disabled={submitting}
                                 onClick={goNext}
                                 style={{
                                     width: '100%',
@@ -182,7 +205,11 @@ const Quiz = ({ module, modProgress, onComplete }) => {
                                     fontSize: 15,
                                 }}
                             >
-                                {current >= questions.length - 1 ? 'Submit' : 'Next question'}
+                                {submitting
+                                    ? 'Submitting…'
+                                    : current >= questions.length - 1
+                                        ? 'Submit'
+                                        : 'Next question'}
                             </button>
                         </motion.div>
                     )}

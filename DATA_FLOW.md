@@ -155,19 +155,18 @@ sequenceDiagram
     end
     
     Mongo-->>CourseRoute: { course, progress }
-    CourseRoute-->>React: 200 { course, progress }
+    CourseRoute-->>React: 200 { course without quiz answer keys, progress }
     React-->>User: Render lesson content
 
     User->>React: Completes lesson → clicks "Mark Complete"
-    React->>Express: PUT /courses/:courseId/lesson/:lessonId/complete<br/>{ xpEarned: 20, score: 85 }
+    React->>Express: PUT /courses/:courseId/lesson/:lessonId/complete
     Express->>AuthMW: auth (strict)
     AuthMW->>CourseRoute: req.id verified
     CourseRoute->>Mongo: ensureUserProgress(userId, courseId)
-    CourseRoute->>Mongo: Find lesson in progress.modules[].lessons[]
-    CourseRoute->>CourseRoute: Mark lesson.completed = true<br/>lesson.xpEarned = xpEarned<br/>Recalculate overallProgress %
-    CourseRoute->>Mongo: User.findById(userId)
-    CourseRoute->>Mongo: user.xp.totalXP += xpEarned<br/>Level-up loop if needed
-    CourseRoute->>Mongo: user.save() + progress.save()
+    CourseRoute->>CourseRoute: Find server-side lesson reward; require unlocked module
+    CourseRoute->>Mongo: Atomically mark incomplete lesson and add its server-defined XP
+    CourseRoute->>CourseRoute: Recalculate overallProgress %
+    CourseRoute->>Mongo: Increment user XP and apply level-ups
     Mongo-->>CourseRoute: Saved
     CourseRoute-->>React: 200 { success: true, progress }
     React-->>User: Show XP animation + progress update
@@ -187,11 +186,12 @@ sequenceDiagram
     participant Mongo as MongoDB
 
     User->>React: Passes module quiz → triggers completion
-    React->>Express: PUT /courses/:courseId/module/:moduleId/complete<br/>{ quizScore: 90 }
+    React->>Express: PUT /courses/:courseId/module/:moduleId/complete<br/>{ answers: [1, 0, 2] }
     Express->>CourseRoute: auth verified
     CourseRoute->>Mongo: Course.findById + ensureUserProgress
-    CourseRoute->>CourseRoute: modProgress.completed = true<br/>modProgress.quizScore = 90<br/>modProgress.quizPassed = true (90 >= 70)<br/>xpEarned += modData.xpReward
-    CourseRoute->>Mongo: User.xp += xpReward, level-up check
+    CourseRoute->>CourseRoute: Grade answers against server-side answer keys; require all lessons complete
+    CourseRoute->>CourseRoute: On pass, record score and server-defined XP once
+    CourseRoute->>Mongo: Increment user XP and apply level-ups
     CourseRoute->>CourseRoute: Unlock next module in progress.modules[]
     CourseRoute->>CourseRoute: Check if ALL modules completed
     
@@ -261,35 +261,32 @@ sequenceDiagram
     React->>Express: POST /user/password/forget { email }
     Express->>ForgotCtrl: forgotPassword(req,res)
     ForgotCtrl->>Mongo: User.findOne({ email })
-    ForgotCtrl->>ForgotCtrl: Generate 6-digit OTP<br/>Set expiry = now + 10min
+    ForgotCtrl->>ForgotCtrl: Generate cryptographically random 6-digit OTP<br/>Set expiry = now + 2min
     ForgotCtrl->>Mongo: user.password_otp = { otp, time, attempts:5 }
     ForgotCtrl->>Mongo: user.save()
     ForgotCtrl->>Mail: sendMail({ to: email, subject: "OTP", text: otp })
     Mail-->>User: Email with OTP code
-    ForgotCtrl-->>React: 200 { message: "OTP sent" }
+    ForgotCtrl-->>React: 200 { message, expiresAt }
     React-->>User: Navigate to /auth/otp/verify
 
     User->>React: Enters OTP
     React->>Express: POST /user/otp/verify { email, otp }
     Express->>OtpCtrl: verifyOtp(req,res)
-    OtpCtrl->>Mongo: Check user.password_otp.otp, expiry, attempts
+    OtpCtrl->>Mongo: Match email and OTP; check expiry
     
     alt OTP valid
-        OtpCtrl->>Mongo: user.password_otp.status = true
-        OtpCtrl-->>React: 200 { verified: true }
+        OtpCtrl->>Mongo: Mark OTP verified and clear OTP code
+        OtpCtrl-->>React: 200 { status: true, resetToken }
         React-->>User: Navigate to /auth/password/change
     else Invalid / expired
-        OtpCtrl->>Mongo: user.password_otp.attempts -= 1
         OtpCtrl-->>React: 400 { message: "Invalid OTP" }
     end
 
     User->>React: Enters new password
-    React->>Express: POST /user/password/update { email, newPassword }
+    React->>Express: POST /user/password/update<br/>Authorization: Bearer resetToken<br/>{ password }
     Express->>UpdCtrl: updatePassword(req,res)
-    UpdCtrl->>Mongo: Verify password_otp.status === true
     UpdCtrl->>UpdCtrl: bcrypt.hash(newPassword, 10)
-    UpdCtrl->>Mongo: user.password = hash<br/>user.password_otp = cleared
-    UpdCtrl->>Mongo: user.save()
+    UpdCtrl->>Mongo: Atomically consume verified OTP state and store password hash
     UpdCtrl-->>React: 200 { message: "Password updated" }
     React-->>User: Redirect to /auth/login
 ```

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import "./auth.css";
@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 
 const NewPassword = () => {
   const { navigate, loading, setLoading } = useGeneral();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const initialState = { password: "" };
 
@@ -20,13 +21,37 @@ const NewPassword = () => {
   });
 
   const submitHandler = async (values) => {
-    const data = { url: apis().updatePassword, method: "POST", body: { password: values.password } };
+    const resetToken = sessionStorage.getItem("passwordResetToken");
+    if (!resetToken) {
+      toast.error("Please verify your password reset code first");
+      navigate("/auth/password/forget");
+      return;
+    }
+    const data = {
+      url: apis().updatePassword,
+      method: "POST",
+      headers: { Authorization: `Bearer ${resetToken}` },
+      body: { password: values.password },
+      silent: true,
+      surfaceError: true,
+    };
+    setErrorMessage("");
     setLoading(true);
-    const result = await httpAction(data);
-    setLoading(false);
-    if (result?.status) {
-      toast.success(result.message || "Password updated");
-      navigate("/auth/login");
+    try {
+      const result = await httpAction(data);
+      if (result?.status) {
+        sessionStorage.removeItem("passwordResetToken");
+        sessionStorage.removeItem("passwordResetEmail");
+        sessionStorage.removeItem("passwordResetExpiresAt");
+        toast.success(result.message || "Password updated");
+        navigate("/auth/login");
+      } else {
+        setErrorMessage(result?.message || "Could not update the password. Please try again.");
+      }
+    } catch (error) {
+      setErrorMessage(error?.message || "Could not update the password. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,6 +67,10 @@ const NewPassword = () => {
               <h2 className="mt-3 text-2xl font-semibold text-gray-800">Change password</h2>
               <p className="text-gray-500 text-sm">Create a new password</p>
             </div>
+
+            {errorMessage ? (
+              <p role="alert" className="text-sm text-red-600">{errorMessage}</p>
+            ) : null}
 
             <TextField
               label="New Password"

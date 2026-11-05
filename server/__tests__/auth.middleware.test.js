@@ -46,7 +46,11 @@ describe('auth middleware', () => {
 
     auth(req, res, next);
 
-    expect(mockVerifyImpl).toHaveBeenCalledWith('valid.jwt.token', process.env.ACCESS_TOKEN_KEY);
+    expect(mockVerifyImpl).toHaveBeenCalledWith(
+      'valid.jwt.token',
+      process.env.ACCESS_TOKEN_KEY,
+      { algorithms: ['HS256'] }
+    );
     expect(req.id).toBe('user-123');
     expect(req.email).toBe('test@example.com');
     expect(next).toHaveBeenCalledWith(/* no args */);
@@ -63,7 +67,11 @@ describe('auth middleware', () => {
 
     auth(req, res, next);
 
-    expect(mockVerifyImpl).toHaveBeenCalledWith('header.jwt.token', process.env.ACCESS_TOKEN_KEY);
+    expect(mockVerifyImpl).toHaveBeenCalledWith(
+      'header.jwt.token',
+      process.env.ACCESS_TOKEN_KEY,
+      { algorithms: ['HS256'] }
+    );
     expect(req.id).toBe('user-456');
     expect(next.mock.calls[0].length).toBe(0);
   });
@@ -146,7 +154,11 @@ describe('auth middleware', () => {
 
     auth(req, res, next);
 
-    expect(mockVerifyImpl).toHaveBeenCalledWith('cookie.token', process.env.ACCESS_TOKEN_KEY);
+    expect(mockVerifyImpl).toHaveBeenCalledWith(
+      'cookie.token',
+      process.env.ACCESS_TOKEN_KEY,
+      { algorithms: ['HS256'] }
+    );
     expect(req.id).toBe('cookie-user');
   });
 });

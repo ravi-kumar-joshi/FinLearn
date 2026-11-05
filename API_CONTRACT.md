@@ -226,7 +226,7 @@ Trigger OTP email for password reset.
 ```
 **Response `200`:**
 ```json
-{ "message": "OTP sent to your email", "status": true }
+{ "message": "OTP sent to your email", "status": true, "expiresAt": 1700000000000 }
 ```
 
 ---
@@ -239,9 +239,9 @@ Verify the password-reset OTP.
 ```json
 { "email": "ravi@example.com", "otp": 123456 }
 ```
-**Response `200`:**
+**Response `200`:** Returns a short-lived reset-only bearer token; it cannot access other protected APIs.
 ```json
-{ "status": true, "verified": true }
+{ "status": true, "resetToken": "<password-reset-only bearer token>" }
 ```
 
 ---
@@ -260,10 +260,11 @@ Get OTP expiry timestamp for the authenticated user (for countdown timer UI).
 ### `POST /user/password/update`
 Set a new password after OTP verification.
 
-**Auth required:** Yes (or verified via OTP flow)  
+**Auth required:** Password-reset-only bearer token returned by OTP verification.
+**Header:** `Authorization: Bearer <resetToken>`
 **Body:**
 ```json
-{ "email": "ravi@example.com", "newPassword": "newSecurePass123" }
+{ "password": "newSecurePass123" }
 ```
 **Response `200`:**
 ```json
@@ -423,7 +424,7 @@ Get full course content + user's progress. Auto-creates progress record on first
             "content": "<p>HTML content...</p>",
             "videoUrl": null,
             "resources": [],
-            "quiz": { "questions": [ { "id": "q1", "question": "...", "options": [...], "correctAnswer": 0 } ] }
+            "quiz": { "questions": [ { "id": "q1", "question": "...", "options": [...] } ] }
           }
         ]
       }
@@ -445,13 +446,7 @@ Mark a lesson as complete and award XP to the user.
 
 **Auth required:** Yes  
 **Params:** `courseId`, `lessonId`  
-**Body:**
-```json
-{
-  "xpEarned": 20,
-  "score": 85
-}
-```
+**Body:** No client-supplied reward or score is accepted; XP is taken from the course definition.
 **Response `200`:**
 ```json
 {
@@ -467,9 +462,9 @@ Mark a module complete (after passing quiz). Awards XP, unlocks next module, and
 
 **Auth required:** Yes  
 **Params:** `courseId`, `moduleId`  
-**Body:**
+**Body:** Submit one selected option index per question, in the order returned by the course endpoint. The server grades answers and awards XP.
 ```json
-{ "quizScore": 90 }
+{ "answers": [1, 0, 2] }
 ```
 **Response `200`:**
 ```json

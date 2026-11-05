@@ -13,11 +13,6 @@ export function collectModuleQuizQuestions(module) {
                 id: q.id ?? `q-${n}`,
                 question: q.question,
                 options: Array.isArray(q.options) ? q.options : [],
-                correctAnswer:
-                    typeof q.correctAnswer === 'number'
-                        ? q.correctAnswer
-                        : Number(q.correctAnswer) || 0,
-                explanation: q.explanation ?? '',
                 timeLimit: q.timeLimit,
             });
             n += 1;

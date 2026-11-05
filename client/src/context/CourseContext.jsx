@@ -11,8 +11,8 @@
   - `loading`: boolean loading state while fetching
   - `error`: error message if fetch fails
   - `fetchCourse`: function to re-fetch course data
-  - `completeLesson(lessonId, xpEarned, score)`: marks a lesson complete
-  - `completeModule(moduleId, quizScore)`: marks a module complete
+  - `completeLesson(lessonId)`: marks a lesson complete
+  - `completeModule(moduleId, answers)`: submits quiz answers for server-side grading
   - `refreshProgress`: wrapper to refresh progress data
 */
 
@@ -58,15 +58,14 @@ export function CourseProvider({ courseId, children }) {
         if (courseId) fetchCourse(); // eslint-disable-line react-hooks/set-state-in-effect
     }, [courseId, fetchCourse]);
 
-    // Complete a lesson: sends a PUT request to the backend with XP/score
-    // and updates local progress state when successful. Also notifies
+    // Complete a lesson and update local progress state when successful. Also notifies
     // other parts of the app via `notifyCourseProgressUpdated` for realtime UI updates.
-    const completeLesson = useCallback(async (lessonId, xpEarned = 20, score) => {
+    const completeLesson = useCallback(async (lessonId) => {
         if (!courseId || !lessonId) return null;
         const res = await httpAction({
             url: `${apis().completeLessonApi}/${courseId}/lesson/${lessonId}/complete`,
             method: 'PUT',
-            body: { xpEarned, score },
+            body: {},
         });
         if (res?.success && res.progress) {
             setProgress(res.progress);
@@ -76,12 +75,12 @@ export function CourseProvider({ courseId, children }) {
     }, [courseId]);
 
     // Complete a module (usually at module-level quiz completion).
-    const completeModule = useCallback(async (moduleId, quizScore = 100) => {
+    const completeModule = useCallback(async (moduleId, answers = []) => {
         if (!courseId || !moduleId) return null;
         const res = await httpAction({
             url: `${apis().completeModuleApi}/${courseId}/module/${moduleId}/complete`,
             method: 'PUT',
-            body: { quizScore },
+            body: { answers },
         });
         if (res?.success && res.progress) {
             setProgress(res.progress);

@@ -31,7 +31,14 @@ const auth = (req, res, next) => {
 
     // Use SYNCHRONOUS jwt.verify to avoid race condition where next()
     // runs before the callback populates req.id / req.email.
-    const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_KEY);
+    const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_KEY, {
+      algorithms: ["HS256"],
+    });
+    if (decoded.purpose === "password_reset") {
+      const error = new Error("Password reset token cannot authenticate this request");
+      error.statusCode = 403;
+      throw error;
+    }
 
     req.id = decoded.id;
     req.email = decoded.email;

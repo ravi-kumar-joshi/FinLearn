@@ -23,6 +23,7 @@ const getLeaderboard = require("../controllers/getLeaderboard");
 
 // Import middleware
 const auth = require("../middlewares/auth");
+const passwordResetAuth = require("../middlewares/passwordResetAuth");
 
 const router = express.Router();
 
@@ -71,7 +72,7 @@ router.post("/profile/image", auth, uploadProfileImage);
 router.get("/otp/exp", auth, getOtpExpTime);
 
 
-router.post("/password/update", auth, updatePassword);
+router.post("/password/update", passwordResetAuth, updatePassword);
 
 // ==================== Email Change Flow ====================
 
