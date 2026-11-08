@@ -1,21 +1,4 @@
-/**
- * Google OAuth Strategy Setup
- *
- * Android-compatible OAuth flow:
- * The standard approach of setting cookies in the Google callback doesn't work
- * when the backend (Render) and frontend (Vercel) are on different domains —
- * cookies set on `finlearn-1.onrender.com` never reach the Vercel proxy domain.
- *
- * Solution: Instead of setting cookies in the callback, we generate a short-lived
- * "exchange code" (JWT, 60s expiry) and redirect the browser to the Vercel frontend
- * with that code. The client then calls `/user/set-token-cookies` through the Vercel
- * proxy, which sets the proper cookies on the Vercel domain.
- *
- * Flow:
- *   Client → /auth/google (Render) → Google OAuth → /auth/google/callback (Render)
- *   → 302 to ${ORIGIN}/auth/google/callback?code=<exchangeCode>
- *   → Client exchanges code via /api/user/set-token-cookies → cookies set on Vercel domain
- */
+
 const googleStrategy = require("passport-google-oauth20").Strategy;
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
@@ -58,20 +41,16 @@ const strategy = (app) => {
     }),
     googleAuth,
     (req, res) => {
-      // Generate a short-lived exchange code (JWT signed with ACCESS_TOKEN_KEY)
-      // This code is passed to the frontend which exchanges it for proper cookies
-      // via the Vercel proxy — solving the cross-domain cookie problem.
       const exchangeCode = jwt.sign(
         {
-          id: req.userId,           // set by googleAuth middleware
-          email: req.userEmail,     // set by googleAuth middleware
-          type: "oauth_code",       // marks this as an exchange code, not an access token
+          id: req.userId,      
+          email: req.userEmail,     
+          type: "oauth_code",
         },
         process.env.ACCESS_TOKEN_KEY,
-        { expiresIn: "60s" }        // very short-lived — single use
+        { expiresIn: "60s" }       
       );
 
-      // Redirect to the Vercel frontend with the exchange code
       const origin = process.env.ORIGIN || "https://fin-learn-client-ttsd.vercel.app";
       const isNewUser = req.isNewUser ? "&new=1" : "";
       const onboardingDone = req.onboardingCompleted ? "&onboarded=1" : "";

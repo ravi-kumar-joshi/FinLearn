@@ -26,68 +26,30 @@ const auth = require("../middlewares/auth");
 const passwordResetAuth = require("../middlewares/passwordResetAuth");
 
 const router = express.Router();
-
-// ==================== Public Routes ====================
-// These routes don't require authentication
-
-
 router.post("/login", login);
-
-
 router.post("/register", register);
-
-
-// POST: refresh access token using the refreshToken cookie (Android session persistence)
 router.post("/refresh-token", refreshToken);
-
-// POST: exchange a short-lived OAuth code for proper auth cookies on the Vercel domain
 router.post("/set-token-cookies", setTokenCookies);
-
-
 router.post("/password/forget", forgotPassword);
-
-
 router.post("/otp/verify", verifyOtp);
-
-
 router.get("/logout", logout);
-// ==================== Protected Routes ====================
-// These routes require JWT authentication (auth middleware)
-
 
 router.get("/access", auth, getAccess);
-
-
 router.get("/profile", auth, getUserProfile);
-
-
 router.put("/profile", auth, updateProfile);
-
-
 router.post("/profile/image", auth, uploadProfileImage);
 
-// ==================== Password Management ====================
-
-
 router.get("/otp/exp", auth, getOtpExpTime);
-
-
 router.post("/password/update", passwordResetAuth, updatePassword);
-
-// ==================== Email Change Flow ====================
-
 router.post("/profile/email/send-otp", auth, sendEmailOtp);
-
 router.post("/profile/email/verify-otp", auth, verifyEmailOtp);
 
-// ==================== Onboarding ====================
-router.post("/onboarding", auth, saveOnboarding);
 
+router.post("/onboarding", auth, saveOnboarding);
 router.post("/onboarding/skip", auth, skipOnboarding);
 
-// ==================== Gamification & Leaderboard ====================
 
 router.get("/leaderboard", auth, getLeaderboard);
 
-// Export router
+
 module.exports = router;

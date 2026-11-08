@@ -10,8 +10,6 @@ const skipOnboarding = async (req, res, next) => {
       error.statusCode = 404;
       throw error;
     }
-
-    // Mark onboarding as completed with default/empty values
     findedUser.onboarding = {
       completed: true,
       experience: "",

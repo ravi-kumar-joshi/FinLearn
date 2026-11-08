@@ -1,18 +1,3 @@
-/**
- * Update Profile Controller
- * 
- * Updates user profile information (name only)
- * Email changes require separate verification flow
- * 
- * @module controllers/updateProfile
- * @async
- * @param {Object} req.body - Request body
- * @param {string} [req.body.name] - User's new name
- * @returns {Object} Success response with updated user data
- * @throws {Error} 404 - User not found
- * @throws {Error} 400 - Email change attempted
- */
-
 const User = require("../models/User");
 
 const updateProfile = async (req, res, next) => {
@@ -33,8 +18,6 @@ const updateProfile = async (req, res, next) => {
       error.statusCode = 400;
       throw error;
     }
-
-    // Update profile fields if provided
     if (name) findedUser.name = name;
     if (phone) findedUser.phone = phone;
     if (location) findedUser.location = location;
@@ -44,9 +27,6 @@ const updateProfile = async (req, res, next) => {
     if (twitter) findedUser.twitter = twitter;
     if (linkedin) findedUser.linkedin = linkedin;
     if (github) findedUser.github = github;
-
-    // IMPORTANT: Only validate modified fields to avoid enum validation errors
-    // on unchanged onboarding fields
     await findedUser.save({ validateModifiedOnly: true });
 
     res.status(200).json({

@@ -7,13 +7,7 @@ const auth = require('../middlewares/auth')
 const adminOnly = require('../middlewares/admin')
 
 const router = express.Router()
-
-// Protect all admin routes
 router.use(auth, adminOnly)
-
-// ============ COURSES CRUD ============
-
-// GET all courses
 router.get('/courses', async (req, res) => {
     try {
         const courses = await Course.find().sort({ createdAt: -1 }).lean()
@@ -24,7 +18,6 @@ router.get('/courses', async (req, res) => {
     }
 })
 
-// GET single course
 router.get('/courses/:id', async (req, res) => {
     try {
         const { id } = req.params

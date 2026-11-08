@@ -1,7 +1,6 @@
 
 const mongoose = require("mongoose");
 
-
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -19,7 +18,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      // Not required - Google OAuth users won't have passwords
       minlength: [6, 'Password must be at least 6 characters']
     },
     profileImage: {
@@ -74,12 +72,12 @@ const userSchema = new mongoose.Schema(
         default: null
       },
       time: {
-        type: Number, // Expiry timestamp
+        type: Number, 
         default: null
       },
       attempts: {
         type: Number,
-        default: 5, // Changed from 4 to 5 for better UX
+        default: 5,
         min: 0,
         max: 5
       },
@@ -94,7 +92,7 @@ const userSchema = new mongoose.Schema(
       },
       status: {
         type: Boolean,
-        default: false // true when OTP is verified
+        default: false 
       },
     },
 
@@ -105,7 +103,7 @@ const userSchema = new mongoose.Schema(
         default: null
       },
       time: {
-        type: Number, // Expiry timestamp
+        type: Number, 
         default: null
       },
       newEmail: {
@@ -116,7 +114,7 @@ const userSchema = new mongoose.Schema(
       },
       attempts: {
         type: Number,
-        default: 5, // Changed from 4 to 5
+        default: 5, 
         min: 0,
         max: 5
       },
@@ -197,8 +195,6 @@ const userSchema = new mongoose.Schema(
       },
       experience: {
         type: String,
-        // Recommended values: 'beginner', 'intermediate', 'advanced'
-        // Enum removed to allow flexibility
         default: null
       },
       goals: [{
@@ -206,14 +202,10 @@ const userSchema = new mongoose.Schema(
       }],
       timeCommitment: {
         type: String,
-        // Recommended values: '1-2 hours/week', '3-5 hours/week', '6+ hours/week'
-        // Enum removed to allow flexibility
         default: null
       },
       learningStyle: {
         type: String,
-        // Recommended values: 'visual', 'reading', 'interactive', 'video'
-        // Enum removed to allow flexibility
         default: null
       },
       currentSituation: {
@@ -240,8 +232,8 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt automatically
-    // Note: 'timeseries' was likely a typo, changed to 'timestamps'
+    timestamps: true, 
+  
   }
 );
 

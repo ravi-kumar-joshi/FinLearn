@@ -1,10 +1,3 @@
-/**
- * Verify OTP Controller
- *
- * Checks the hashed password-reset OTP and atomically consumes it.
- * A second request with the same code cannot issue another reset token.
- */
-
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const {

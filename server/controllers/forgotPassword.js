@@ -1,12 +1,3 @@
-/**
- * Forgot Password Controller
- *
- * Sends a password-reset OTP. Unknown addresses get the same success
- * payload as known ones so the endpoint cannot be used to enumerate accounts.
- * Send attempts are compare-and-swapped so two parallel requests cannot both
- * spend the same remaining attempt.
- */
-
 const User = require("../models/User");
 const { randomInt } = require("node:crypto");
 const sendMail = require("../utils/sendMail");

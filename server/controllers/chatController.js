@@ -62,7 +62,7 @@ exports.chat = async (req, res) => {
 
     // OpenRouter API call
     const completion = await client.chat.completions.create({
-      model: "moonshotai/kimi-k2.6:free",
+       model: "openrouter/free",
       messages: [
         {
           role: "system",

@@ -119,10 +119,6 @@ const userProgressSchema = new mongoose.Schema(
     }
 );
 
-// Compound index stays here since it involves multiple fields
 userProgressSchema.index({ userId: 1, courseId: 1 }, { unique: true });
-
-// 🛠️ REMOVED THE DUPLICATE LINE FROM HERE:
-// userProgressSchema.index({ verificationId: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("UserProgress", userProgressSchema);

@@ -1,19 +1,3 @@
-/**
- * User Registration Controller
- * 
- * Creates a new user account with email and password
- * Passwords are hashed using bcrypt before storage
- * 
- * @module controllers/register
- * @async
- * @param {Object} req.body - Request body
- * @param {string} req.body.name - User's full name
- * @param {string} req.body.email - User's email address
- * @param {string} req.body.password - User's plain text password (will be hashed)
- * @returns {Object} Success message
- * @throws {Error} 400 - User already exists or validation failed
- */
-
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const register = async (req, res, next) => {

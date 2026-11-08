@@ -1,22 +1,6 @@
-/**
- * Auth Middleware
- *
- * Extracts the access token from the HttpOnly cookie, verifies it
- * synchronously (avoids the async-callback race condition where next()
- * could fire before req.id/req.email are set), and attaches the decoded
- * user fields to the request object for downstream controllers.
- *
- * Also falls back to the Authorization header for token transport
- * (useful when cookies are stripped by certain mobile proxies).
- */
 const jwt = require("jsonwebtoken");
-
 const auth = (req, res, next) => {
   try {
-    // NOTE: Removed debug logs that exposed request origins/cookies to prevent
-    // sensitive token leakage in production logs.
-
-    // Primary: HTTP-only cookie — Secondary: Authorization Bearer header
     const accessToken =
       req.cookies?.accessToken ||
       (req.headers.authorization?.startsWith("Bearer ")
@@ -28,9 +12,6 @@ const auth = (req, res, next) => {
       error.statusCode = 403;
       throw error;
     }
-
-    // Use SYNCHRONOUS jwt.verify to avoid race condition where next()
-    // runs before the callback populates req.id / req.email.
     const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_KEY, {
       algorithms: ["HS256"],
     });
@@ -45,7 +26,6 @@ const auth = (req, res, next) => {
 
     next();
   } catch (error) {
-    // Normalise JWT-specific errors into a 403
     if (
       error.name === "TokenExpiredError" ||
       error.name === "JsonWebTokenError" ||

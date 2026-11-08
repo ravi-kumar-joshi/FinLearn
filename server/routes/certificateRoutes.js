@@ -1,8 +1,3 @@
-/**
- * Public certificate verification routes
- * Mount: app.use('/certificates', certificateRoutes)
- */
-
 const express = require('express');
 const auth = require('../middlewares/auth');
 const UserProgress = require('../models/UserProgress');
@@ -34,10 +29,10 @@ async function handleVerify(req, res) {
     }
 }
 
-/** Public — lookup certificate by verification ID */
+
 router.get('/verify/:verifyId', handleVerify);
 
-/** Alias for OG / older clients */
+
 router.get('/og-meta/:verifyId', handleVerify);
 
 /** Authenticated — ensure verification ID exists for completed course */
