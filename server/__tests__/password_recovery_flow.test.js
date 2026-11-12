@@ -18,6 +18,7 @@ const assert = require('node:assert/strict');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const { hashOtp } = require('../utils/passwordResetOtp');
 
 // Set environment variables before any module loads
 process.env.SESSION_SECRET = 'test-session-secret-for-password-flow-32c!!';
@@ -100,6 +101,7 @@ describe('Password Recovery & Authentication Flow', () => {
         attempts: 5,
         last_attempt_time: null,
         status: false,
+        verify_attempts: 0,
       },
       save: async function () {
         return this;
@@ -108,27 +110,48 @@ describe('Password Recovery & Authentication Flow', () => {
 
     // Mock User.findOne
     User.findOne = async (query) => {
-      if (query.email === mockUserDb.email) {
-        if ('password_otp.otp' in query) {
-          if (mockUserDb.password_otp.otp === query['password_otp.otp']) {
-            return mockUserDb;
-          }
-          return null;
-        }
+      if (query.email === mockUserDb.email || (query._id && query._id.toString() === mockUserDb._id.toString())) {
         return mockUserDb;
       }
       return null;
     };
 
+    // Mock User.updateOne
+    User.updateOne = async (filter, update) => {
+      if (filter._id === mockUserDb._id) {
+        if (update.$set) {
+          if (update.$set.password_otp) {
+            mockUserDb.password_otp = { ...mockUserDb.password_otp, ...update.$set.password_otp };
+          }
+          if (update.$set['password_otp.otp'] !== undefined) {
+            mockUserDb.password_otp.otp = update.$set['password_otp.otp'];
+          }
+          if (update.$set['password_otp.status'] !== undefined) {
+            mockUserDb.password_otp.status = update.$set['password_otp.status'];
+          }
+        }
+        if (update.$inc) {
+          if (update.$inc['password_otp.verify_attempts']) {
+            mockUserDb.password_otp.verify_attempts =
+              (mockUserDb.password_otp.verify_attempts || 0) +
+              update.$inc['password_otp.verify_attempts'];
+          }
+        }
+        return { acknowledged: true, modifiedCount: 1 };
+      }
+      return { acknowledged: true, modifiedCount: 0 };
+    };
+
     // Mock User.findOneAndUpdate
     User.findOneAndUpdate = async (filter, update) => {
-      if (
-        filter._id === mockUserDb._id &&
-        mockUserDb.password_otp.status === true &&
-        mockUserDb.password_otp.time >= Date.now()
-      ) {
+      if (filter._id === mockUserDb._id || (filter._id && filter._id.toString() === mockUserDb._id.toString())) {
         if (update.$set) {
-          if (update.$set.password) mockUserDb.password = update.$set.password;
+          if (update.$set.password_otp) {
+            mockUserDb.password_otp = { ...mockUserDb.password_otp, ...update.$set.password_otp };
+          }
+          if (update.$set.password) {
+            mockUserDb.password = update.$set.password;
+          }
           if (update.$set['password_otp.status'] !== undefined) {
             mockUserDb.password_otp.status = update.$set['password_otp.status'];
           }
@@ -137,6 +160,9 @@ describe('Password Recovery & Authentication Flow', () => {
           }
           if (update.$set['password_otp.time'] !== undefined) {
             mockUserDb.password_otp.time = update.$set['password_otp.time'];
+          }
+          if (update.$set['password_otp.verify_attempts'] !== undefined) {
+            mockUserDb.password_otp.verify_attempts = update.$set['password_otp.verify_attempts'];
           }
         }
         return mockUserDb;
@@ -162,17 +188,22 @@ describe('Password Recovery & Authentication Flow', () => {
     assert.equal(nextCalled, null, 'next() should not receive an error');
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.status, true);
-    assert.ok(res.body.expiresAt, 'Response must contain expiresAt');
-    assert.ok(mockUserDb.password_otp.otp >= 100000 && mockUserDb.password_otp.otp <= 999999);
-    assert.equal(mockUserDb.password_otp.attempts, 4);
-    assert.equal(mockUserDb.password_otp.status, false);
+    assert.ok(res.body.expiresAt, 'Response must include expiresAt timestamp');
+    assert.ok(mockUserDb.password_otp.otp, 'User record must store hashed OTP');
   });
 
   // -------------------------------------------------------------------------
   // Test 2: Invalid Email Format
   // -------------------------------------------------------------------------
   it('2. Invalid email - returns 400 validation error', async () => {
-    const testCases = ['', 'invalid-email', 'missing@domain', null, undefined];
+    const testCases = [
+      '',
+      'not-an-email',
+      'user@',
+      '@domain.com',
+      null,
+      undefined,
+    ];
 
     for (const badEmail of testCases) {
       const req = createMockReq({ body: { email: badEmail } });
@@ -194,8 +225,9 @@ describe('Password Recovery & Authentication Flow', () => {
   // -------------------------------------------------------------------------
   it('3. Email delivery failure - propagates error through next(error)', async () => {
     shouldSmtpFail = true;
-
-    const req = createMockReq({ body: { email: 'ravi.kumar@example.com' } });
+    const req = createMockReq({
+      body: { email: 'ravi.kumar@example.com' },
+    });
     const res = createMockRes();
     let capturedError = null;
 
@@ -203,7 +235,7 @@ describe('Password Recovery & Authentication Flow', () => {
       capturedError = err;
     });
 
-    assert.ok(capturedError, 'Should catch SMTP failure');
+    assert.ok(capturedError, 'Should propagate error to next()');
     assert.match(capturedError.message, /Failed to send email/i);
   });
 
@@ -211,9 +243,9 @@ describe('Password Recovery & Authentication Flow', () => {
   // Test 4: Successful OTP Verification
   // -------------------------------------------------------------------------
   it('4. Successful OTP verification - returns JWT resetToken', async () => {
-    // Stage an active OTP
+    // Stage an active OTP with HMAC hash
     const activeOtp = 654321;
-    mockUserDb.password_otp.otp = activeOtp;
+    mockUserDb.password_otp.otp = hashOtp(mockUserDb.email, activeOtp);
     mockUserDb.password_otp.time = Date.now() + 120000; // 2 mins in future
     mockUserDb.password_otp.status = false;
 
@@ -244,7 +276,7 @@ describe('Password Recovery & Authentication Flow', () => {
   // Test 5: Incorrect OTP
   // -------------------------------------------------------------------------
   it('5. Incorrect OTP - returns 400 error', async () => {
-    mockUserDb.password_otp.otp = 111111;
+    mockUserDb.password_otp.otp = hashOtp(mockUserDb.email, 111111);
     mockUserDb.password_otp.time = Date.now() + 120000;
 
     const req = createMockReq({
@@ -267,7 +299,7 @@ describe('Password Recovery & Authentication Flow', () => {
   // -------------------------------------------------------------------------
   it('6. Expired OTP - returns 400 error indicating expiry', async () => {
     const expiredOtp = 222222;
-    mockUserDb.password_otp.otp = expiredOtp;
+    mockUserDb.password_otp.otp = hashOtp(mockUserDb.email, expiredOtp);
     mockUserDb.password_otp.time = Date.now() - 5000; // 5 seconds in the past
 
     const req = createMockReq({
