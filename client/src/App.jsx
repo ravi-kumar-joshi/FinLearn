@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Analytics } from '@vercel/analytics/next';
 
 // ==================== Pages ====================
 import Home from './pages/Home';
@@ -122,7 +121,6 @@ function App() {
         </Route>
 
       </Routes>
-       <Analytics />
     </>
   );
 }
