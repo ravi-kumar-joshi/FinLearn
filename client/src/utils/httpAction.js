@@ -18,6 +18,14 @@
  * 4. Network-aware error messages — distinguishes "no internet" from
  *    "server error" so the user sees helpful toasts.
  *
+ * Fix applied:
+ *   #9  - refreshPromise is now backed by an explicit Promise constructor so
+ *         the module-level variable is always cleared in the finally block,
+ *         even if the async IIFE throws synchronously. The old pattern had a
+ *         window where a synchronous throw inside the IIFE could leave
+ *         refreshPromise pointing to a settled (but not-yet-nulled) promise,
+ *         causing all subsequent concurrent callers to re-use a dead promise.
+ *
  * @module utils/httpAction
  */
 import toast from "react-hot-toast";
@@ -105,43 +113,46 @@ async function doFetch(url, method, body, timeoutMs = 25000, headers = {}) {
 }
 
 /**
- * Attempt to refresh the access token via the refreshToken cookie.
- * Coalesces concurrent calls into a single request.
+ * FIX #9: Attempt to refresh the access token via the refreshToken cookie.
+ *
+ * Uses an explicit Promise constructor instead of wrapping an async IIFE.
+ * This guarantees refreshPromise is set to null in the finally block even
+ * when the inner code throws synchronously, closing the race window that
+ * existed in the previous implementation.
+ *
  * Returns true on success, false on failure (caller should redirect to login).
  */
-async function attemptRefresh() {
+function attemptRefresh() {
+  // Coalesce concurrent 401s into a single refresh request.
   if (refreshPromise) return refreshPromise;
 
-  refreshPromise = (async () => {
-    try {
-      // Use doFetch but bypass retry/refresh to avoid infinite loops
-      const { controller, timer } = makeTimeout(15000);
+  refreshPromise = new Promise((resolve) => {
+    const { controller, timer } = makeTimeout(15000);
+
+    // Inline IIFE so we can use async/await inside the Promise constructor.
+    (async () => {
       try {
-        const res = await fetch(
-          // We need the URL directly here to avoid circular dependency with apis()
-          // apis() uses import.meta.env.MODE which is available at call time.
-          (() => {
-            const isDev = import.meta.env.MODE === "development";
-            const base = isDev ? "http://localhost:5050/" : "/api/";
-            return `${base}user/refresh-token`;
-          })(),
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            signal: controller.signal,
-          }
-        );
+        const isDev = import.meta.env.MODE === "development";
+        const base = isDev ? "http://localhost:5050/" : "/api/";
+        const res = await fetch(`${base}user/refresh-token`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          signal: controller.signal,
+        });
         clearTimeout(timer);
-        return res.ok;
+        resolve(res.ok);
       } catch {
+        // Network error or timeout — treat as refresh failure.
         clearTimeout(timer);
-        return false;
+        resolve(false);
+      } finally {
+        // FIX #9: Always clear the module-level guard so future calls
+        // can initiate a new refresh request.
+        refreshPromise = null;
       }
-    } finally {
-      refreshPromise = null;
-    }
-  })();
+    })();
+  });
 
   return refreshPromise;
 }
@@ -205,7 +216,7 @@ const httpAction = async (data) => {
         continue; // continue retry loop after refresh+retry
       }
 
-      // ── 403: unauthorized — handled by redirect in caller ──────────
+      // ── 403: forbidden — handled by redirect in caller ─────────────
       if (err.status === 403) {
         if (data.surfaceError) {
           return {

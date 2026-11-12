@@ -1,3 +1,23 @@
+/**
+ * Login Controller
+ *
+ * Authenticates user with email and password.
+ * Returns JWT tokens in HTTP-only cookies upon successful login.
+ *
+ * @module controllers/login
+ * @async
+ * @param {Object} req.body - Request body containing email and password
+ * @param {string} req.body.email - User's email address
+ * @param {string} req.body.password - User's plain text password
+ * @returns {Object} Success response with user data
+ * @throws {Error} 400 - User not found or incorrect password
+ *
+ * Security fixes applied:
+ *   #1  - Token removed from JSON body (lives in HttpOnly cookie only).
+ *   #5  - Removed console.log that leaked NODE_ENV to production logs.
+ *   #14 - generateToken now accepts named-options object for explicit expiry control.
+ */
+
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const generateToken = require("../utils/generateToken");
@@ -18,7 +38,9 @@ const login = async (req, res, next) => {
       throw error;
     }
     if (!findedUser.password) {
-      const error = new Error("This account was registered using Google Sign-In. Please use the 'Continue with Google' option to log in.");
+      const error = new Error(
+        "This account was registered using Google Sign-In. Please use the 'Continue with Google' option to log in."
+      );
       error.statusCode = 400;
       error.isGoogleAccount = true;
       throw error;
@@ -32,28 +54,31 @@ const login = async (req, res, next) => {
       throw error;
     }
 
-    // Generate JWT tokens (7 days expiry for access token)
-    const { accessToken, refreshToken } = generateToken(findedUser, "7d");
+    // FIX #14: generateToken accepts named options — both expiries are now explicit.
+    const { accessToken, refreshToken } = generateToken(findedUser, { accessExp: "7d" });
+
+    // Set cookies with appropriate security settings.
+    // Android Chrome requires Partitioned (CHIPS) flag for cross-site cookies.
     const isProd = process.env.NODE_ENV === "production";
-    console.log("NODE_ENV =", process.env.NODE_ENV);
 
     const cookieOptions = (maxDays) => ({
-      httpOnly: true,         
-      secure: isProd,          
-      sameSite: isProd ? 'none' : 'lax', 
-      partitioned: isProd,     
+      httpOnly: true,          // Prevents XSS attacks
+      secure: isProd,          // HTTPS only in production
+      sameSite: isProd ? "none" : "lax", // Required for cross-domain on Android
+      partitioned: isProd,     // CHIPS - prevents Android Chrome cookie blocking
       maxAge: maxDays * 24 * 60 * 60 * 1000,
-      path: '/',               
+      path: "/",               // Explicit path for consistent clearCookie behavior
     });
 
     res.cookie("accessToken", accessToken, cookieOptions(7));
     res.cookie("refreshToken", refreshToken, cookieOptions(30));
 
-  
+    // FIX #1: `token` field removed from response body.
+    // Sending the raw JWT in JSON risks XSS-based theft if the client ever
+    // stores it in localStorage. The HttpOnly cookie set above is sufficient.
     res.status(200).json({
       message: "Login successful",
       status: true,
-      token: accessToken,
       user: {
         id: findedUser._id,
         name: findedUser.name,

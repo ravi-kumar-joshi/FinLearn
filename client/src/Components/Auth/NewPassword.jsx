@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import "./auth.css";
-import { TextField, Button, CircularProgress } from "@mui/material";
+import {
+  TextField,
+  Button,
+  CircularProgress,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { MdOutlineUpdate } from "react-icons/md";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, Visibility, VisibilityOff } from "@mui/icons-material";
 import useGeneral from "../../hooks/useGeneral";
 import apis from "../../utils/apis";
 import httpAction from "../../utils/httpAction";
@@ -13,18 +19,30 @@ import toast from "react-hot-toast";
 const NewPassword = () => {
   const { navigate, loading, setLoading } = useGeneral();
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const initialState = { password: "" };
 
   const validationSchema = Yup.object({
-    password: Yup.string().min(6, "Minimum 6 characters").required("Password is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
   });
+
+  // Guard: if user lands here without a valid resetToken, redirect to start
+  useEffect(() => {
+    const resetToken = sessionStorage.getItem("passwordResetToken");
+    if (!resetToken) {
+      toast.error("Please verify your password reset code first");
+      navigate("/auth/password/forgot", { replace: true });
+    }
+  }, [navigate]);
 
   const submitHandler = async (values) => {
     const resetToken = sessionStorage.getItem("passwordResetToken");
     if (!resetToken) {
       toast.error("Please verify your password reset code first");
-      navigate("/auth/password/forget");
+      navigate("/auth/password/forgot");
       return;
     }
     const data = {
@@ -43,13 +61,17 @@ const NewPassword = () => {
         sessionStorage.removeItem("passwordResetToken");
         sessionStorage.removeItem("passwordResetEmail");
         sessionStorage.removeItem("passwordResetExpiresAt");
-        toast.success(result.message || "Password updated");
+        toast.success(result.message || "Password updated successfully");
         navigate("/auth/login");
       } else {
-        setErrorMessage(result?.message || "Could not update the password. Please try again.");
+        const msg = result?.message || "Could not update the password. Please try again.";
+        setErrorMessage(msg);
+        toast.error(msg);
       }
     } catch (error) {
-      setErrorMessage(error?.message || "Could not update the password. Please try again.");
+      const msg = error?.message || "Could not update the password. Please try again.";
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -65,7 +87,7 @@ const NewPassword = () => {
                 <MdOutlineUpdate className="text-2xl" />
               </div>
               <h2 className="mt-3 text-2xl font-semibold text-gray-800">Change password</h2>
-              <p className="text-gray-500 text-sm">Create a new password</p>
+              <p className="text-gray-500 text-sm">Create a new secure password</p>
             </div>
 
             {errorMessage ? (
@@ -75,7 +97,7 @@ const NewPassword = () => {
             <TextField
               label="New Password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               fullWidth
               size="small"
               value={values.password}
@@ -83,6 +105,15 @@ const NewPassword = () => {
               onBlur={handleBlur}
               error={touched.password && Boolean(errors.password)}
               helperText={touched.password && errors.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <Button
@@ -96,7 +127,13 @@ const NewPassword = () => {
               Change password
             </Button>
 
-            <Button variant="outlined" fullWidth startIcon={<ArrowBack />} onClick={() => navigate("/auth/login")}>
+            <Button
+              variant="outlined"
+              fullWidth
+              startIcon={<ArrowBack />}
+              onClick={() => navigate("/auth/login")}
+              className="rounded-lg!"
+            >
               Back to login
             </Button>
           </div>

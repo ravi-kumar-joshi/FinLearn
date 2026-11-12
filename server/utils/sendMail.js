@@ -1,44 +1,62 @@
 /**
- * Email Service - OTP Sender
- * 
- * Sends beautifully formatted OTP emails using Nodemailer and Gmail
- * Used for password reset and email verification flows
- * 
+ * Email Service - OTP Sender (Performance & Reliability Optimized)
+ *
+ * Sends beautifully formatted OTP emails using Nodemailer and Gmail SMTP.
+ *
+ * PERFORMANCE OPTIMIZATIONS:
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 1. Singleton Connection Pool (`pool: true`):
+ *    Reuses open SMTP connections, reducing email delivery latency.
+ * 2. Explicit Socket & Handshake Timeouts:
+ *    connectionTimeout (8s), greetingTimeout (5s), and socketTimeout (10s)
+ *    so slow connections fail fast with actionable errors rather than locking the UI.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
  * @module utils/sendMail
- * @async
- * @param {Object} data - Email configuration
- * @param {string} data.receiver - Recipient email address
- * @param {number} data.otp - 6-digit OTP code
- * @param {string} [data.subject] - Email subject line
- * @returns {Promise<Object>} Nodemailer success response
- * @throws {Error} If email sending fails
- * 
- * @example
- * await sendMail({
- *   receiver: "user@example.com",
- *   otp: 123456,
- *   subject: "Password Reset OTP"
- * });
  */
 
 const nodemailer = require("nodemailer");
 
-let transporter;
+// Cached singleton transporter
+let cachedTransporter = null;
+let lastPasswordHash = null;
 
-function getTransporter() {
-  const user = process.env.MAIL_USER;
-  const pass = process.env.MAIL_PASSWORD;
-  if (!user || !pass) {
-    throw new Error("MAIL_USER and MAIL_PASSWORD must be configured");
+/**
+ * Returns a pooled singleton Nodemailer transporter.
+ * Recreates the transporter only if MAIL_PASSWORD or MAIL_USER changes.
+ */
+const getTransporter = () => {
+  const mailPassword = process.env.MAIL_PASSWORD;
+  const mailUser = process.env.MAIL_USER || "6396rahulj@gmail.com";
+
+  if (!mailPassword) {
+    throw new Error("MAIL_PASSWORD not configured in environment");
   }
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user, pass },
-    });
+
+  // Reuse existing transporter if credentials haven't changed
+  if (cachedTransporter && lastPasswordHash === mailPassword) {
+    return cachedTransporter;
   }
-  return transporter;
-}
+
+  cachedTransporter = nodemailer.createTransport({
+    service: "gmail",
+    pool: true,               // Connection pooling: reuses open SMTP sockets
+    maxConnections: 3,        // Concurrency limit suited for shared/dev hosting
+    maxMessages: 100,         // Max messages per socket before clean recycle
+    rateDelta: 1000,          // Rate-limiting window
+    rateLimit: 5,             // Max 5 messages/sec to prevent Gmail throttle
+    connectionTimeout: 8000,  // 8s timeout to establish socket
+    greetingTimeout: 5000,    // 5s timeout for 220 greeting
+    socketTimeout: 10000,     // 10s timeout for data transfer
+    auth: {
+      user: mailUser,
+      pass: mailPassword,
+    },
+  });
+
+  lastPasswordHash = mailPassword;
+  return cachedTransporter;
+};
 
 const sendMail = async (data) => {
   try {
@@ -47,16 +65,17 @@ const sendMail = async (data) => {
       throw new Error("Receiver email and OTP are required");
     }
 
+    const mailUser = process.env.MAIL_USER || "6396rahulj@gmail.com";
     const transporter = getTransporter();
 
     /**
      * Email Configuration
-     * HTML template with inline CSS for cross-client compatibility
+     * Lightweight HTML template with inline styles for rapid rendering across all email clients
      */
     const mailOptions = {
       from: {
         name: "Financial Literacy Hub",
-        address: process.env.MAIL_USER,
+        address: mailUser,
       },
       to: data.receiver,
       subject: data.subject || "Your OTP for Password Reset",
@@ -73,7 +92,6 @@ const sendMail = async (data) => {
     border-radius:12px;
     box-shadow:0 4px 12px rgba(0,0,0,0.08);
   ">
-
     <div style="text-align:center;">
       <img 
         src="https://cdn-icons-png.flaticon.com/128/11472/11472815.png"
@@ -110,6 +128,11 @@ const sendMail = async (data) => {
       Do not share it with anyone for security reasons.
     </p>
 
+    <div style="background:#fff8e6; border:1px solid #ffd591; padding:10px 14px; border-radius:8px; margin:15px 0; font-size:12px; color:#ad4e00; line-height:1.5;">
+      ⏱️ <strong>Timestamp:</strong> ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}<br/>
+      💡 <em>If you receive more than one OTP email, always use the code from the most recent message.</em>
+    </div>
+
     <p style="font-size:13px; color:#777; text-align:center; margin-top:30px;">
       If you did not request this, you can safely ignore this email.
     </p>
@@ -122,20 +145,15 @@ const sendMail = async (data) => {
         Empowering your financial journey.
       </p>
     </div>
-
   </div>
-</div>
-
-      `,
+</div>`,
     };
 
-    // Send email
+    // Send email via pooled connection
     const success = await transporter.sendMail(mailOptions);
 
-    // Log success (in production, use proper logging service)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('✉️ Email sent successfully to:', data.receiver);
-      // Removed logging of the OTP value to avoid leaking sensitive one-time codes
+    if (process.env.NODE_ENV === "development") {
+      console.log("✉️ Email sent successfully to:", data.receiver);
     }
 
     return success;

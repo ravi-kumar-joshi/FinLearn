@@ -1,15 +1,20 @@
 /** Login Component
- * 
- * User authentication form with email and password
- * Supports both traditional login and Google OAuth
- * 
+ *
+ * User authentication form with email and password.
+ * Supports both traditional login and Google OAuth.
+ *
  * Features:
  * - Form validation using Formik and Yup
  * - Password visibility toggle
  * - Google Sign-In integration
  * - Automatic redirect to onboarding or dashboard
  * - Loading states and error handling
- * 
+ *
+ * Fix applied:
+ *   #13 - Added an inline aria-live error banner so API errors are visible
+ *         to screen readers and users who dismiss toasts quickly.
+ *         Previously errors were only surfaced via react-hot-toast.
+ *
  * @component
  */
 
@@ -42,6 +47,9 @@ const Login = () => {
   // State for password visibility toggle
   const [show, setShow] = useState(false);
 
+  // FIX #13: Track API error for accessible inline banner
+  const [apiError, setApiError] = useState(null);
+
   // Custom hook for navigation and loading state
   const { navigate, loading, setLoading } = useGeneral();
 
@@ -63,16 +71,19 @@ const Login = () => {
 
   /**
    * Form Submit Handler
-   * 
-   * Authenticates user and redirects based on onboarding status
-   * - New users or incomplete onboarding -> /auth/onboarding
-   * - Existing users with completed onboarding -> /dashboard
+   *
+   * Authenticates user and redirects based on onboarding status:
+   * - New users / incomplete onboarding → /auth/onboarding
+   * - Existing users with completed onboarding → /dashboard
    */
   const submitHandler = async (values) => {
+    // FIX #13: Clear any previous API error before a new attempt
+    setApiError(null);
+
     const data = {
       url: apis().loginUser,
       method: "POST",
-      body: values
+      body: values,
     };
 
     setLoading(true);
@@ -86,12 +97,19 @@ const Login = () => {
       } else {
         navigate("/dashboard");
       }
+    } else if (!result) {
+      // FIX #13: Surface error inline (toast is also shown by httpAction)
+      // so screen readers and users who miss the toast still see feedback.
+      setApiError("Login failed. Please check your credentials and try again.");
     }
-    // Error handling is done in httpAction utility
   };
 
   return (
-    <Formik initialValues={initialState} validationSchema={validationSchema} onSubmit={submitHandler}>
+    <Formik
+      initialValues={initialState}
+      validationSchema={validationSchema}
+      onSubmit={submitHandler}
+    >
       {({ handleBlur, handleChange, errors, touched, values }) => (
         <Form>
           <div className="w-full flex flex-col gap-6">
@@ -104,6 +122,19 @@ const Login = () => {
               <h2 className="mt-3 text-2xl font-semibold text-gray-800">Welcome Back</h2>
               <p className="text-gray-500 text-sm">Sign in to continue to your account</p>
             </div>
+
+            {/* FIX #13: Accessible inline error banner.
+                role="alert" + aria-live="assertive" ensures screen readers
+                announce the error immediately when it appears. */}
+            {apiError && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="bg-red-50 border border-red-300 text-red-700 px-4 py-2 rounded-lg text-sm"
+              >
+                {apiError}
+              </div>
+            )}
 
             {/* Form */}
             <div className="flex flex-col gap-4">
@@ -178,7 +209,6 @@ const Login = () => {
                 variant="text"
                 fullWidth
                 onClick={() => navigate("/auth/password/forgot")}
-
               >
                 <p className="text-red-400">Forgot password?</p>
               </Button>

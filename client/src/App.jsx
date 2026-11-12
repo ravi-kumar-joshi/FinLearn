@@ -1,5 +1,3 @@
-
-
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // ==================== Pages ====================
@@ -68,14 +66,18 @@ function App() {
         <Route path="/auth/login" element={<AuthLayout> <Login /> </AuthLayout>} />
         <Route path="/auth/register" element={<AuthLayout> <Register /> </AuthLayout>} />
         <Route path="/auth/password/forgot" element={<AuthLayout> <ForgetPassword /> </AuthLayout>} />
+        {/* Backward-compatibility alias for /auth/password/forget */}
+        <Route path="/auth/password/forget" element={<Navigate to="/auth/password/forgot" replace />} />
+
+        {/* Public Password Recovery routes - accessible without active login session */}
+        <Route path="/auth/otp/verify" element={<AuthLayout> <Verification /> </AuthLayout>} />
+        <Route path="/auth/password/change" element={<AuthLayout> <NewPassword /> </AuthLayout>} />
 
         {/* Google OAuth callback: exchanges code for cookies on the Vercel domain */}
         <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
         {/* The `Super` component protects these routes and redirects unauthenticated users */}
         <Route element={<Super />}>
-          <Route path="/auth/otp/verify" element={<AuthLayout> <Verification /> </AuthLayout>} />
-          <Route path="/auth/password/change" element={<AuthLayout> <NewPassword /> </AuthLayout>} />
           <Route path="/auth/onboarding" element={<AuthLayout> <Onboarding /> </AuthLayout>} />
         </Route>
 

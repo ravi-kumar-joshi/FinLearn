@@ -1,3 +1,13 @@
+/**
+ * Forgot Password Controller (Performance & Reliability Optimized)
+ *
+ * Handles password reset flow by sending HMAC-hashed OTP to user's email.
+ * Implements rate limiting (5 attempts per 24 hours), 30s debounce protection,
+ * and enumeration prevention.
+ *
+ * @module controllers/forgotPassword
+ */
+
 const User = require("../models/User");
 const { randomInt } = require("node:crypto");
 const sendMail = require("../utils/sendMail");
@@ -43,12 +53,22 @@ async function claimOtpSlot(user) {
     );
   }
 
+  // Debounce protection: prevent duplicate requests within 30 seconds
+  if (withinDay && now - lastAttempt < 30 * 1000 && previous.otp) {
+    const secondsLeft = Math.ceil((30 * 1000 - (now - lastAttempt)) / 1000);
+    throw httpError(
+      `An OTP was recently sent. Please wait ${secondsLeft}s before requesting a new one.`,
+      429
+    );
+  }
+
   const otp = randomInt(100000, 1000000);
   const expiresAt = now + OTP_TTL_MS;
+  const attemptsLeft = withinDay ? Math.max(0, previous.attempts - 1) : MAX_SEND_ATTEMPTS - 1;
   const nextState = {
     otp: hashOtp(user.email, otp),
     last_attempt_time: new Date(now),
-    attempts: withinDay ? Math.max(0, previous.attempts - 1) : MAX_SEND_ATTEMPTS - 1,
+    attempts: attemptsLeft,
     time: expiresAt,
     status: false,
     verify_attempts: 0,
@@ -73,13 +93,14 @@ async function claimOtpSlot(user) {
   );
 
   if (!updated) return null;
-  return { otp, expiresAt, previous, otpHash: nextState.otp };
+  return { otp, expiresAt, previous, otpHash: nextState.otp, attemptsLeft };
 }
 
 const forgotPassword = async (req, res, next) => {
-  const email = typeof req.body?.email === "string"
-    ? req.body.email.trim().toLowerCase()
-    : "";
+  const email =
+    typeof req.body?.email === "string"
+      ? req.body.email.trim().toLowerCase()
+      : "";
 
   try {
     if (!email || !/^\S+@\S+\.\S+$/.test(email) || email.length > 254) {
@@ -124,7 +145,10 @@ const forgotPassword = async (req, res, next) => {
     res.status(200).json({
       message: GENERIC_MESSAGE,
       status: true,
+      attemptsLeft: claimed.attemptsLeft,
       expiresAt: claimed.expiresAt,
+      ...(process.env.NODE_ENV === "development" &&
+        process.env.EXPOSE_OTP === "true" && { otp: claimed.otp }),
     });
   } catch (error) {
     next(error);

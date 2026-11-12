@@ -39,7 +39,7 @@ const Verification = () => {
   });
 
   // Recover the email and expiry returned by the public password-reset request.
-  const loadOtpTime = useCallback(async () => {
+  const loadOtpTime = useCallback(() => {
     const email = sessionStorage.getItem("passwordResetEmail") || "";
     const expiresAt = Number(sessionStorage.getItem("passwordResetExpiresAt"));
     setUserEmail(email);
@@ -49,6 +49,12 @@ const Verification = () => {
 
   useEffect(() => {
     let active = true;
+    const email = sessionStorage.getItem("passwordResetEmail");
+    if (!email) {
+      toast.error("Please enter your registered email first");
+      navigate("/auth/password/forgot", { replace: true });
+      return;
+    }
     loadOtpTime();
     const timer = setTimeout(() => {
       if (!active) return;
@@ -59,7 +65,7 @@ const Verification = () => {
       active = false;
       clearTimeout(timer);
     };
-  }, [loadOtpTime]);
+  }, [loadOtpTime, navigate]);
 
   // Auto shift to next input
   const handleOtpChange = (value, setFieldValue, field, index) => {
@@ -72,11 +78,24 @@ const Verification = () => {
     }
   };
 
+  // Support pasting full 6-digit OTP into any field
+  const handlePaste = (e, setFieldValue) => {
+    const pasteData = e.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, 6);
+    if (pasteData.length === 6) {
+      e.preventDefault();
+      pasteData.split("").forEach((char, idx) => {
+        setFieldValue(`otp${idx + 1}`, char);
+      });
+      const lastInput = document.getElementById("otp-6");
+      if (lastInput) lastInput.focus();
+    }
+  };
+
   // FIXED SUBMIT HANDLER
   const submitHandler = async (values) => {
     if (!userEmail) {
       toast.error("Start password reset by entering your email first");
-      navigate("/auth/password/forget");
+      navigate("/auth/password/forgot");
       return;
     }
 
@@ -97,6 +116,8 @@ const Verification = () => {
       url: apis().verifyOtp,
       method: "POST",
       body: { email: userEmail, otp: Number(code) },
+      timeout: 12000,
+      retries: 0,
     };
 
     setLoading(true);
@@ -107,10 +128,10 @@ const Verification = () => {
         toast.success(result.message || "OTP verified!");
         navigate("/auth/password/change");
       } else {
-        toast.error(result?.message || "Invalid OTP");
+        toast.error(result?.message || "Invalid or expired OTP");
       }
     } catch (error) {
-      toast.error(error?.message || "Invalid OTP");
+      toast.error(error?.message || "Invalid or expired OTP");
     } finally {
       setLoading(false);
     }
@@ -120,7 +141,7 @@ const Verification = () => {
   const resendOtpHandler = async () => {
     if (!userEmail) {
       toast.error("Start password reset by entering your email first");
-      navigate("/auth/password/forget");
+      navigate("/auth/password/forgot");
       return;
     }
 
@@ -128,6 +149,8 @@ const Verification = () => {
       url: apis().forgetPassword,
       method: "POST",
       body: { email: userEmail },
+      timeout: 12000,
+      retries: 0,
     };
 
     setLoading(true);
@@ -138,6 +161,8 @@ const Verification = () => {
         sessionStorage.setItem("passwordResetExpiresAt", String(result.expiresAt));
         toast.success(result.message || "OTP resent!");
         loadOtpTime();
+      } else {
+        toast.error(result?.message || "Could not resend the code");
       }
     } catch (error) {
       toast.error(error?.message || "Could not resend the code");
@@ -164,11 +189,16 @@ const Verification = () => {
                 <MdOutlineVerified className="text-2xl" />
               </div>
               <h2 className="mt-3 text-2xl font-semibold text-gray-800">Verify OTP</h2>
-              <p className="text-gray-500 text-sm">Enter the 6-digit code sent to your email</p>
+              <p className="text-gray-500 text-sm">
+                Enter the 6-digit code sent to <span className="font-medium text-gray-700">{userEmail || "your email"}</span>
+              </p>
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-1.5 rounded-lg text-center mt-2">
+                💡 If you received more than one email, please use the code from the <strong>latest email</strong>.
+              </div>
             </div>
 
             {/* OTP BOXES */}
-            <div className="flex justify-between gap-3">
+            <div className="flex justify-between gap-3" onPaste={(e) => handlePaste(e, setFieldValue)}>
 
               {otpFields.map((field, index) => (
                 <TextField

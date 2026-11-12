@@ -62,7 +62,7 @@ exports.chat = async (req, res) => {
 
     // OpenRouter API call
     const completion = await client.chat.completions.create({
-       model: "openrouter/free",
+      model: process.env.OPENROUTER_MODEL || "openrouter/free",
       messages: [
         {
           role: "system",

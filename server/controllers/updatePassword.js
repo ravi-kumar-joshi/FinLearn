@@ -26,6 +26,7 @@ const updatePassword = async (req, res, next) => {
       throw error;
     }
 
+    // Hash new password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const updatedUser = await User.findOneAndUpdate(
@@ -43,7 +44,7 @@ const updatePassword = async (req, res, next) => {
           "password_otp.verify_attempts": 0,
         },
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!updatedUser) {
@@ -52,6 +53,8 @@ const updatePassword = async (req, res, next) => {
       throw error;
     }
 
+    // Clear login tokens (force new login)
+    // Attributes must match the original Set-Cookie for Android Chrome to actually clear them
     const isProd = process.env.NODE_ENV === "production";
     const clearOpts = {
       httpOnly: true,

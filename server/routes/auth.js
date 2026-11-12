@@ -1,4 +1,3 @@
-
 const express = require("express");
 
 // Import controllers
@@ -41,15 +40,14 @@ router.post("/profile/image", auth, uploadProfileImage);
 
 router.get("/otp/exp", auth, getOtpExpTime);
 router.post("/password/update", passwordResetAuth, updatePassword);
+
+// ==================== Email Change Flow ====================
 router.post("/profile/email/send-otp", auth, sendEmailOtp);
 router.post("/profile/email/verify-otp", auth, verifyEmailOtp);
-
 
 router.post("/onboarding", auth, saveOnboarding);
 router.post("/onboarding/skip", auth, skipOnboarding);
 
-
 router.get("/leaderboard", auth, getLeaderboard);
-
 
 module.exports = router;
